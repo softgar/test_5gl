@@ -1,0 +1,81 @@
+﻿/**
+@descr	staber_forms3d_rproc <br>
+		staber_forms3d_rproc
+@author ccp
+@date	2025_11_06
+**/
+rc_class('staber_forms3d_rproc') :-
+
+	class +$ 'staber_forms3d_rproc' d ( es,'Ejemplos RDlg Engine ADA') sc function,
+    'staber_forms3d::demomode'(_, _, _, _),
+    'staber_forms3d_rproc_pattern::folders'(_, _, _, _).
+
+'staber_forms3d::demomode'(_, _OBJ_in, _, OBJ_out) :-
+    Title = 'Escenario simple para inicialización de Engine 3D ADA',
+
+    OBJ_form = {
+        type: 'forms3d',
+        busId: 'bus__forms3d_demomode',
+        events: [
+            {
+                type: 'init',
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        {
+                            type: "function",
+                            name: "new_rc3d",
+                            in: {
+                                deploy: "deploy__wasm"
+                            },
+                            context: { delegatedTo: 'builderweb' } 
+                        },
+                        { 
+                            type: 'function', 
+                            name: 'Start', 
+                            in: {
+                                demo: false,
+                                streaming: true
+                            },                     
+                            context: {
+                                delegatedTo: {
+                                    ras: {
+                                        path: '/staber/Execute',
+                                        transport: 'http'
+                                    },
+                                    implementedBy: 'C',
+                                    module: 's3d_web_agent_proxy',
+                                    logicalAgent: 'testapp'
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ_form,
+        hasKw: testapp_forms3d_demomode,
+        hasDsca: Title,
+        hasIcon: 'clipboard-ok',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_forms3d_rproc_pattern::folders'(_, _, _, _):-
+	Conf_folder = {
+		type: 'krp:folder',               
+        hasKw: folder__repositorioTests_rproc_forms3d,
+        hasDsca: 'Test FormS3d ADA Engine',
+        hasIcon: 'dinamic',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            testapp_forms3d_demomode
+        ]
+	},
+	create_rprocess(_, Conf_folder, _, _).

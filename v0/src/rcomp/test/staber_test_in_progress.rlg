@@ -1,0 +1,26 @@
+﻿/**
+@descr	staber_test_in_progress <br>
+		staber_test_in_progress
+@author gbl
+@date	2023_03_14
+**/
+rc_class('staber_test_in_progress') :-
+	class +$ 'staber_test_in_progress' d ( es,'Clase Para definicion de test en progreso') sc function,
+    'staber_test_in_progress::folders'(_, _, _, _).
+    
+'staber_test_in_progress::folders'(_, _, _, _):-
+    Title1 =  'Test in Progress',
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_test_in_progress,
+            hasDsca: Title1,
+            hasIcon: 'dinamic',
+            isRoot: false,
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [
+                       rproc__4gl_rform__001,
+                       rproc__4gl_kform__013
+            ]
+        },_,_).

@@ -1,0 +1,314 @@
+﻿/**
+@descr	staber_execprocess_rproc_pattern <br>
+		staber_execprocess_rproc_pattern
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_execprocess_rproc_pattern') :-
+
+	class +$ 'staber_execprocess_rproc_pattern' d ( es,'Ejemplos de ejecuciones de procesos') sc function,
+    'staber_execprocess_rproc_pattern::usecase_001'(_, _, _, _),
+    'staber_execprocess_rproc_pattern::usecase_002'(_, _, _, _),
+    'staber_execprocess_rproc_pattern::usecase_003'(_, _, _, _),
+    'staber_execprocess_rproc_pattern::usecase_004'(_, _, _, _),
+    'staber_execprocess_rproc_pattern::usecase_005'(_, _, _, _),
+    'staber_execprocess_rproc_pattern::folders'(_, _, _, _).
+
+'staber_execprocess_rproc_pattern::usecase_001'(_, _OBJ_in, _, OBJ_out) :-	
+    newKw('bus__execprocess__', BUS_PROCESS),
+    IN = {
+        resultFunction : 'esperando ejecución...'
+    },  
+    PROC = {
+            type: 'sequence',
+                context: {
+                   delegatedTo: 'builderweb'
+                },                       
+                hasProcess: [
+                    {
+                        type: 'function',                              
+                        name: 'staber_execprocess_rproc_pattern::execute',
+                        context: {
+                            delegatedTo: 'builderweb'
+                        }
+                    }                    
+                ]                                
+    },  
+    GUI_IN = {
+        type: 'button',                
+        label: { icon: 'ray', d: 'Ejecutar Proceso' },
+        events:[{
+                type: 'click',
+                method: 'set_propertyValue_exec',
+                payload: {property: 'resultFunction', value : 'Función servidor ejecutada'},
+                targetBusId: BUS_PROCESS
+            }
+        ]                           
+    },           
+    newKw('channel', CHANNEL),
+    Title = 'Ejecutar secuencia sencilla',    
+    Obj_proc = {        
+        type: 'rprocess',        
+        in: IN,
+        busId: BUS_PROCESS,
+        hasDsca: Title,
+        hasKw: rproc__4gl_execprocess__001,
+        hasChannel: CHANNEL,
+        hasIcon: 'dinamic',
+        do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_in: GUI_IN,        
+        gui_out: PROC,
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_execprocess_rproc_pattern::usecase_002'(_, _OBJ_in, _, OBJ_out) :-	
+    newKw('bus__execprocess__', BUS_PROCESS),
+    IN = {
+        resultFunction : 'esperando ejecución...'
+    },  
+    PROC = {
+            type: 'sequence',
+                context: {
+                   delegatedTo: 'builderweb'
+                },                       
+                hasProcess: [
+                    {
+                        type: 'function',                              
+                        name: 'staber_test_resultfunction',
+                        context: {
+                            delegatedTo: 'builderweb'
+                        }
+                    },
+                    {
+                        type: 'function',                              
+                        name: 'staber_execprocess_rproc_pattern::execute',
+                        context: {
+                            delegatedTo: 'builderweb'
+                        }
+                    }                    
+                ]                                
+    },  
+    GUI_IN = {
+        type: 'button',                
+        label: { icon: 'ray', d: 'Ejecutar Proceso' },
+        events:[{
+                type: 'click',
+                method: 'set_propertyValue_exec',
+                payload: {property: 'resultFunction', value : 'Inicializando...'},
+                targetBusId: BUS_PROCESS
+            }
+        ]                           
+    },           
+    newKw('channel', CHANNEL),
+    Title = 'Ejecutar dos llamadas a servidor',    
+    Obj_proc = {        
+        type: 'rprocess',        
+        in: IN,
+        busId: BUS_PROCESS,
+        hasDsca: Title,
+        hasKw: rproc__4gl_execprocess__002,
+        hasChannel: CHANNEL,
+        hasIcon: 'dinamic',
+        % do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_in: GUI_IN,        
+        gui_out: PROC,
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+
+'staber_execprocess_rproc_pattern::usecase_003'(_, _OBJ_in, _, OBJ_out) :-	
+    newKw('bus__execprocess__', BUS_PROCESS),
+    IN = {
+        resultFunction : 'esperando ejecución...'
+    },  
+    PROC = {
+        type: 'sequence',
+        context: {
+            delegatedTo: 'builderweb'
+        },                       
+        hasProcess: [
+            {
+                type: 'sequence',
+                hasProcess: [
+                    {type: 'function', in: {}, name: 'staber_test_resultfunction' },
+                    {type: 'function', in: {}, name: 'staber_execprocess_rproc_pattern::execute' }                                
+                ]
+            }
+        ]                                
+    },  
+    GUI_IN = {
+        type: 'button',                
+        label: { icon: 'ray', d: 'Ejecutar Proceso' },
+        events:[{
+                type: 'click',
+                method: 'set_propertyValue_exec',
+                payload: {property: 'resultFunction', value : 'Inicializando...'},
+                targetBusId: BUS_PROCESS
+            }
+        ]                           
+    },           
+    newKw('channel', CHANNEL),
+    Title = 'Ejecutar secuencia con dos llamadas a servidor',    
+    Obj_proc = {        
+        type: 'rprocess',        
+        in: IN,
+        busId: BUS_PROCESS,
+        hasDsca: Title,
+        hasKw: rproc__4gl_execprocess__003,
+        hasChannel: CHANNEL,
+        hasIcon: 'dinamic',
+        do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_in: GUI_IN,        
+        gui_out: PROC,
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_execprocess_rproc_pattern::usecase_004'(_, _OBJ_in, _, OBJ_out) :-	
+    newKw('bus__execprocess__', BUS_PROCESS),
+    IN = {
+        resultFunction : 'esperando ejecución...'
+    },  
+    PROC = {
+        type: 'sequence',
+        context: {
+            delegatedTo: 'builderweb'
+        },                       
+        hasProcess: [
+            { type: 'method', name: 'getContextInfo', module: 'SessionContext'},
+            {
+                type: 'sequence',
+                hasProcess: [
+                    {type: 'function', in: {}, name: 'staber_test_resultfunction' },
+                    {type: 'function', in: {}, name: 'staber_execprocess_rproc_pattern::execute' }                               
+                ]
+            }
+        ]                                
+    },  
+    GUI_IN = {
+        type: 'button',                
+        label: { icon: 'ray', d: 'Ejecutar Proceso' },
+        events:[{
+                type: 'click',
+                method: 'set_propertyValue_exec',
+                payload: {property: 'resultFunction', value : 'Inicializando...'},
+                targetBusId: BUS_PROCESS
+            }
+        ]                           
+    },           
+    newKw('channel', CHANNEL),
+    Title = 'Ejecutar metodo y secuencia con dos llamadas a servidor',    
+    Obj_proc = {        
+        type: 'rprocess',        
+        in: IN,
+        busId: BUS_PROCESS,
+        hasDsca: Title,
+        hasKw: rproc__4gl_execprocess__004,
+        hasChannel: CHANNEL,
+        hasIcon: 'dinamic',
+        do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_in: GUI_IN,        
+        gui_out: PROC,
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+
+'staber_execprocess_rproc_pattern::usecase_005'(_, _OBJ_in, _, OBJ_out) :-	
+    newKw('bus__execprocess__', BUS_PROCESS),
+    IN = {
+        resultFunction : 'esperando ejecución...'
+    },  
+    PROC = {
+        type: 'sequence',                     
+        hasProcess: [
+                    {type: 'function', in: {}, name: 'staber_test_resultfunction::appError',  context: {delegatedTo: 'builderweb'}},
+                    {type: 'function', in: {}, name: 'staber_execprocess_rproc_pattern::execute',  context: {delegatedTo: 'builderweb'}}                               
+                ]
+    },  
+    GUI_IN = {
+        type: 'button',                
+        label: { icon: 'ray', d: 'Ejecutar Proceso' },
+        events:[{
+                type: 'click',
+                method: 'set_propertyValue_exec',
+                payload: {property: 'resultFunction', value : 'Inicializando...'},
+                targetBusId: BUS_PROCESS
+            }
+        ]                           
+    },           
+    newKw('channel', CHANNEL),
+    Title = 'Ejecutar secuencia con fallo appError y retorno de mensaje',    
+    Obj_proc = {        
+        type: 'rprocess',        
+        in: IN,
+        busId: BUS_PROCESS,
+        hasDsca: Title,
+        hasKw: rproc__4gl_execprocess__005,
+        hasChannel: CHANNEL,
+        hasIcon: 'dinamic',
+        do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_in: GUI_IN,        
+        gui_out: PROC,
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+/*Predicates*/
+'staber_test_resultfunction'( Obj_ctx, Obj_in, Obj_ctx, Obj_out):-
+    obj_set( in:resultFunction, Obj_in, 'Función ejecutada', Obj_out).
+
+'staber_test_resultfunction::appError'( Obj_ctx, _Obj_in, Obj_ctx, Obj_out):-
+    Obj_out = { apperror: { type: infoMsg, txt: 'Al diablo' } }.
+    
+'staber_test_getuser'( Obj_ctx, Obj_in, Obj_ctx, Obj_out):-
+    obj_get( in:hasUser, Obj_in, Value, ''),
+    obj_set( in:resultFunction, Obj_in, Value, Obj_out).
+
+'staber_execprocess_rproc_pattern::execute'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_get(in:resultFunction, Obj_in, Value, ''),
+    Obj_out= {
+            type: 'text',
+            % enabled: false,
+            value: Value,                
+            label: {
+                d: 'Resultado de la ejecución de la secuencia'
+            }                
+     }.
+     
+'staber_execprocess_rproc_pattern::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_execprocess,
+        hasDsca: 'Test de Ejecución de Secuencias',
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__4gl_execprocess__001,
+            rproc__4gl_execprocess__002,
+            rproc__4gl_execprocess__003,
+            rproc__4gl_execprocess__004,
+            rproc__4gl_execprocess__005
+
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

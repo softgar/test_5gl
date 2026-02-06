@@ -1,0 +1,1021 @@
+﻿/**
+@descr	staber_kanvas <br>
+		staber_kanvas
+@author gbl
+@date	2024_06_20
+**/
+rc_class('staber_kanvas') :-    
+	class +$ 'staber_kanvas' d ( es,'Patrón rproc para kanvas') sc function,
+    'staber_kanvas::usecase__1'(_, _, _, _),
+    'staber_kanvas::usecase__2'(_, _, _, _),
+    'staber_kanvas::usecase__3'(_, _, _, _),
+    'staber_kanvas::usecase__4'(_, _, _, _),
+    'staber_kanvas::usecase__5'(_, _, _, _),
+    'staber_kanvas::usecase__6'(_, _, _, _),
+    'staber_kanvas::usecase__7'(_, _, _, _),
+    'staber_kanvas::folders'(_, _, _, _).
+
+'staber_kanvas::usecase__1'(_, _OBJ_in, _, OBJ_out):-
+    getTemplateProperty(TemplateProperty),
+    getCanvasProperties_usecase_001(CanvasProperties),
+    newKw('BusId_kanvas__',BUS_Kanvas),
+    KW = 'testapp_contacto_001',
+    KWC = 'testapp:contact',
+    I_dataset =  'Default',
+    TestDsca = kanvas_test_bussinesscard_uiML,
+    TestKW = 'test_kanvas__001',
+    Obj_in =  {
+        hasKw: KW,
+        hasKwc: KWC,
+        kanvasBusId: BUS_Kanvas,
+        enabled: false,
+        hasDataset: I_dataset,
+        canvasDefinition:{
+            background: {
+                source: '/repcon/f_get/repository/data/test_5gl_server/JobCardFrame.png',
+                color:  white,
+                size: auto
+            },
+            border: {
+                color: 'black',
+                width: 2
+            }
+        },
+        template:{
+            templateProperty: TemplateProperty,
+            canvasProperties: CanvasProperties
+        },
+        export: true
+    },
+    'staber_kanvas::gui_out__export'( TestKW, TestDsca, Obj_in, OBJ_out).
+
+'staber_kanvas::usecase__2'(_, _OBJ_in, _, OBJ_out):-
+    newKw('BusId_kanvas__',BUS_Kanvas),
+    KW = 'testapp_contacto_canvas_001',
+    KWC = 'testapp:contact_canvas',
+    I_dataset =  'Default',
+    TestDsca = 'Tarjeta de visita. Literales con agrupaciones y exportación',
+    TestKW = 'test_kanvas__002',
+    Obj_in =  {
+        hasKw: KW,
+        hasKwc: KWC,
+        enabled: false,
+        hasState: 'state_noedit',
+        kanvasBusId: BUS_Kanvas,
+        hasDataset: I_dataset,
+        hasAggrupationLegacy: true,
+        hasPropertySearchMode: 'customProperties',
+        hasCustomPropertyLst: [  'contact:hasName', 'contact:hasIdPhoto', 'contact:hasPhoneNumber', 'contact:hasEmail'],
+        canvasDefinition:{
+            background: {
+                source: '/repcon/f_get/repository/data/test_5gl_server/JobCardFrame.png',
+                color:  white,
+                size: auto
+            },
+            border: {
+                color: 'black',
+                width: 2
+            }
+        },
+        export: true
+    },
+    'staber_kanvas::gui_out__export'( TestKW, TestDsca, Obj_in, OBJ_out).
+
+'staber_kanvas::usecase__3'(_, _OBJ_in, _, OBJ_out):-
+    KW = 'testapp_contacto_canvas_witharc_001',
+    KWC = 'testapp:contact_canvas',
+    I_dataset =  'Default',
+    TestDsca = 'Tarjeta de visita. Valores calculados y con agrupaciones.',
+    TestKW = 'test_kanvas__003',
+    Obj_in =  {
+        hasKw: KW,
+        hasKwc: KWC,
+        enabled: false,
+        hasState: 'state_noedit',
+        hasDataset: I_dataset,
+        navigationFilter: 'all',
+        options: {
+            getSchema: true
+        },
+        hasAggrupationLegacy: true,
+        canvasDefinition:{
+            background: {
+                source: '/repcon/f_get/repository/data/test_5gl_server/JobCardFrame.png',
+                color:  white,
+                size: auto
+            },
+            border: {
+                color: 'black',
+                width: 2
+            }
+        }
+    },
+    'staber_kanvas::gui_out__1_common'( TestKW, TestDsca, Obj_in, OBJ_out).
+
+'staber_kanvas::usecase__4'(_, _OBJ_in, _, OBJ_out):-
+    KW = 'testapp_contacto_canvas_editable_001',
+    KWC = 'testapp:contact_canvas_editable',
+    I_dataset =  'Default',
+    TestDsca = kanvas_test_bussinesscardwithform_uiML,
+    TestKW = 'test_kanvas__004',
+    Obj_in =  {
+        hasKw: KW,
+        hasKwc: KWC,
+        enabled: true,
+        hasState: 'state_noedit',
+        hasDataset: I_dataset,
+        navigationFilter: 'all',
+        options: {
+            getSchema: true
+        },
+        hasAggrupationLegacy: true,
+        canvasDefinition:{
+            background: {
+                source: '/repcon/f_get/repository/data/test_5gl_server/JobCardFrame.png',
+                color:  white,
+                size: auto
+            },
+            border: {
+                color: 'black',
+                width: 2
+            }
+        }
+    },
+    'staber_kanvas::gui_out__1_common'( TestKW, TestDsca, Obj_in, OBJ_out).
+
+'staber_kanvas::usecase__5'(_, _OBJ_in, _, OBJ_out):-
+    newKw('bus_kanvasForm__', BUS_PROCESS),
+    TestDsca = 'Test componente para kanvas + kform',
+    TestKW = 'test_kanvas__005',
+    KW = 'testapp_contacto_canvas_editable_001',
+    KWC = 'testapp:contact_canvas_editable',
+    I_dataset =  'Default',
+    Overrides = [
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'kanvas::rc_gui_out::kanvas_kform', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         } 
+    ],
+    Channel_kanvas = 'kanvas_channel_for_test_with_rproc',
+    Channel_kform = 'kform_channel_for_test_with_rproc',
+    Obj_in =  {
+        hasKw: KW,
+        hasKwc: KWC,
+        enabled: true,
+        hasState: 'state_noedit',
+        hasDataset: I_dataset,
+        navigationFilter: 'all',
+        options: {
+            getSchema: true
+        },
+        hasChannelKanvas: Channel_kanvas,
+        hasChannelKform: Channel_kform
+    },
+    Obj_proc = {
+        type: 'rprocess',
+        busId: BUS_PROCESS,
+        in: Obj_in,
+        do_exec: true,
+        overrides: Overrides,
+        evtSubscribe:[
+            { topic: 'refreshNode', channel: Channel_kanvas},
+            { topic: 'refreshNode', channel: Channel_kform}
+        ],
+        hasDsca: [('es', TestDsca)],
+        hasKw: TestKW,
+        hasIcon: 'photo',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_kanvas::usecase__6'(_, _OBJ_in, _, OBJ_out):-
+    newKw('bus_kanvasForm__', BUS_PROCESS),
+    TestDsca = 'Test componente para kanvas en diálogo',
+    TestKW = 'test_kanvas__006',
+    KW = 'testapp_contacto_canvas_editable_001',
+    KWC = 'testapp:contact_canvas_editable',
+    I_dataset =  'Default',
+
+    Channel_kanvas = 'kanvas_channel_for_test_with_dlg',
+    Obj_in =  {
+        hasKw: KW,
+        hasKwc: KWC,
+        enabled: true,
+        hasState: 'state_noedit',
+        hasDataset: I_dataset,
+        navigationFilter: 'all',
+        options: {
+            getSchema: true
+        },
+        hasChannelKanvas: Channel_kanvas
+    },
+    Overrides = [
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'kanvas_test::dlg_content::kanvas', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         } 
+    ],
+	DLG_DATA = {
+		type: assembly,
+		classList: ['kanvasDlg'],
+		children: [
+			{
+				in: Obj_in,
+				type: 'rprocess',
+				busId: 'bus__kanvas__shaft',
+				hasChannel: '_.dlg.hasChannel',
+				do_exec: true,
+				overrides: Overrides,
+				evtSubscribe:[
+					{ topic: 'refreshNode', channel: Channel_kanvas}
+				]
+			}
+		]
+	},
+
+    GUI_OUT = {
+        type: assembly,
+        children: [
+            {
+                type: button,
+                label: {
+                    d: 'Show kanvas'
+                },
+                events: [
+                    {
+                        type: click,
+                        method: dialog_add,
+                        targetBusId: BUS_PROCESS,
+                        payload: {dlg_data: DLG_DATA}
+                    }
+                ]
+            }
+        ]
+    },
+    Obj_proc = {
+        type: 'rprocess',
+        busId: BUS_PROCESS,
+        in: Obj_in,
+        hasDlg: true,
+        dlg: {
+            type: 'rdlg',
+            classList: ['scroll']
+        },
+        do_exec: true,
+        gui_out: GUI_OUT,
+        hasDsca: [('es', TestDsca)],
+        hasKw: TestKW,
+        hasIcon: 'photo',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_kanvas::usecase__7'(_, _OBJ_in, _, OBJ_out):-
+    newKw('BusId_kanvas__',BUS_Kanvas),
+    newKw('BusId_kanvas__',BUS_Kanvas2),
+    KW = 'testapp_contacto_canvas_witharc_001',
+    KW2 = 'testapp_contacto_canvas_witharc_002',
+    KWC = 'testapp:contact_canvas_witharc',
+    I_dataset =  'Default',
+    TestDsca = 'Exportar múltiples kanvas.',
+    TestKW = 'test_kanvas__multiple_export',
+    Obj_in =  {
+        kanvasKw: {
+            first: KW,
+            second: KW2
+        },
+        hasKwc: KWC,
+        enabled: false,
+        hasState: 'state_noedit',
+        kanvasBusId: {
+            first: BUS_Kanvas,
+            second: BUS_Kanvas2
+        },
+        hasDataset: I_dataset,
+        hasAggrupationLegacy: true,
+        hasPropertySearchMode: 'customProperties',
+        % hasCustomPropertyLst: [  'contact:hasName', 'contact:hasIdPhoto', 'contact:hasPhoneNumber', 'contact:hasEmail'],
+        canvasDefinition:{
+            background: {
+                source: '/repcon/f_get/repository/data/test_5gl_server/JobCardFrame.png',
+                color:  white,
+                size: auto
+            },
+            border: {
+                color: 'black',
+                width: 2
+            }
+        },
+        export: true
+    },
+    'staber_kanvas::gui_out__multiple_export'( TestKW, TestDsca, Obj_in, OBJ_out).
+
+% GUI OUT AND AUX PREDICATES
+'kanvas::rc_gui_out::kanvas_kform'(_, Obj_in, _, Obj_out):-
+    'kanvas::editable_test_kform'(Obj_in, Obj_kform),
+    'kanvas::editable_test_kanvas'(Obj_in, Obj_kanvas),
+    Obj_out = {
+            type: assembly,
+        % style: { display: 'flex'},
+        children: [{
+            type: assembly,
+            width: 70,
+            children: [Obj_kanvas]
+        }, {
+            type: assembly,
+            width: 30,
+            children: [Obj_kform]
+        }]
+    }.
+
+'kanvas::rc_gui_out::gui_out__2_export'(_, ObjIn, _, ObjOut):-
+    obj_fetch(busId, ObjIn, BUS_PROCESS),
+    obj_fetch(in, ObjIn, KanvasIn),
+    obj_fetch(kanvasBusId, KanvasIn, BUS_Kanvas),
+    obj_fetch(exportObj, KanvasIn, ObjExport, {BUS_Kanvas: ''}),
+    obj_fetch(BUS_Kanvas, ObjExport, Value, ' '),
+    Obj_kanvas = {
+        type: 'kanvas',
+        busId: BUS_Kanvas,
+        in: KanvasIn
+    },
+    Obj_export = {
+        type: button,
+        label:{
+            d: 'Export'
+        },
+        events:[{
+            type: 'click',
+            targetBusId: BUS_PROCESS,
+            method: 'log',
+            p_exec:{
+                type: sequence,
+                hasProcess:[
+                    { type: 'method', name: 'exportToImage', busId: BUS_Kanvas },
+                    { type: 'method', name: 'change_config', busId: BUS_PROCESS }
+                ]
+            }
+        }]
+    },
+    Obj_text = {
+        type: text,
+        value: Value
+    },
+    Children = [Obj_kanvas, Obj_export, Obj_text],
+    ObjOut = {
+        type: assembly,
+        children: Children
+    }.
+
+
+
+'staber_kanvas::gui_out__export'( TestKW, TestDsca, Obj_in, OBJ_out):-
+    newKw('BusId_rprocess__',BUS_PROCESS),
+    Gui_out = [
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'kanvas::rc_gui_out::gui_out__2_export', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         } 
+    ],
+    Obj_proc = {
+        type: 'rprocess',
+        busId: BUS_PROCESS,
+        do_exec: true,
+        hasDsca: [('es', TestDsca)],
+        hasKw: TestKW,
+        in: Obj_in,
+        hasIcon: 'photo',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        overrides: Gui_out
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_kanvas::getcanvasForm'(Obj_kanvas):-
+    
+    Obj_kanvas = {
+      'type': 'canvasform',
+      'children': [
+        {
+          'type': 'text',
+          'value': 'ggg',
+          'position': {
+            'x': 10,
+            'y': -15
+          }
+        }
+      ],
+      'canvas': {
+        'type': 'canvas',
+        'background': {
+          'source': '/repcon/f_get/repository/data/test_5gl_server/JobCardFrame.png',
+          'color': 'black',
+          'size': 'auto'
+        },
+        'children': [
+          {
+            'type': 'label',
+            'd': 'Desierto',
+            'color': 'white',
+            'font': {
+              'size': '3rem'
+            },
+            'position': {
+              'x': 10,
+              'y': -15
+            }
+          },
+          {
+            'type': 'label',
+            'd': 'Bioma de clima árido, en donde las',
+            'font': {
+              'size': '1rem'
+            },
+            'position': {
+              'x': 12,
+              'y': 45
+            }
+          },
+          {
+            'type': 'label',
+            'color': 'dodgerblue',
+            'd': ' precipitaciones',
+            'font': {
+              'size': '1rem'
+            }
+          },
+          {
+            'type': 'label',
+            'd': ' son escasas.',
+            'font': {
+              'size': '1rem'
+            }
+          },
+          {
+            'type': 'label',
+            'd': 'powered by',
+            'color': 'white',
+            'font': {
+              'size': '1rem'
+            },
+            'position': {
+              'x': 430,
+              'y': 175
+            }
+          }
+        ]
+      }
+    }.
+
+'staber_kanvas::gui_out__1_common'( TestKW, TestDsca, OBJ_in, OBJ_out):-
+    newKw('BusId_kanvas__',BUS_Kanvas),
+    newKw('BusId_search__',BUS_PROCESS),
+    obj_fetch(enabled, OBJ_in, Enabled, false),
+    obj_fetch(hasDataset, OBJ_in, Dataset, 'Default'),
+
+    Obj_kanvas0 = {
+        type: 'kanvas',
+        busId: BUS_Kanvas,
+        hasDsca: TestDsca,
+        in: OBJ_in
+    },
+    (   Enabled == false ->
+        Obj_kanvas = Obj_kanvas0
+    ;   Events = {events:[
+            {
+                type: updateStmt,
+                method: updateStmt,
+                targetBusId: BUS_Kanvas,
+                payload: {
+                    hasDataset: Dataset,
+                    % hasConfiguration: "$.in.hasConfiguration",
+                    % hasEvent: "$.in.hasEvent",
+                    % hasState: "$.in.hasState",
+                    applyRules: true
+                },
+                p_exec: {
+                    type: sequence,
+                    hasProcess: [{
+                        type: function,
+                        name: builder50_updStmt,
+                        context: {
+                            delegatedTo: builderweb
+                        }
+                    }]
+                }
+            }
+        ]},
+        obj_merge(Obj_kanvas0, Events, Obj_kanvas)
+    ),
+    Gui_out = {
+        type: assembly,
+        children: [Obj_kanvas]
+    },
+    
+    Obj_proc = {
+        type: 'rprocess',
+        busId: BUS_PROCESS,
+        do_exec: true,
+        hasDsca: [('es', TestDsca)],
+        hasKw: TestKW,
+        hasIcon: 'photo',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_out: Gui_out
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'kanvas::editable_test_kanvas'(Obj_in0, Obj_out):-
+    newKw('kanvasChannel__', Df_channel),
+    newKw('kanvasBusId__', BUS_Kanvas),
+    obj_get(in, Obj_in0,  Obj_in1),
+    obj_get(hasChannelKanvas, Obj_in1,  Channel_kanvas, Df_channel),
+    Canvas_in =  {
+        hasAggrupationLegacy: true,
+        canvasDefinition:{
+            id: 'canvas_kform',
+            background: {
+                source: '/repcon/f_get/repository/data/test_5gl_server/JobCardFrame.png',
+                color:  white,
+                size: auto
+            },
+            border: {
+                color: 'black',
+                width: 2
+            }
+        }
+    },
+    obj_merge(Obj_in1, Canvas_in, Obj_in),
+    Obj_out = {
+        type: 'kanvas',
+        busId: BUS_Kanvas,
+        hasChannel: Channel_kanvas,
+        in: Obj_in,
+        events:[
+            {
+                type: updateStmt,
+                method: updateStmt,
+                targetBusId: BUS_Kanvas,
+                payload: {
+                    applyRules: true
+                },
+                p_exec: {
+                    type: sequence,
+                    hasProcess: [{
+                        type: function,
+                        name: builder50_updStmt,
+                        context: {
+                            delegatedTo: builderweb
+                        }
+                    }]
+                }
+            }
+        ]
+    }.
+
+'kanvas::editable_test_kform'(Obj_in0, Obj_form):-
+    newKw('BusId_form__', BusId_form),
+    newKw('kformChannel__', Df_channel),
+    obj_get(in, Obj_in0,  Obj_in1),
+    obj_get(hasChannelKform, Obj_in1,  Channel_kform, Df_channel),
+    Template = {
+        type: assembly,
+        children: [
+            {
+                arc: 'contact:hasName'
+            },
+            {
+                arc: 'contact:hasPhoneNumber'
+            },
+            {
+                arc: 'contact:hasEmail'
+            },
+            {
+                arc: 'pathAddresss_0contactAddress:hasAddressLine',
+                path:{
+                    arc: 'contactAddress:hasAddressLine',
+                    fromPath: pathAddress_0,
+                    pathAddress_0:[{
+                        from: '?IN',
+                        to: '?OUT',
+                        arc: 'contact:hasAddress',
+                        orda: 0
+                    }]
+                }
+            },
+            {
+                arc: 'pathAddresss_1contactAddress:hasAddressLine',
+                path:{
+                    arc: 'contactAddress:hasAddressLine',
+                    fromPath: pathAddress_1,
+                    pathAddress_1:[{
+                        from: '?IN',
+                        to: '?OUT',
+                        arc: 'contact:hasAddress',
+                        orda: 1
+                    }]
+                }
+            },
+            {
+                arc: 'contact:hasMaster'
+            }
+        ]
+    },
+    Form_in = {
+        template: Template
+    },
+    obj_merge(Obj_in1, Form_in, Obj_in),
+    Obj_form = {
+        type: kform,
+        busId: BusId_form,
+        hasChannel: Channel_kform,
+        in: Obj_in,
+        events:[
+            {
+                type: updateStmt,
+                method: updateStmt,
+                targetBusId: BusId_form,
+                payload: {
+                    applyRules: true
+                },
+                p_exec: {
+                    type: sequence,
+                    hasProcess: [{
+                        type: function,
+                        name: builder50_updStmt,
+                        context: {
+                            delegatedTo: builderweb
+                        }
+                    }]
+                }
+            }
+        ]
+    }.
+
+'staber_kanvas::gui_out__multiple_export'( TestKW, TestDsca, Obj_in, OBJ_out):-
+    newKw('BusId_rprocess__',BUS_PROCESS),
+    Gui_out = [
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'kanvas::rc_gui_out::gui_out__multiple_export', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         } 
+    ],
+    Obj_proc = {
+        type: 'rprocess',
+        busId: BUS_PROCESS,
+        do_exec: true,
+        hasDsca: [('es', TestDsca)],
+        hasKw: TestKW,
+        in: Obj_in,
+        hasIcon: 'photo',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        overrides: Gui_out
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'kanvas::rc_gui_out::gui_out__multiple_export'(_, ObjIn, _, ObjOut):-
+    obj_fetch(busId, ObjIn, BUS_PROCESS),
+    obj_fetch(in, ObjIn, KanvasIn),
+    obj_fetch(kanvasBusId:first, KanvasIn, BUS_Kanvas),
+    obj_fetch(kanvasBusId:second, KanvasIn, BUS_Kanvas2),
+    obj_fetch(kanvasKw:first, KanvasIn, Kw_Kanvas),
+    obj_fetch(kanvasKw:second, KanvasIn, Kw_Kanvas2),
+    obj_merge(KanvasIn, {hasKw:Kw_Kanvas}, KanvasIn1),
+    obj_merge(KanvasIn, {hasKw:Kw_Kanvas2}, KanvasIn2),
+    obj_fetch(exportObj, KanvasIn, ObjExport, {BUS_Kanvas: '', BUS_Kanvas2: ''}),
+    obj_fetch(BUS_Kanvas, ObjExport, Value1, ' '),
+    obj_fetch(BUS_Kanvas2, ObjExport, Value2, ' '),
+    Obj_kanvas = {
+        type: 'kanvas',
+        busId: BUS_Kanvas,
+        in: KanvasIn1
+    },
+    Obj_kanvas2 = {
+        type: 'kanvas',
+        busId: BUS_Kanvas2,
+        in: KanvasIn2
+    },
+    Obj_export = {
+        type: button,
+        label:{
+            d: 'Export'
+        },
+        events:[{
+            type: 'click',
+            targetBusId: BUS_PROCESS,
+            method: 'log',
+            p_exec:{
+                type: sequence,
+                hasProcess:[
+                    { type: 'method', name: 'exportToImage', busId: BUS_Kanvas },
+                    { type: 'method', name: 'exportToImage', busId: BUS_Kanvas2 },
+                    { type: 'method', name: 'change_config', busId: BUS_PROCESS }
+                ]
+            }
+        }]
+    },
+    Obj_text = {
+        label:{
+            d: 'Primer kanvas'
+        },
+        type: text,
+        value: Value1
+    },
+    Obj_text2 = {
+        label: {
+            d: 'Segundo kanvas'
+        },
+        type: text,
+        value: Value2
+    },
+    Children = [Obj_kanvas, Obj_kanvas2, Obj_export, Obj_text, Obj_text2],
+    ObjOut = {
+        type: assembly,
+        children: Children
+    }.
+
+'kanvas_test::dlg_content::kanvas'(_, ObjIn, _, Obj_out):-
+    Channel_kanvasD = 'kanvas_channel_for_test_with_dlg',
+    KWD = 'testapp_contacto_canvas_editable_001',
+    KWCD = 'testapp:contact_canvas_editable',
+    obj_get(hasKw, ObjIn, KW, KWD),
+    obj_get(hasKwc, ObjIn, KWC, KWCD),
+    obj_get(hasChannelKanvas, ObjIn, Channel_kanvas, Channel_kanvasD),
+    I_dataset =  'Default',
+    newKw('Bus_kanvas_dlg__',BUS_Kanvas),
+    Obj_in =  {
+        hasKw: KW,
+        hasKwc: KWC,
+        enabled: true,
+        hasState: 'state_noedit',
+        hasDataset: I_dataset,
+        navigationFilter: 'all',
+        options: {
+            getSchema: true
+        },
+        hasAggrupationLegacy: true,
+        canvasDefinition:{
+            id: 'canvas_rdlg',
+            background: {
+                source: '/repcon/f_get/repository/data/test_5gl_server/JobCardFrame.png',
+                color:  white,
+                size: auto
+            },
+            border: {
+                color: 'black',
+                width: 2
+            },
+            width: 909
+        }
+    },
+    Obj_out = {
+        type: 'kanvas',
+        busId: BUS_Kanvas,
+        hasChannel: Channel_kanvas,
+        in: Obj_in,
+        events:[
+            {
+                type: updateStmt,
+                method: updateStmt,
+                targetBusId: BUS_Kanvas,
+                payload: {
+                    hasDataset: I_dataset,
+                    applyRules: true
+                },
+                p_exec: {
+                    type: sequence,
+                    hasProcess: [{
+                        type: function,
+                        name: builder50_updStmt,
+                        context: {
+                            delegatedTo: builderweb
+                        }
+                    }]
+                }
+            }
+        ]
+    }.
+
+getCanvasProperties_usecase_001(Lst_out):-
+    Lst_out = [
+        {
+            type: 'image',
+            mimetype: 'app/img',
+            width: 120,
+            height: 150,
+            position: {
+                x: 100,
+                y: 100
+            },
+            source: '/repcon/f_get/repository/data/test_5gl_server/avatar4.png'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/repcon_grid.png',
+            height: 20,
+            width: 95,
+            position:{
+                x: 400,
+                y: 465
+            }
+        },
+        {
+            
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/semantic-systems.png',
+            height: 100,
+            position:{
+                x: 680,
+                y: 15
+            }
+        },
+        {
+            type: label,
+            color: white,
+            font: {
+                size: '1rem'
+            },
+            position: {
+                x: 710,
+                y: 115
+            },
+            d:'Semantic-Systems'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 90,
+                y: 297
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.2rem'
+            },
+            position: {
+                x: 100,
+                y: 305
+            },
+            d:'Ana García'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 90,
+                y: 327
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.2rem'
+            },
+            position: {
+                x: 100,
+                y: 335
+            },
+            d: '+34 94 587 68 52'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 90,
+                y: 357
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.2rem'
+            },
+            position: {
+                x: 100,
+                y: 365
+            },
+            d: 'ana.garcia@example.com'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 650,
+                y: 200
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.5rem'
+            },
+            color: white,
+            position: {
+                x: 670,
+                y: 205
+            },
+            d: 'Soluciones a medida'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 650,
+                y: 240
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.5rem'
+            },
+            color: white,
+            position: {
+                x: 670,
+                y: 245
+            },
+            d: 'Configurador'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 650,
+                y: 280
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.5rem'
+            },
+            color: white,
+            position: {
+                x: 670,
+                y: 285
+            },
+            d: 'Factory'
+        }
+    ].
+
+% FOLDERS
+'staber_kanvas::folders'(_, _, _, _):-
+    Title = 'kanvas',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_kanvas,
+        hasDsca: Title,
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'dinamic',
+        hasERCPart: [
+            test_kanvas__001,
+            test_kanvas__002,
+            test_kanvas__multiple_export,
+            test_kanvas__003,
+            test_kanvas__004,
+            test_kanvas__005,
+            test_kanvas__006
+        ]
+	},	
+    create_rprocess(_, Conf_folder, _, _).
+

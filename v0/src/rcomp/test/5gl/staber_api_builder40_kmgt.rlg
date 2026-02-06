@@ -1,0 +1,480 @@
+﻿/**staber_k
+@descr	staber_api_builder40 <br>
+		staber_api_builder40
+@author XXX
+@date	20XX_XX_XX
+**/
+
+rc_class('staber_api_builder40_kmgt'):-
+	class +$ 'staber_api_builder40_kmgt'  d ( 'es', 'staber_api_builder40_kmgt' )
+		sc [ 'rComponent' ].
+
+rc_schema('staber_api_builder40_kmgt'):-
+    'staber_api_builder40::folders'(_, _, _, _).
+
+'staber_api_builder40::folders'(_, _, _, _):-
+
+    PermissionLst = [permissionProfile__repositorioTests_KRP],
+
+    %% Configuración sencilla de mantenimiento de contactos
+    staber_api_builder40_instancemgt_basic(PermissionLst, KmgtKw_usecase_001),
+
+    %% Configuración personalizada de mantenimiento de contactos
+    staber_api_builder40_instancemgt_advanced(PermissionLst, KmgtKw_usecase_002),
+
+    %% Configuración de esquema con paths
+    staber_api_builder40_instancemgt_pathsInSchema(PermissionLst, KmgtKw_usecase_003),
+
+    %% Ejemplo de utilización de override de áreas en tiempo de ejecución
+    staber_api_builder40_instancemgt_areaConfig_override(PermissionLst, KmgtKw_usecase_004),
+
+    %% Ejemplo de overrides de distintas áreas
+    staber_api_builder40_instancemgt_area_overrides(PermissionLst, KmgtKw_usecase_005),
+
+    %% Test de comparativa entre formulario automatico y por agrupacion
+    staber_api_builder40_aggrupation_template(PermissionLst, KwAggrupationTemplateTest),
+
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTest_api_staber_builder40_5gl,
+        hasDsca: 'Generación de componentes 5GL - Desarrollador',
+        hasIcon: 'instancia-line',
+        isRoot: false,
+        security_edit: PermissionLst,
+        security_view: PermissionLst,
+        hasERCPart:[
+            KmgtKw_usecase_001,
+            KmgtKw_usecase_002,
+            KmgtKw_usecase_003,
+            KmgtKw_usecase_004,
+            KmgtKw_usecase_005,
+            KwAggrupationTemplateTest
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).
+
+staber_api_builder40_instancemgt_basic(PermissionLst, KmgtKw):-
+    Obj_kmgt = {
+        hasKw: '5GL_kmgt_001',
+        hasDsca: 'Configuración de kmgt de instancias básica (5GL_kmgt_001)',
+        security_edit: PermissionLst,
+        hasNavbar: true,
+        in: {
+            hasKwc: 'testapp:contact',
+            hasDataset: 'dataset__test_5gl_server'
+        }
+    },
+    builder50_newInstanceMgt(Obj_kmgt, KmgtKw).
+
+staber_api_builder40_instancemgt_advanced(PermissionLst, KmgtKw):-
+
+    ResultSchema = {
+        data: [
+            {
+                arc: 'contact:hasIdNumber',
+                label: {d: 'Identificador'},
+                sorted: true,
+                filter: false
+            },
+            {arc: 'hasDsca'}
+        ]
+    },
+
+    RowActions = {
+        fixed: true,
+        icon: 'menu2',
+        align: 'right',
+        actions: [
+            {
+                label: {icon: 'pencil', d: 'Editar'},
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: '$.busId',
+                        payload: {action: 'editar'},
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                {type: 'function', name: 'testapp_api_builder40:actionNotification', context:{ delegatedTo: 'builderweb' }}
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                label: {icon: 'print', d: 'Imprimir'},
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: '$.busId',
+                        payload: {action: 'imprimir'},
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                {type: 'function', name: 'testapp_api_builder40:actionNotification', context:{ delegatedTo: 'builderweb' }}
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+
+    Obj_kmgt = {
+        hasKw: '5GL_kmgt_002',
+        hasDsca: 'Configuración de kmgt de instancias compleja (5GL_kmgt_002)',
+        security_edit: PermissionLst,
+        in: {
+            hasKwc: 'testapp:contact',
+            hasLayout: 'result',
+            setSearchProperties: ['hasDsca'],
+            hasDataset: 'dataset__test_5gl_server',
+            hasArea: {
+                result: {
+                    schema: ResultSchema,
+                    limit: 5,
+                    rowactions: RowActions
+                },
+                detail: {
+                    showAllProperties: true
+                }
+            }
+        }
+    },
+    builder50_newInstanceMgt(Obj_kmgt, KmgtKw).
+
+staber_api_builder40_instancemgt_pathsInSchema(PermissionLst, KmgtKw):-
+    Schema = {
+        data: [
+            {arc: hasDsca},
+            {
+                arc: 'contact:hasBirthCountry',
+                propToShow: 'hasDsca'
+            },
+            {
+                label: {d: 'Descripción del permiso'},
+                arc: 'hasDsca',
+                pathToProp: ['contact:hasPermission']
+            }
+        ]
+    },
+
+    Obj_kmgt = {
+        hasKw: '5GL_kmgt_003',
+        hasDsca: 'Configuración con paths en esquema (5GL_kmgt_003)',
+        security_edit: PermissionLst,
+        in: {
+            hasKwc: 'testapp:contact',
+            hasDataset: 'dataset__test_5gl_server',
+            hasLayout: 'result',
+            hasArea: {
+                result: {
+                    schema: Schema
+                }
+            }
+        }
+    },
+    builder50_newInstanceMgt(Obj_kmgt, KmgtKw).
+
+staber_api_builder40_instancemgt_areaConfig_override(PermissionLst, KmgtKw):-
+    Obj_kmgt = {
+        hasKw: '5GL_kmgt_004',
+        hasDsca: 'Ejemplo de override de la configuración de áreas (5GL_kmgt_004)',
+        security_edit: PermissionLst,
+        in: {
+            hasKwc: 'testapp:contact',
+            hasDataset: 'dataset__test_5gl_server'
+        }
+    },
+    builder50_newInstanceMgt(Obj_kmgt, KmgtKw).
+
+staber_api_builder40_instancemgt_area_overrides(PermissionLst, KmgtKw):-
+    Obj_kmgt = {
+        hasKw: '5GL_kmgt_005',
+        hasDsca: 'Ejemplo de overrides de áreas (5GL_kmgt_005)',
+        hasModule: ['testapp', 'api_staber_builder40'],
+        security_edit: PermissionLst,
+        in: {
+            hasKwc: 'testapp:contact',
+            hasDataset: 'dataset__test_5gl_server',
+            hasArea: {
+                search: {
+                    hasDlg: true
+                }
+            }
+        }
+    },
+    builder50_newInstanceMgt(Obj_kmgt, KmgtKw).
+
+'testapp_api_builder40:actionNotification'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_get(action, Obj_in, Action),
+    wAddInfoMsgML('Aviso', 'Se ha intentado <b>?a{1}</b> la línea <b>?a{2}</b>', [Action],{showTime:3}),
+    Obj_out = Obj_in.
+
+'5GL_kmgt_004::staber_builder50_instancesMgt_kmgt_updateAreasData_custom'( Obj_ctx, Obj_in, Obj_ctx, Obj_out):-
+
+    obj_fetch(hasArea, Obj_in, AreaObj),
+    obj_fetch(result, AreaObj, ResultObj),
+    obj_fetch(detail, AreaObj, DetailObj),
+
+    NewSchema = {
+        data: [
+            {arc: 'contact:hasIdNumber'},
+            {arc: hasDsca}
+        ]
+    },
+    obj_set(schema, ResultObj, NewSchema, NewResultObj),
+
+    obj_set(showAllProperties, DetailObj, true, NewDetailObj),
+
+    NewAreaObj0 = {
+        result: NewResultObj,
+        detail: NewDetailObj
+    },
+    obj_merge(AreaObj, NewAreaObj0, false, NewAreaObj),
+    Obj_out = {hasArea: NewAreaObj}.
+
+'testapp::api_staber_builder40::5GL_kmgt_005::staber_builder50_kmgt_search_getUIControls'(Obj_ctx, Obj_in, Obj_ctx, Obj_out):-
+
+    obj_get(in:parentBusId, Obj_in,  PARENTBUS),
+    obj_get(in:hasDscaFilter, Obj_in,  Dsca, ''),
+
+    Obj_out = {
+        type: 'assembly',
+        children:
+        [              
+            {
+                type: 'text',
+                placeholder: 'Descripción...',
+                value: Dsca,
+                events: [
+                    {
+                        type: 'change',
+                        method: 'set_propertyValue',
+                        targetBusId: PARENTBUS,
+                        payload: {property: 'hasDscaFilter'}
+                    }
+                ]
+            },      
+            {
+                type: 'button',
+                label: { 
+                    icon: 'search'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'setSearchQuery',
+                        targetBusId: PARENTBUS,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { 
+                                    type: 'function', 
+                                    name: 'staber_mgt_search_set_search_process', 
+                                    context: { 
+                                        delegatedTo: 'builderweb'   
+                                    } 
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }.
+
+'staber_mgt_search_set_search_process'(Obj_ctx, Obj_in, Obj_ctx, OBJ_out):-
+
+    obj_get(hasDscaFilter, Obj_in, DscaFilter, ''),
+
+    ( DscaFilter \== '' ->
+        codes_append([
+            "stmt( 'hasDsca', HASKW, VDsca), like_ci('*", DscaFilter,"*', VDsca),"
+        ], Filter1)
+    ;   Filter1 = []
+    ),
+
+    flatten([ Filter1], Filter),
+
+    OBJ_out = {
+        queryFilter: Filter
+    }.
+
+'testapp::api_staber_builder40::5GL_kmgt_005::staber_builder50_kmgt_result_getSchemaControls'(Obj_ctx, _Obj_in, Obj_ctx, Obj_out) :-
+    Obj_out = {
+        data:[
+            {
+                label: {
+                    d: 'Nombre de usuario'
+                },
+                arc: 'hasDsca'
+            },
+            {
+                label: {
+                    d: 'Edad'
+                },
+                arc: 'contact:hasAge',
+                inputtype: 'integer'
+            }
+        ]
+    }.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TEST TEMPLATE POR AGRUPACIÓN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+staber_api_builder40_aggrupation_template(PermissionLst, 'test_aggrupation_template'):-
+
+    newKw('bus__rprocess', BusId_Rprocess),
+
+    Form_in = {
+        hasAgent: 'builderweb',
+        hasDataset: 'Default',
+        hasKw: 'testapp_provider_001',
+        hasKwc: 'testapp:provider',
+        showAllProperties: true,
+        hasEvent: 'e_view'
+        
+    },
+
+    Template = {
+        type: 'assembly',
+        class: 'cols-1',
+        children: [
+            %{arc: 'provider:hasDeliveryTime'},
+            %{arc: 'provider:hasProviderText'},
+            %{arc: 'contact:hasName'},
+            %{arc: 'contact:hasBirthDate'},
+            %{arc: 'contact:hasAge'},
+            %{arc: 'provider:hasAffinity'},
+            %{arc: 'contact:hasIdPhoto'},
+            %{arc: 'provider:hasLogo'},
+            %{arc: 'provider:hasProviderConfiguration'},
+            %{arc: 'contact:hasProfessionalProfile'},
+            %{arc: 'provider:hasWorkingCountry'},
+            {
+                type: 'text',
+                label:{
+                    d: 'Pais de Nacimiento'
+                },
+                enabled: true,
+                arc: 'codigoISO_1',
+                id: 'idtest1',
+                path:{
+                    arc: codigoISO,
+                    fromPath: f_path1,
+                    hasKw: 'testapp_provider_001',
+                    f_path1 :[{
+                        from: '$IN',
+                        to: '$OUT',
+                        arc: 'contact:hasBirthCountry'
+                    }]
+                }
+            },
+            {
+                type: 'text',
+                label:{
+                    d: 'Pais del Papa'
+                },
+                enabled: true,
+                arc: 'codigoISO_2',   
+                id: 'idtest1',
+                path:{
+                    arc: codigoISO,
+                    fromPath: f_path2,
+                    hasKw: 'testapp_provider_001',
+                    f_path2 :[{
+                        from: '$IN',
+                        to: '$OUT',
+                        arc: 'contact:hasFathersCountry'
+                    }]
+                }
+            }
+           % {arc: 'contact:hasResidenceCountry'},
+           % {arc: 'contact:hasVisitedCountry'},
+           % {arc: 'contact:hasPreferredCountry'},
+           % {arc: 'provider:hasSupplierCountries'},
+           % {arc: 'provider:hasWorkerNames'}
+        ]
+    },
+
+    obj_set(template, Form_in, Template, AutoForm_in),
+    concatConstants([BusId_Rprocess, '_autoform'], BusId_autoform),
+    Obj_autoform = {
+        type: 'kdetail',
+        busId: BusId_autoform,
+        do_exec: true,
+        in: AutoForm_in
+    },
+
+    obj_set(hasAggrupationLegacy, Form_in, true, AggrupationForm_in),
+    concatConstants([BusId_Rprocess, '_aggrupationform'], BusId_aggrupationform),
+    _Obj_form_aggrupations = {
+        type: 'kdetail',
+        busId: BusId_aggrupationform,
+        do_exec: true,
+        in: AggrupationForm_in
+    },
+
+    Obj_form_assembly ={
+        type:'assembly',
+        width: 100,
+        classList: [
+            'r-separator',
+            'b-group'
+        ],
+        children:[
+            {
+                type: 'assembly',
+                width: 50,
+                label: {
+                     d: 'Formulario automático'
+                },
+                children:[
+                    Obj_autoform
+                ]
+            }
+            /*
+            {
+                type: 'assembly',
+                width: 50,
+                label: {
+                    d: 'Formulario por agrupación'
+                },
+                children:[
+                    Obj_form_aggrupations
+                ]
+            }
+            */
+        ]
+    },
+
+    Obj_testapp_templates = {
+        type: 'rprocess',
+        busId: BusId_Rprocess,
+        hasKw: 'test_aggrupation_template',
+        hasDsca: 'Implementación de template a través de agrupaciones (test_aggrupation_template) (en desarrollo)',
+        hasIcon: 'staber',
+        do_exec: true,
+        security_edit: PermissionLst,
+        gui_out: Obj_form_assembly
+    },
+
+    create_rprocess(_,Obj_testapp_templates,_,_Obj_out).
+
+'testapp:provider::complete_propertyInTemplate'( Property, Obj_config, Obj_in0, Obj_out):-
+    Property == 'codigoISO', !,
+    'builder::complete_propertyInTemplate'( Property, Obj_config, Obj_in0, Obj_out0),
+
+    NewControlObj = {
+        enabled: false,
+        label: {'d': 'Codigo ISO del país'}
+    },
+
+    obj_merge(Obj_out0, NewControlObj, false, Obj_out).
+
+'testapp:provider::complete_propertyInTemplate'( Property, Obj_config, Obj_in0, Obj_out):-
+    'builder::complete_propertyInTemplate'( Property, Obj_config, Obj_in0, Obj_out).

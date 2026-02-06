@@ -1,0 +1,747 @@
+﻿/**
+@descr	staber_showLoading_pattern <br>
+		staber_showLoading_pattern
+@author IGA
+@date	2025_06_05
+**/
+rc_class('staber_showLoading_pattern') :-
+	class +$ 'staber_showLoading_pattern' d ( es,'Ejemplos mensajes de carga bajo demanda') sc function,
+    'staber_showLoading_pattern::showLoading_inbutton'(_, _, _, _),    
+    'staber_showLoading_pattern::showLoading_mpcall'(_, _, _, _),
+    'staber_showLoading_pattern::showLoading_inbutton_notification'(_, _, _, _),    
+    'staber_showLoading_pattern::showLoading_proc_guiout'(_, _, _, _),    
+    'staber_showLoading_pattern::showLoading_fail_insequence'(_, _, _, _),
+    'staber_showLoading_pattern::showLoading_dialogexec'(_, _, _, _),     
+    'staber_showLoading_pattern::perfomance'(_, _, _, _),
+    'staber_showLoading_pattern::showLoading_standard_inbutton'(_, _, _, _),
+    % 'staber_showLoading_pattern::showLoading_hideblocker_inthemiddle'(_, _, _, _),
+    'staber_showLoading_pattern::folders'(_, _, _, _).
+
+'staber_showLoading_pattern::showLoading_inbutton'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__process', BUSID),
+    OBJ = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'button',
+                label: {
+                    d: 'Mensaje de Carga Bloqueante (showLoading)'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID,
+                        p_exec: {
+                            hasProcess: [     
+                                { 
+                                    type: 'function', 
+                                    name: 'staber_showLoading_pattern::showMessages_multipy', 
+                                    context: { delegatedTo: 'builderweb' } 
+                                },
+                                {   
+                                    type: 'method', 
+                                    name: 'publish', 
+                                    module: 'PubSub',
+                                    in: {
+                                        publish: [{
+                                            topic: 'hideBlocker',
+                                            channel: 'channel__notification_server_blocker'                                
+                                        }]
+                                    }
+                                } 
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]             
+    },
+    Conf_obj ={
+        type: 'rprocess',
+        gui_out: OBJ,
+        busId: BUSID,
+        hasKw: rproc__4gl_showLoading__000,
+        hasDsca: ui_ux_showloading_basic,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'progress_3'
+    },
+    create_rprocess(_, Conf_obj, _, OBJ_out).
+
+'staber_showLoading_pattern::showLoading_mpcall'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__process', BUSID),
+    PROC = {
+        type: 'sequence',
+        hasProcess: [                
+            { 
+                type: 'function', 
+                name: 'showMessageWithBlocker',      
+                in: {
+                    text: 'LLamada directa al MP (showMessageWithBlocker)'
+                },
+                context: { delegatedTo: 'builderweb' } 
+            },
+            { 
+                type: 'function', 
+                name: 'staber_showLoading_pattern::sleep',                
+                context: { delegatedTo: 'builderweb' } 
+            },      
+            {   
+                type: 'method', 
+                name: 'publish', 
+                module: 'PubSub',
+                in: {
+                    publish: [{
+                        topic: 'hideBlocker',
+                        channel: 'channel__notification_server_blocker'                                
+                    }]
+                }
+            }          
+        ]
+    },
+    GUI_OUT = {
+        type: 'assembly',
+        children:[
+            { 
+                type: 'label',
+                d: 'Test con llamada directa al MP finalizado'
+            }
+        ]
+    },
+    Conf_obj ={
+        type: 'rprocess',
+        proc: PROC,
+        gui_out: GUI_OUT,
+        busId: BUSID,
+        hasKw: rproc__4gl_showLoading__simplecall,
+        hasDsca: ui_ux_showloading_mpcall,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'progress_3'
+    },
+    create_rprocess(_, Conf_obj, _, OBJ_out).
+
+'staber_showLoading_pattern::showLoading_inbutton_notification'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__process', BUSID),
+    OBJ = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'button',
+                label: {
+                    d: 'Mensaje de Carga Bloqueante con Notificación (showLoading)'
+                },
+  
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID,
+                        p_exec: {
+                            hasProcess: [                               	
+                                { 
+                                    type: 'function', 
+                                    name: 'staber_showLoading_pattern::showMessages_notify', 
+                                    context: { delegatedTo: 'builderweb' } 
+                                },
+                                {   
+                                    type: 'method', 
+                                    name: 'publish', 
+                                    module: 'PubSub',
+                                    in: {
+                                        publish: [{
+                                            topic: 'hideBlocker',
+                                            channel: 'channel__notification_server_blocker'                                
+                                        }]
+                                    }
+                                } 
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]             
+    },
+    Conf_obj ={
+        type: 'rprocess',
+        gui_out: OBJ,
+        busId: BUSID,
+        hasKw: rproc__4gl_showLoading__001,
+        hasDsca: ui_ux_showloading_notification,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'progress_3'
+    },
+    create_rprocess(_, Conf_obj, _, OBJ_out).
+
+'staber_showLoading_pattern::showLoading_proc_guiout'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__process', BUSID),
+    PROC = {
+        type: 'sequence',
+        hasProcess: [                
+            { 
+                type: 'function', 
+                name: 'staber_showLoading_pattern::showMessages_multipy', 
+                context: { delegatedTo: 'builderweb' } 
+            }           
+        ]
+    },
+    GUI_OUT = {
+        type: 'sequence',
+        hasProcess: [    
+            { 
+                type: 'function', 
+                name: 'staber_showLoading_pattern::showMessages_unique_guiout', 
+                context: { delegatedTo: 'builderweb' } 
+            },
+            { 
+                type: 'function', 
+                name: 'staber_showLoading_pattern::label_gui_out', 
+                context: { delegatedTo: 'builderweb' } 
+            },
+            {   
+                type: 'method', 
+                name: 'publish', 
+                module: 'PubSub',
+                in: {
+                    publish: [{
+                        topic: 'hideBlocker',
+                        channel: 'channel__notification_server_blocker'                                
+                    }]
+                }
+            }
+        ]
+    },
+    Conf_obj ={
+        type: 'rprocess',
+        proc: PROC, 
+        gui_out: GUI_OUT,
+        busId: BUSID,
+        hasKw: rproc__4gl_showLoading__002,
+        hasDsca: ui_ux_showloading_sequences,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'progress_3'
+    },
+    create_rprocess(_, Conf_obj, _, OBJ_out).
+ 
+'staber_showLoading_pattern::showLoading_fail_insequence'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__process', BUSID),
+    GUI_OUT = {
+        type: 'sequence',
+        hasProcess: [         
+            { 
+                type: 'function', 
+                name: 'staber_showLoading_pattern::showMessages_multipy', 
+                context: { delegatedTo: 'builderweb' } 
+            },  
+            { 
+                type: 'function', 
+                name: 'staber_showLoading_pattern::showMessages_force_fail', 
+                context: { delegatedTo: 'builderweb' } 
+            },
+            { 
+                type: 'function', 
+                name: 'staber_showLoading_pattern::label_gui_out', 
+                context: { delegatedTo: 'builderweb' } 
+            },                                                                  
+            {   
+                type: 'method', 
+                name: 'publish', 
+                module: 'PubSub',
+                in: {
+                    publish: [{
+                        topic: 'hideBlocker',
+                        channel: 'channel__notification_server_blocker'                                
+                    }]
+                }
+            } 
+        ]
+    },
+    Conf_obj ={
+        type: 'rprocess',
+        gui_out: GUI_OUT,
+        busId: BUSID,
+        hasKw: rproc__4gl_showLoading__003,
+        hasDsca: ui_ux_showloading_error,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'progress_3'
+    },
+    create_rprocess(_, Conf_obj, _, OBJ_out).
+
+'staber_showLoading_pattern::showLoading_dialogexec'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__process_showLoading', BUSID_SHOWLOADING),
+    newKw('bus__process_dlgexec', BUSID_DLGEXEC),
+
+    % DATA_CUSTOMER = {
+    %     type: 'kresult',
+    %     busId: BUSID_DLGEXEC,
+    %     hasChannel: '_.dlg.hasChannel',
+    %     in: {
+    %         hasAgent: 'builderweb',
+    %         hasDataset: 'Default',
+    %         hasKw: 'testapp:contact'
+    %     }
+    % },
+
+    % DLG_CUSTOMER = {
+    %     type: 'rdlg',
+    %     busId: '$.dlg.busId',
+    %     in: {
+    %     }        
+    % },
+
+    DLG_CUSTOMER = {
+        type: 'rdlg',
+        busId: BUSID_DLGEXEC,
+        in: {
+            close: false,
+            options: {
+                label: {
+                    d: 'Dialogo de prueba CCP'
+                },
+                actions: [
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Aceptar'
+                        },
+                        enabled: true,
+                        events: [{
+                            type: 'click',
+                            method: 'accept',
+                            targetBusId: '_.dlg.busId'
+                        }]
+                    }
+                ]
+            }
+        }
+    },
+
+    DATA_CUSTOMER = {
+        type: 'assembly',
+        id: 'assembly_1', 
+        label: {
+            d: 'Diálogo de ejemplo para probar mensaje de carga bajo demanda'
+        }
+    },
+
+    GUI_OUT = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'label',
+                d: 'Ejecuta secuencia con diálogo',
+                events: [
+                {
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BUSID_SHOWLOADING,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { 
+                                type: 'function', 
+                                name: 'staber_showLoading_pattern::showMessages_multipy', 
+                                context: { delegatedTo: 'builderweb' } 
+                            },
+                            {   
+                                type: 'method', 
+                                name: 'publish', 
+                                module: 'PubSub',
+                                in: {
+                                    publish: [{
+                                        topic: 'hideBlocker',
+                                        channel: 'channel__notification_server_blocker'                                
+                                    }]
+                                }
+                            },
+                            { 
+                                type: 'method', 
+                                in: { 
+                                    dlg_data: DATA_CUSTOMER, 
+                                    dlg: DLG_CUSTOMER
+                                }, 
+                                name: 'dialog_exec', 
+                                busId: BUSID_SHOWLOADING
+                            },                                                                            
+                            { 
+                                type: 'function', 
+                                name: 'staber_showLoading_pattern::label_gui_out', 
+                                context: { delegatedTo: 'builderweb' } 
+                            }                        
+                        ]
+                    }
+                }]
+            }                
+        ]
+    },
+    Conf_obj ={
+        type: 'rprocess',
+        gui_out: GUI_OUT,
+        busId: BUSID_SHOWLOADING,
+        hasDlg: true,
+        hasKw: rproc__4gl_showLoading__004,
+        hasDsca: ui_ux_showloading_dilogexec,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'progress_3'
+    },
+    create_rprocess(_, Conf_obj, _, OBJ_out).
+
+%%%% The scenario works but it is not recommended to make a PUBSUB call in the middle of a sequence. %%%%
+% 'staber_showLoading_pattern::showLoading_hideblocker_inthemiddle'(_, _OBJ_in, _, OBJ_out) :-
+%     newKw('bus__process', BUSID),
+%     GUI_OUT = {
+%         type: 'sequence',
+%         hasProcess: [                
+%             { 
+%                 type: 'function', 
+%                 name: 'staber_showLoading_pattern::showMessages_multipy',      
+%                 in: {                
+%                     param1: 'Este texto se ha pasado como parametro desde un predicado al inicio de la secuencia'
+%                 },
+%                 context: { delegatedTo: 'builderweb' } 
+%             },  
+%             {   
+%                 type: 'method', 
+%                 name: 'publish', 
+%                 module: 'PubSub',
+%                 in: {
+%                     publish: [{
+%                         topic: 'hideBlocker',
+%                         channel: 'channel__notification_server_blocker'                                
+%                     }]
+%                 }
+%             },
+%             { 
+%                 type: 'function', 
+%                 name: 'staber_showLoading_pattern::label_parameter_gui_out',                
+%                 context: { delegatedTo: 'builderweb' } 
+%             }              
+%         ]
+%     },
+%     Conf_obj ={
+%         type: 'rprocess',
+%         gui_out: GUI_OUT,
+%         busId: BUSID,
+%         hasKw: rproc__4gl_showLoading__hideinthemiddle,
+%         hasDsca: 'Probando escenario con PUBSUB en medio de la secuencia',
+%         security_edit: [permissionProfile__repositorioTests_KRP],
+%         security_view: [permissionProfile__repositorioTests_KRP],
+%         hasIcon: 'progress_3'
+%     },
+%     create_rprocess(_, Conf_obj, _, OBJ_out).
+
+'staber_showLoading_pattern::perfomance'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__process', BUSID),
+    OBJ = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'button',
+                label: {
+                    d: 'Testeando rendimiento (sin mensajes de progreso)'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID,
+                        p_exec: {
+                            hasProcess: [     
+                                { 
+                                    type: 'function', 
+                                    name: 'staber_showLoading_pattern::testing_multiple_calls_withoutshowmessage', 
+                                    context: { delegatedTo: 'builderweb' } 
+                                },
+                                {   
+                                    type: 'method', 
+                                    name: 'publish', 
+                                    module: 'PubSub',
+                                    in: {
+                                        publish: [{
+                                            topic: 'hideBlocker',
+                                            channel: 'channel__notification_server_blocker'                                
+                                        }]
+                                    }
+                                } 
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                type: 'button',
+                label: {
+                    d: 'Testeando rendimiento (100 sms, 100ms de latencia)'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID,
+                        p_exec: {
+                            hasProcess: [     
+                                { 
+                                    type: 'function', 
+                                    name: 'staber_showLoading_pattern::testing_multiple_calls', 
+                                    context: { delegatedTo: 'builderweb' } 
+                                },
+                                {   
+                                    type: 'method', 
+                                    name: 'publish', 
+                                    module: 'PubSub',
+                                    in: {
+                                        publish: [{
+                                            topic: 'hideBlocker',
+                                            channel: 'channel__notification_server_blocker'                                
+                                        }]
+                                    }
+                                } 
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                type: 'button',
+                label: {
+                    d: 'Testeando rendimiento larga latencia (sin mensajes de progreso)'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID,
+                        p_exec: {
+                            hasProcess: [     
+                                { 
+                                    type: 'function', 
+                                    name: 'staber_showLoading_pattern::testing_multiple_calls_longsleep_withoutshowmessage', 
+                                    context: { delegatedTo: 'builderweb' } 
+                                },
+                                {   
+                                    type: 'method', 
+                                    name: 'publish', 
+                                    module: 'PubSub',
+                                    in: {
+                                        publish: [{
+                                            topic: 'hideBlocker',
+                                            channel: 'channel__notification_server_blocker'                                
+                                        }]
+                                    }
+                                } 
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                type: 'button',
+                label: {
+                    d: 'Testeando rendimiento (100 sms, 1000ms de latencia)'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID,
+                        p_exec: {
+                            hasProcess: [     
+                                { 
+                                    type: 'function', 
+                                    name: 'staber_showLoading_pattern::testing_multiple_calls_longsleep', 
+                                    context: { delegatedTo: 'builderweb' } 
+                                },
+                                {   
+                                    type: 'method', 
+                                    name: 'publish', 
+                                    module: 'PubSub',
+                                    in: {
+                                        publish: [{
+                                            topic: 'hideBlocker',
+                                            channel: 'channel__notification_server_blocker'                                
+                                        }]
+                                    }
+                                } 
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]             
+    },
+    Conf_obj ={
+        type: 'rprocess',
+        gui_out: OBJ,
+        busId: BUSID,
+        hasKw: rproc__4gl_showLoading__performance1,
+        hasDsca: ui_ux_showloading_perfomance,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'progress_3'
+    },
+    create_rprocess(_, Conf_obj, _, OBJ_out).
+
+'staber_showLoading_pattern::showLoading_standard_inbutton'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__process', BUSID),
+    OBJ = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'button',
+                label: {
+                    d: 'Mensaje de Carga estandar de la INFR'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID,
+                        p_exec: {
+                            hasProcess: [     
+                                { 
+                                    type: 'function', 
+                                    name: 'staber_showLoading_pattern::sleep', 
+                                    context: { delegatedTo: 'builderweb' } 
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]             
+    },
+    Conf_obj ={
+        type: 'rprocess',
+        gui_out: OBJ,
+        busId: BUSID,
+        hasKw: rproc__4gl_showLoading__stadndard,
+        hasDsca: ui_ux_showloading_infr,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'progress_3'
+    },
+    create_rprocess(_, Conf_obj, _, OBJ_out).
+
+% AUX PREDICATES
+'staber_showLoading_pattern::sleep'(Ctx, Obj, Ctx,Obj):- 
+    sleep_ms(4000).
+
+'staber_showLoading_pattern::showMessages_multipy'(Ctx, Obj, Ctx,Obj):-      
+    showMessageWithBlocker(Ctx, '<h3>Primer mensaje de espera...</h3>', 20),
+    sleep_ms(2000),        
+    showMessageWithBlocker(Ctx, '<h3>Segundo mensaje...</h3>', 30),
+    sleep_ms(2000),
+    showMessageWithBlocker(Ctx, '<h3>Tercer mensaje ...</h3>', 50),    
+    sleep_ms(500),
+    showMessageWithBlocker(Ctx, '<h3>Último mensaje antes del cierre...</h3>', 70),
+    sleep_ms(3000).
+
+'staber_showLoading_pattern::showMessages_unique_guiout'(Ctx, Obj, Ctx,Obj):-      
+    showMessageWithBlocker(Ctx, '<h3>Mensaje GUI_OUT...</h3>', 100),
+    sleep_ms(5000).
+    
+'staber_showLoading_pattern::showMessages_force_fail'(Ctx, _Obj, Ctx,OBJ_OUT):-      
+    OBJ_OUT = {
+        apperror:
+            {
+                code:'TEST_ERROR', 
+                txt:'Testing return errors -apperror-'
+            }
+    }.
+
+'staber_showLoading_pattern::showMessages_notify'(Ctx, Obj, Ctx,Obj):-      
+    showMessageWithBlocker(Ctx, '<h3>Primer mensaje de espera...</h3>', 20),
+    sleep_ms(2000),    
+    wAddInfoMsgML('Aviso', 'Mostrando notificación <b>?a{1}</b> <b>?a{2}</b>', ['Not1','Not2'],{showTime:3}),
+    showMessageWithBlocker(Ctx, '<h3>Enviando actualización de porcentaje...</h3>', 30),
+    sleep_ms(2000),
+    showMessageWithBlocker(Ctx, '<h3>Enviando segunda actualización de porcentaje......</h3>', 50),    
+    sleep_ms(500),
+    showMessageWithBlocker(Ctx, '<h3>Última actualización...</h3>', 70),
+    sleep_ms(3000).
+
+'staber_showLoading_pattern::label_gui_out'(_, _OBJ_in, _, OBJ_out) :-
+    OBJ_out = {
+        type: 'assembly',
+        children:[
+            { 
+                type: 'label',
+                d: 'Flujo finalizado'
+            }
+        ]
+    }.
+
+% 'staber_showLoading_pattern::label_parameter_gui_out'(_, OBJ_in, _, OBJ_out) :-
+%     obj_get(param1, OBJ_in, LABELTEXT),
+%     OBJ_out = {
+%         type: 'assembly',
+%         children:[
+%             { 
+%                 type: 'label',
+%                 d: LABELTEXT
+%             }
+%         ]
+%     }.
+
+'staber_showLoading_pattern::testing_multiple_calls'(Ctx, Obj, Ctx,Obj):-
+    mkNumList(0, 100, Lst),
+    applyall((
+        member(N, Lst),
+        _N2 is N * 2,        
+        showMessageWithBlocker(Ctx, '<h3>Testeando rendimiento con progreso...</h3>', N),
+        sleep_ms(100)
+    )).
+
+'staber_showLoading_pattern::testing_multiple_calls_longsleep'(Ctx, Obj, Ctx,Obj):-
+    mkNumList(0, 100, Lst),
+    applyall((
+        member(N, Lst),
+        _N2 is N * 2,        
+        showMessageWithBlocker(Ctx, '<h3>Testeando rendimiento con progreso..</h3>', N),
+        sleep_ms(1000)
+    )).
+
+'staber_showLoading_pattern::testing_multiple_calls_longsleep_withoutshowmessage'(Ctx, Obj, Ctx,Obj):-
+    mkNumList(0, 100, Lst),
+    applyall((
+        member(N, Lst),
+        _N2 is N * 2,        
+        sleep_ms(1000)
+    )).
+
+'staber_showLoading_pattern::testing_multiple_calls_withoutshowmessage'(Ctx, Obj, Ctx,Obj):-
+    mkNumList(0, 100, Lst),
+    applyall((
+        member(N, Lst),
+        _N2 is N * 2,        
+        sleep_ms(100)
+    )).
+
+'staber_showLoading_pattern::folders'(_, _, _, _):-
+	Conf_folder = {
+		type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_showLoading,
+        hasDsca: 'showLoading Bloqueantes',
+        hasIcon: 'progress_3',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__4gl_showLoading__simplecall,
+            rproc__4gl_showLoading__000,
+            rproc__4gl_showLoading__001,
+            rproc__4gl_showLoading__002,
+            rproc__4gl_showLoading__003,
+            rproc__4gl_showLoading__004,
+            rproc__4gl_showLoading__performance1,
+            rproc__4gl_showLoading__stadndard
+            % rproc__4gl_showLoading__hideinthemiddle
+        ]
+	},
+	create_rprocess(_, Conf_folder, _, _).

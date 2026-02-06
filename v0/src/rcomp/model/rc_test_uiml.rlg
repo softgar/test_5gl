@@ -1,0 +1,240 @@
+﻿
+/**
+@descr	rc_test_uiml <br>
+		rc_test_uiml
+@author GBL
+@date	2024_11_11
+**/
+
+
+rc_class('rc_test_uiml') :-
+    'rc_test_uiml_test5gl',
+    'rc_test_uiml_features',
+    'rc_test_uiml_test5gl_folders',
+    'rc_test_uiml_uiux',
+    'rc_test_uiml_framework_folders'.
+
+'rc_test_uiml_test5gl_folders':-
+    uiML *$ 'folder__repositorioTests_kdetail_uiML' d [('es', 'kdetail (builder40)'), ('en', 'kdetail (builder40)')],
+    uiML *$ 'folder__repositorioTests_kresult_uiML' d [('es', 'kresult: Componente Resultados (PivotGrid/Gallery)'), ('en', 'kresult: Result Component (PivotGrid/Gallery)')],
+    uiML *$ 'folder_ui_ux_customizationmodel_uiML' d [('es', 'Personalizando UI/UX por modelo'), ('en', 'UI/UX customization by model')],
+    uiML *$ 'folder_ui_ux_form_uiML' d [('es', 'Personalizando UI/UX para formularios'), ('en', 'UI/UX customization in forms')].
+
+
+'rc_test_uiml_framework_folders':-
+    uiML *$ 'framework_general__uiML' d [('es', 'Framework de Componentes'), ('en', 'Component Framework')],
+    uiML *$ 'framework_final__uiML' d [('es', 'Componentes finales (búsquedas, formularios, galerías, etc.)'), ('en', 'Final components (searches, forms, galleries, etc.)')],
+    uiML *$ 'framework_aplication__uiML' d [('es', 'Componentes para desarrollo inicial de una aplicación'), ('en', 'Components for initial development of an application')],
+    uiML *$ 'framework_containers__uiML' d [('es', 'Componentes que agrupan funcionalidad (mantenimientos, catálogos)'), ('en', 'Components that group functionality (maintenance, catalogs)')],
+    uiML *$ 'framework_treetable__uiML' d [('es', 'Árboles/Tablas'), ('en', 'Trees/Tables')],
+    uiML *$ 'framework_navegation__uiML' d [('es', 'Navegación'), ('en', 'Navigation')],
+    uiML *$ 'framework_dialog__uiML' d [('es', 'Cuadros de diálogo'), ('en', 'Dialog boxes')],
+    uiML *$ 'framework_form__uiML' d [('es', 'Formularios'), ('en', 'Formularios')],
+    uiML *$ 'framework_graphics2d__uiML' d [('es', 'Representación gráfica 2D'), ('en', 'Graphical component 2D')].
+
+'rc_test_uiml_test5gl':-
+    'test5gl_uiml_kdetail',
+    'test5gl_uiml_kresult',
+    'test5gl_uiml_kchart',
+    'test5gl_uiml_kanvas',
+    'test5gl_uiml_kform',
+    'test5gl_uiml_kscheduler',
+    'test5gl_uiml_kgraph',
+    'rc_test_uiml_showloading',
+    'rc_test_uiml_toolbar',
+    'rc_test_uiml_kstatusview',
+    'rc_test_uiml_kfooter',
+    'rc_test_uiml_kpivot'.
+
+'test5gl_uiml_kdetail':-
+    uiML *$ 'kdetail_test_000_uiML' d [('es', 'Instancia de contacto contra Default con acciones extra por estado'), ('en', 'Contact instance with extra actions, dataset Default')],
+    uiML *$ 'kdetail_test_001_uiML' d [('es', 'kdetail__001 Mantenimiento de compañía para nueva compañia'), ('en', 'kdetail__001 Company management, new company')],
+    uiML *$ 'kdetail_test_002_uiML' d [('es', 'kdetail__002  Mantenimiento de documento con sobrecarga SM'), ('en', 'kdetail__002  Document management using SM overload')],
+    uiML *$ 'kdetail_test_003_uiML' d [('es', 'kdetail__003 Mantenimiento de contacto con formulario personalizado'), ('en', 'kdetail__003 Contact management with personalized form')],
+    uiML *$ 'kdetail_test_004_uiML' d [('es', 'kdetail__004 Mantenimiento de contacto con dialogo para nueva instancia'), ('en', 'kdetail__004 Contact management using a dialog for new instance')],
+    uiML *$ 'kdetail_test_005_uiML' d [('es', 'kdetail__005  stmtedition keyNavigation tab'), ('en', 'kdetail__005  stmtedition keyNavigation tab')],
+    uiML *$ 'kdetail_formulario_contactos_simple_uiML' d [('es', 'Formulario de contacto automático'), ('en', 'Automatic contact form')],
+    uiML *$ 'kdetail_formulario_contactos_agrupaciones_api_uiML' d [('es', 'Formulario de contacto con agrupaciones'), ('en', 'Contact form with aggrupations')],
+    uiML *$ 'kdetail_formulario_tabla_contactos_uiML' d [('es', 'Formulario de contacto en formato tabla'), ('en', 'Contact form with table format')],
+    uiML *$ 'kdetail_formulario_contactos_agrupaciones_mode_change_uiML' d [('es', 'Kdetail con opción a cambiar de formulario automático a agrupaciones'), ('en', 'Kdetail which allows to change between automatic and aggrupation form')],
+    uiML *$ 'uiML_kdetail_change_aggrupation_mode_to_automatic_form' d [('es', 'Cambiar a vista de formulario automático'), ('en', 'Change to automatic form view')],
+    uiML *$ 'uiML_kdetail_change_aggrupation_mode_to_aggrupation_form' d [('es', 'Cambiar a vista de agrupaciones'), ('en', 'Change to aggrupation view')],    
+    uiML *$ 'kdetail_show_icons_uiux_uiML' d [('es', 'Testeando formularios con/sin iconos'), ('en', 'Testing forms with/without icons')].
+
+'test5gl_uiml_kresult':-
+    uiML *$ 'kresult_test_000_uiML' d[('es', 'Tabla de contactos'), ('en', 'Contact table')],
+    uiML *$ 'kresult_test_choose_006_uiML' d[('es', 'Tabla de contactos (seleccion columnas) en desarrollo'), ('en', 'Contact table (column choose)')],
+    uiML *$ 'kresult_test_010_uiML' d[('es', 'Tabla de contactos (edición de celdas)'), ('en', 'Contact table (cell edit)')],
+    uiML *$ 'kresult_test_setSelected_uiML' d[('es', 'Tabla de contactos (selección externa)'), ('en', 'Contact table (Selection from event)')],
+    uiML *$ 'kresult_test_kmenuLeft_and_multiselection_uiML' d[('es', 'Tabla de contactos con rowactions en la izquierda y multiselección *En Desarrollo*'), ('en', 'Contact table with rowactions to the left and multiselection *En Desarrollo*')],
+    uiML *$ 'kresult_test_preselectedRows_uiML' d[('es', 'Tabla de contactos con filas preseleccionadas y multiselección *En Desarrollo*'), ('en', 'Contact table with preselected rows and multiselection *En Desarrollo*')],
+    uiML *$ 'kresult_test_001_uiML' d[('es', 'Tabla de Documentos, consulta rem y plantilla en schema (Dominio)'), ('en', 'Document table, rem query and template in schema (Domain)')],
+    uiML *$ 'kresult_test_002_uiML' d[('es', 'Tabla de Proyectos, consulta rql y override (Dominio)'), ('en', 'Proyect table, rql query using override (Domain)')],
+    uiML *$ 'kresult_test_003_uiML' d[('es', 'Tabla de usuarios, consulta SQL (Dominio)'), ('en', 'User table, SQL query (Domain)')],
+    uiML *$ 'kresult_test_004_uiML' d[('es', 'kresult__004 - Oportunidades (pivotgrid, dataset__oOrder_test, rem with pre query)'), ('en', 'kresult__004 - Oportunidades (pivotgrid, dataset__oOrder_test, rem with pre query)')],
+    uiML *$ 'kresult_test_005_uiML' d[('es', 'kresult__005 - documentos (pivotgrid, datase__semantic, rem with absolute query)'), ('en', 'kresult__005 - documents (pivotgrid, datase__semantic, rem with absolute query)')],
+    uiML *$ 'kresult_test_006_uiML' d[('es', 'Galería de proyectos, consulta rql (Dominio)'), ('en', 'Proyect gallery, rql query (Domain)')],
+    uiML *$ 'kresult_test_007_uiML' d[('es', 'kresult__007 - Contactos (overrides - getSchemaControls)'), ('en', 'kresult__007 - Contacts (overrides - getSchemaControls)')],
+    uiML *$ 'kresult_test_012_uiML' d[('es', 'usecase__012 - FICHEROS (mmResource+ss:document, dataset__semantic_test, rem with queryFunction+mapFunction)'), ('en', 'usecase__012 - Files (mmResource+ss:document, dataset__semantic_test, rem with queryFunction+mapFunction)')],
+    uiML *$ 'kresult_test_009_uiML' d[('es', 'kresult__009 - Provincias Españolas (Integración con SAP, consulta rql y predicate)'), ('en', 'kresult__009 - Spanish provinces (SAP integration, rql query and predicate)')],
+    uiML *$ 'kresult_control_when_is_editable_uiML' d[('es', 'Tabla con aplicación de controles al editar'), ('en', 'Table with controls on edit')],
+    uiML *$ 'kresult_test_011_uiML' d[('es', 'Tabla con refresco de fila en acciones en celda'), ('en', 'Table with row refresh in cell actions')],
+    uiML *$ 'kresult_test_tips_uiML' d[('es', 'Tabla de contactos con tips'), ('en', 'Contact table with tips')],
+    uiML *$ 'kresult_different_ranges_in_schema_uiML' d[('es', 'Tabla con rangos de propiedad diferentes en schema'), ('en', 'Table with different property ranges defined in schema')],
+    uiML *$ 'kresult_test_editable_from_model_uiML' d[('es', 'Tabla de contactos: editabilidad por modelo'), ('en', 'Contact table: editablity by model')],
+    uiML *$ 'kresult_contact__ontology_tree_uiML' d [('es', 'Árbol de ontología de contactos'), ('en', 'Contact ontology tree')],
+    uiML *$ 'kresult_test_008_uiML' d [('es', 'kresult - Visualización de arbol con menú contextual'), ('en', 'kresult - Tree with contextual menu')],
+    uiML *$ 'kresult_test_kmenu_onTheLeft_uiML' d [('es', 'kresult - Visualización de tabla con kmenu en la izquierda'), ('en', 'kresult - Table with menu on he left')],
+    uiML *$ 'kresult_test__external_row_add_uiML' d [('es', 'kresult - Tabla con acción externa para añadir fila'), ('en', 'kresult - Table with external row add action')],
+    uiML *$ 'kresult_external_set_pv_exec_uiML' d[('es', 'kresult con refresco desde combo externo'),('en', 'kresult with refresh from external combo')].
+
+'test5gl_uiml_kchart':-
+    uiML *$ 'kchart_test_bar_contact_uiML' d[('es', 'Gráfico de barras de distribución por edades de los contactos'), ('en', 'Bar chart of age distribution of contacts')].
+
+'test5gl_uiml_kanvas':-
+    uiML *$ 'kanvas_test_bussinesscard_uiML' d[('es', 'Tarjeta de visita con valores literales y exportación'), ('en', 'Business card with literal values ​​and export')],
+    uiML *$ 'kanvas_test_bussinesscardwithform_uiML' d[('es', 'Tarjeta de visita con formulario editable'), ('en', 'Business card with editable form')].
+
+'test5gl_uiml_kform':-
+    uiML *$ 'kform_test_numPhone_validation_uiML' d[('es', 'Los numeros de tres en tres separados por espacios. Ej. 123 456 789'), ('en', 'Grouped by three and separated by white spaces. Ex. 123 456 789')],
+    uiML *$ 'kform_test_formulario_contactos_simple_uiML' d[('es', 'Formulario de contacto sam'), ('en', 'Contact Form')],
+    uiML *$ 'kform_test_001_uiML' d[('es', 'kform Usecase 1'), ('en', 'kform Usecase 1')],
+    uiML *$ 'kform_test_001_autoTemplate_uiML' d[('es', 'kform Usecase 1 ( autotemplate)'), ('en', 'kform Usecase 1 ( autotemplate)')],
+    uiML *$ 'kform_test_002_autoTemplate_uiML' d[('es', 'kform Usecase 2 ( autotemplate + cust)'), ('en', 'kform Usecase 2 ( autotemplate + cust)')],
+    uiML *$ 'kform_test_001_icons_uiML' d[('es', 'kform Usecase 1 ( iconos)'), ('en', 'kform Usecase 1 ( icons)')],
+    uiML *$ 'kform_test_003_uiML' d[('es', 'kform StmtEdition Form *(En Desarrollo)'), ('en', 'kform StmtEdition Form *(in development)')],
+    uiML *$ 'kform_test_004_uiML' d[('es', 'Formulario con Ayudas'), ('en', 'Form with help in properties')],
+    uiML *$ 'kform_test_005_uiML' d[('es', 'kform Usecase 5 - Dialog'), ('en', 'kform Usecase 5 - Dialog')],
+    uiML *$ 'kform_test_006_uiML' d[('es', 'kform Usecase 6 - agrupaciones collapsibles'), ('en', 'kform Usecase 6 - collapsible aggrupation')],
+    uiML *$ 'kform_test_006_table_uiML' d[('es', 'kform Usecase 6 - agrupaciones collapsibles en Tabla'), ('en', 'kform Usecase 6 - collapsible aggrupation display table')],
+    uiML *$ 'kform_test_007_uiML' d[('es', 'kform Usecase 7 - agrupaciones tab'), ('en', 'kform Usecase 7 - tab aggrupation')],
+    uiML *$ 'kform_test_008_uiML' d[('es', 'kform Usecase 8 - agrupaciones initab'), ('en', 'kform Usecase 8 - initab aggrupation')],
+    uiML *$ 'kform_test_009_uiML' d[('es', 'kform Usecase 9 - agrupaciones Default (assembly)'), ('en', 'kform Usecase 9 - Default aggrupation (assembly)')],
+    uiML *$ 'kform_test_009_table_uiML' d[('es', 'kform Usecase 9 - Agrupaciones Default Table (assembly)'), ('en', 'kform Usecase 9 - Default aggrupation Table (assembly)')],
+    uiML *$ 'kform_test_010_uiML' d[('es', 'kform Usecase 10 - agrupaciones simulación completa'), ('en', 'kform Usecase 10 - Aggrupation simulation complete example')],
+    uiML *$ 'kform_test_011_uiML' d[('es', 'kform Usecase 11 - Simulacion completa usando template'), ('en', 'kform Usecase 11 - Aggrupation simulation using template')],
+    uiML *$ 'kform_test_012_uiML' d[('es', 'Formulario con personalización en agrupaciones sin API'), ('en', 'Form with customized aggrupations without using API')],
+    uiML *$ 'kform_test_013_uiML' d[('es', 'kform Usecase 13 - FileInput'), ('en', 'kform Usecase 13 - FileInput')],
+    uiML *$ 'kform_test_015_uiML' d[('es', 'kform stmtEdition Table (2 campos)'), ('en', 'kform stmtEdition Table (2 fields)')],
+    uiML *$ 'kform_test_016_uiML' d[('es', 'Formulario de contacto con agrupaciones'), ('en', 'Contact Form using aggrupations')],
+    uiML *$ 'kform_test_formulario_contactos_table_with_help_uiML' d[('es', 'kform en tabla con ayudas'), ('en', 'kform as table with help')],
+    uiML *$ 'kform_test_kform_uiML' d[('es', 'kform'), ('en', 'kform')],
+    uiML *$ 'kform_test_aggrupations_uiML' d[('es', 'kform: Agrupaciones'), ('en', 'kform: Aggrupations')],
+    uiML *$ 'kform_test_aggrupations_using_API_uiML' d[('es', 'kForm: Agrupaciones creadas con su Api'), ('en', 'kForm: Aggrupations using API')],
+    uiML *$ 'kform_test_simulated_aggrupations_table_uiML' d[('es', 'kForm: Agrupaciones simuladas en Tabla'), ('en', 'kForm: Simulated aggrupations display table')],
+    uiML *$ 'kform_test_simulated_aggrupations_uiML' d[('es', 'kForm: Agrupaciones simuladas'), ('en', 'kForm: Simulated aggrupations')].
+
+'test5gl_uiml_kscheduler':-
+    uiML *$ 'folder__repositorioTests_kscheduler_uiML' d[('es', 'kscheduler'), ('en', 'kscheduler')],
+    uiML *$ 'kscheduler_test_contactos_simple_uiML' d[('es', 'Eventos de contactos con datos locales'), ('en', 'Contacts events with local data')],
+    uiML *$ 'kscheduler_test_contactos_simple_remote_uiML' d[('es', 'Eventos de contactos con datos remotos y filtros'), ('en', 'Contacts events with local data and filters')].
+
+
+'test5gl_uiml_kgraph' :-
+    uiML *$ 'kgraph_test_contactos_with_config' d[('es', 'Kgraph con configuración'), ('en', 'Kgraph with configuration')],
+    uiML *$ 'kgraph_test_contactos_diagramType_with_config' d[('es', 'Kgraph con diagramType y configuración'), ('en', 'Kgraph with diagramType and configuration')].
+
+'rc_test_uiml_kstatusview' :-
+    uiML *$ 'kstatusview_test_001_uiML' d[('es', 'Area de visualización de estado'), ('en', 'Status area view')],
+    uiML *$ 'kstatusview_test_imageLogo_uiML' d[('es', 'kstatusView con imagen'), ('en', 'kstatusView with image')].
+
+'rc_test_uiml_kfooter' :-
+    uiML *$ 'kfooter_test_001_uiML' d[('es', 'Pie de pagina simple'), ('en', 'Simple footer')],
+    uiML *$ 'kfooter_test_hasLayout_statusView_uiML' d[('es', 'Footer que solo muestra la barra de estado'), ('en', 'Footer showing only a status bar')].
+
+'rc_test_uiml_uiux' :-
+    uiML *$ 'ui_ux_for_table_uiML' d [('es', 'Configuración de estilos para tabla'), ('en', 'Style configuration for table')],
+    uiML *$ 'ui_ux_for_graph_uiML' d [('es', 'Grafo de ontología de contactos'), ('en', 'Contact ontology graph')],
+    uiML *$ 'ui_ux_dlg_heights_uiML' d [('es', 'Mostrando diálogos con diferentes alturas'), ('en', 'Dialogs with different height')],
+    uiML *$ 'ui_ux_form_automatic_uiML' d [('es', 'Personalización de estilos para formulario automáticos'), ('en', 'Style customization for automatic forms')],
+    uiML *$ 'ui_ux_form_aggrupationapi_uiML' d [('es', 'Personalización de estilos para formulario con agrupaciones (API)'), ('en', 'Style customization form aggrupation forms (API)')],
+    uiML *$ 'ui_ux_form_kmgt_uiML' d [('es', 'Personalización del área de detail del kmgt'), ('en', 'Detail area customization in kmgt')],
+    uiML *$ 'ui_ux_form_template_controls_uiML' d [('es', 'Personalización de controles'), ('en', 'Control customization')],
+    uiML *$ 'ui_ux_form_template_tabs_uiML' d [('es', 'Configurando pestañas'), ('en', 'Tab configuration')],
+    uiML *$ 'ui_ux_form_template_colapsible_uiML' d [('es', 'Configurando colapsibles'), ('en', 'Collapsible configuration')],
+    uiML *$ 'ui_ux_form_template_assembly_uiML' d [('es', 'Configurando areas de trabajo'), ('en', 'Setting up work areas')],
+    uiML *$ 'ui_ux_form_template_helpinfo_uiML' d [('es', 'Configurando paneles de información y ayuda'), ('en', 'Help and information panel configuration')],
+    uiML *$ 'ui_ux_form_help_dlg_uiML' d [('es', 'Formulario con Ayudas y diálogo con ayudas'), ('en', 'Form with help and dialog with help')],
+    uiML *$ 'ui_ux_kmgt_test_autocols_uiML' d [('es', 'Contactos: dataset Default autocols'), ('en', 'Contact: dataset Default autocols')],
+    uiML *$ 'ui_ux_kmgt_test_stylesVars_uiML' d [('es', 'Contactos: dataset Default autocols stylesVars auto cols, layout sheet, showIcons...'), ('en', 'Contact: dataset Default autocols stylesVars auto cols, layout sheet, showIcons...')],
+    uiML *$ 'ui_ux_kmgt_test_display_uiML' d [('es', 'Contactos: dataset Default con display inline'), ('en', 'Contact: dataset Default with display inline')],
+    uiML *$ 'ui_ux_formulario_contactos_simple_stylesVars_uiML' d [('es', 'Formulario de contacto columnas auto'), ('en', 'Contact form with auto columns')],
+    uiML *$ 'ui_ux_kdetail_test_stylesVars_uiML' d [('es', 'kdetail stmtedition stylesVars'), ('en', 'kdetail stmtedition stylesVars')],
+    uiML *$ 'ui_ux_folder_ui_ux_autocols_uiML' d [('es', 'Personalización con columnas automáticas'), ('en', 'Auto columns customization')],
+    uiML *$ 'ui_ux_kmgt_test_form_stylesVars_uiML' d [('es', 'Contactos: dataset Default stylesVars propertyColor, fontSize'), ('en', 'Contact: stylesVars propertyColor, fontSize')],
+    uiML *$ 'ui_ux_text_stylesVars_uiML' d [('es', 'Personalizacion Control Text StylesVars'), ('en', 'Text Control StylesVars')],
+    uiML *$ 'ui_ux_controls_checkbox_uiML' d [('es', 'Control checkbox con multiples estados'), ('en', 'Checkbox control with multiple states')],
+    uiML *$ 'ui_ux_form_template_validation_uiML' d [('es', 'Validación en controles text'), ('en', 'Text Control validation')],
+    uiML *$ 'ui_ux_form_template_validation_name_uiML' d [('es', 'Cada palabra debe empezar con mayúsculas'), ('en', 'Words must start with capital letter')],
+    uiML *$ 'ui_ux_form_template_validation_name_tip_uiML' d [('es', 'Nombre - Ayuda de validación en tip de label'), ('en', 'Name - Validation help in label tip')],
+    uiML *$ 'ui_ux_form_template_validation_mail_uiML' d [('es', 'Un texto seguido de una arroba, otro texto y terminado con un punto seguido de 2 o 3 letras'), ('en', 'A text followed by a @, followed by another text, and finished by a dot followed by 2 to 3 letters')],
+    uiML *$ 'ui_ux_form_template_validation_mail_action_uiML' d [('es', 'Mail - Ayuda de validación en tip de acción'), ('en', 'Mail - Validation help in action tip')],
+    uiML *$ 'ui_ux_form_template_validation_idNumer_uiML' d [('es', 'Nueve números y una letra mayúscula'), ('en', 'Nine digits and a capital letter')],
+    uiML *$ 'ui_ux_form_template_validation_idNumer_placeholder_uiML' d [('es', 'DNI - Ayuda de validación en placeholder'), ('en', 'Id number - Validation help in placeholder')],
+    uiML *$ 'ui_ux_form_template_validation_phoneNumber_uiML' d [('es', 'Nueve números, los tres primeros seguidos y despues divididos en grupos de 2 por espacios'), ('en', 'Nine numbers. First three in a row, then in grups of two separated by space')],
+    uiML *$ 'ui_ux_form_template_validation_phoneNumber_all_uiML' d [('es', 'Teléfono - Todas las opciones para ayudas de validación'), ('en', 'Phone Nº - All validation help options')],
+    uiML *$ 'folder_ui_ux_stylevar_form_uiML' d [('es', 'Comportamientos stylesVars en base a agrupaciones'), ('en', 'StylesVars behaviour based in aggrupations')],
+    uiML *$ 'ui_ux_stylevar_form_compare_uiML' d [('es', 'Comparación entre formulario auto, hasAggrupation y hasLegacyAggrupation'), ('en', 'Comparison between auto, hasAggrupation and hasLegacyAggrupation forms')],
+    uiML *$ 'ui_ux_stylevar_form_compare_automatic_uiML' d [('es', 'kform con formulario automático, sin estilos extra ni stylesVars.'), ('en', 'kform with automatic form, no styles or stylesVars.')],
+    uiML *$ 'ui_ux_stylevar_form_compare_aggrupation_uiML' d [('es', 'kform con formulario por agrupaciones. Instancia de estilos en formato RG.'), ('en', 'kform with aggrupation form, styles instance has been set in RG format.')],
+    uiML *$ 'ui_ux_stylevar_form_compare_legacy_uiML' d [('es', 'kform con formulario con instancia de agrupaciones. Los estilos están definidos en una instancia con ese propósito'), ('en', 'kform with legacy aggrupation form, styles defined in instance for that purpose.')].
+    
+
+'rc_test_uiml_showloading':-
+    uiML *$ 'ui_ux_showloading_mpcall' d [('es', 'Ejemplo con llamada directa al MP (showMessageWithBlocker)'), ('en', 'Example with direct call to the MP (showMessageWithBlocker)')],
+    uiML *$ 'ui_ux_showloading_basic' d [('es', 'Ejemplo básico un solo proceso'), ('en', 'Basic example of a single process')],
+    uiML *$ 'ui_ux_showloading_notification' d [('es', 'Ejemplo básico con mensaje intermedio de notificación'), ('en', 'Basic example with intermediate notification message')],
+    uiML *$ 'ui_ux_showloading_sequences' d [('es', 'Ejemplo con dos secuencias'), ('en', 'Example with two sequences')],
+    uiML *$ 'ui_ux_showloading_error' d [('es', 'Ejemplo con error en secuencia'), ('en', 'Example with error in sequence')],
+    uiML *$ 'ui_ux_showloading_dilogexec' d [('es', 'Ejemplo con ejecución de diálogo en secuencia'), ('en', 'Example with sequenced dialog execution')],
+    uiML *$ 'ui_ux_showloading_perfomance' d [('es', 'Ejemplo para medición de rendimiento'), ('en', 'Example to testing perfomance')],
+    uiML *$ 'ui_ux_showloading_infr' d [('es', 'Ejemplo carga estandar de la INFR'), ('en', 'Example of standard INFR load')].
+
+'rc_test_uiml_toolbar':-
+    uiML *$ 'ui_ux_toolbar_title' d [('es', 'Título toolbar'), ('en', 'Toolbar title')],
+    uiML *$ 'ui_ux_toolbar_tip' d [('es', 'Probando tip'), ('en', 'Testing tip')],
+    uiML *$ 'ui_ux_toolbar_combo_title' d [('es', 'Probando tip'), ('en', 'Testing tip')].
+
+'testing_override_ui_literals':-
+  uiML *$ 'common.language.de' d [('es', 'Aleman'), ('en', 'German'),
+                                  ('pt', 'Germaninho'), ('de', 'Deuchland')].
+
+'rc_test_uiml_features' :-
+    % Table filters
+    uiML *$ 'folder__repositorioTests_table_filters_uiML' d [('es', 'Filtros por tecnología y tipo de dato'), ('en', 'Filters by technology and data type')],
+    uiML *$ 'table_filters_rem_sql_test_uiML' d[('es', 'Testeando filtros y ordenaciones (REM/SQL)'), ('en', 'Testing Filters and Sorts (REM/SQL)')],
+    uiML *$ 'table_filters_rem_test_uiML' d[('es', 'Filtros y ordenaciones con tecnología REM'), ('en', 'Filters and sorts with REM technology')],
+    uiML *$ 'table_filters_sql_test_uiML' d[('es', 'Filtros y ordenaciones con tecnología SQL'), ('en', 'Filters and sorts with SQL technology')],
+    uiML *$ 'table_filters_rem_test_uiML' d[('es', 'Filtros REM'), ('en', 'REM filters')],
+    uiML *$ 'table_filters_mysql_test_uiML' d[('es', 'Filtros MYSQL'), ('en', 'MYSQL filters')],
+    uiML *$ 'staber_table_selection_pivotrid_both_selections_UIML' d[('es', 'Pivotgrid con ambas selecciones'), ('en', 'Pivotgrid with both selections')],
+    uiML *$ 'folder__funcionalities_table_selection_UIML' d[('es', 'Selección en tablas'), ('en', 'Selection in tables')],
+    uiML *$ 'staber_table_selection_kresult_both_selections_UIML' d[('es', 'Kresult con ambas selecciones'), ('en', 'Kresult with both selections')],
+    uiML *$ 'ui_ux_test_general_features' d[('es', 'Test para funcionalidades generales'), ('en', 'General features test')],
+    uiML *$ 'ui_ux_general_features_textarea_behaviour_when_enabled_false' d[('es', 'Comportamiento de textarea no editable'), ('en', 'Textarea behaviour when not enabled')],
+    uiML *$ 'ui_ux_textarea_behaviour_when_enabled_false_no_form' d[('es', 'Textarea no editable'), ('en', 'Textarea not enabled')],
+    uiML *$ 'ui_ux_textarea_behaviour_when_enabled_false_form' d[('es', 'Textarea no editable en formulario'), ('en', 'Textarea not enabled in form')],
+    uiML *$ 'ui_ux_textarea_behaviour_when_enabled_false_table' d[('es', 'Textarea no editable en tabla'), ('en', 'Textarea not enabled in table')],
+    uiML *$ 'ui_ux_textarea_behaviour_when_enabled_false_placeholder' d[('es', 'Intenta copiar y pegar aquí'), ('en', 'Try to copy&paste here')],
+    uiML *$ 'ui_ux_textarea_behaviour_when_enabled_false_no_form_rlg_editor' d[('es', 'Editor RLG no editable'), ('en', 'RLG editor not enabled')],
+    uiML *$ 'ui_ux_textarea_behaviour_when_enabled_false_no_form_json_editor' d[('es', 'Editor JSON no editable'), ('en', 'JSON editor not enabled')],
+    uiML *$ 'ui_ux_textarea_behaviour_when_enabled_false_no_form_md_editor' d[('es', 'Editor MD no editable'), ('en', 'MD editor not enabled')],
+    uiML *$ 'ui_ux_staber_general_features_tag_register' d[('es', 'Registro dinámico de tags en kworkspace'), ('en', 'Dynamic tag registration in kworkspace')],
+    uiML *$ 'ui_ux_staber_general_features_payload_in_rlg_editor_actions' d[('es', 'Payload en acciones extra para editor rlg'), ('en', 'Payload in extra actions for rlg editor')],
+    uiML *$ 'ui_ux_staber_server_aggrupation_server' d[('es', 'Escenarios para comprobar agrupaciones de servidor'), ('en', 'Scenarios for checking server clusters')],
+    uiML *$ 'ui_ux_staber_server_aggrupation_full_test' d[('es', 'Prueba completa con agrupaciones de servidor'), ('en', 'Full test with server clusters')],
+
+    uiML *$ 'ui_ux_feature_error_server_sql_error' d[('es', 'Forzar error en SQL'), ('en', 'Force SQL error')],
+    uiML *$ 'ui_ux_feature_error_server_sql_error_label' d[('es', 'Error en proceso no controlado de SQL. Incluye solamente type: appError'), ('en', 'Forced error in non-controlled SQL process')],
+    uiML *$ 'ui_ux_feature_error_server_fetch_error' d[('es', 'Forzar error en fetch'), ('en', 'Force fetch error')],
+    uiML *$ 'ui_ux_feature_error_server_fetch_error_label' d[('es', 'Error en proceso fetch no controlado incluyendo type:appError y appError en la respuesta'), ('en', 'Error in non-controlled fetch process')],
+    uiML *$ 'ui_ux_feature_error_server_apperror' d[('es', 'Forzar error appError sin tipo'), ('en', 'Force appError error without type')],
+    uiML *$ 'ui_ux_feature_error_server_apperror_label' d[('es', 'Error de tipo appError '), ('en', 'appError error type')],
+    uiML *$ 'ui_ux_feature_error_server_uncaught' d[('es', 'Error en secuencia de servidor '), ('en', 'Error during server sequence')],
+    uiML *$ 'ui_ux_feature_error_server_uncaught_combo' d[('es', 'Seleccione tipo de error'), ('en', 'Select error type')],
+    uiML *$ 'ui_ux_feature_error_server_uncaught_combo_unchecked_property' d[('es', 'Busqueda propiedad no existente -appError'), ('en', 'Search non-existent property - appError')],
+    uiML *$ 'ui_ux_feature_error_server_uncaught_combo_errortype' d[('es', 'Forzar type: errorType'), ('en', 'force type:errorType')],
+    uiML *$ 'ui_ux_feature_error_server_kresult' d[('es', 'Error en KResult'), ('en', 'Error in KResult')].
+
+'rc_test_uiml_kpivot' :-
+    uiML *$ kpivot_columns_customization_simple_uiML d [('es', 'Customización de columnas simple'), ('en', 'Simple columns customization')].

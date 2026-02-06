@@ -1,0 +1,271 @@
+﻿/**
+@descr	staber_template_replace <br>
+		staber_template_replace
+@author gbl
+@date	2024_04_04
+**/
+rc_class('staber_template_replace') :-
+	class +$ 'staber_template_replace' d ( es,'Escenarios para reemplazo de variables en template') sc function,
+    'staber_template_replace::rowTemplate'(_, _, _, _),
+    'staber_template_replace::schema_template'(_, _, _, _),
+    'staber_template_replace::folders'(_, _, _, _).
+
+'staber_template_replace::rowTemplate'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),
+    newKw('bus__kresult', BUSID_RESULT),
+    OVERRIDES = [            
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'replace_rowTemplate_kpivotGrid', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }        
+    ],
+    Schema = {
+        data:[                   
+            {
+                label: {
+                    d: 'Nombre'
+                },
+                enabled: false,
+                class: 'user',
+                arc: 'contact:hasName'
+            },
+            {
+                label: {
+                    d: 'Color de fondo'
+                },
+                arc: 'contact:hasBackgroundColor',
+                template: '<div>#{_.contact:hasBackgroundColor.to}</div>',
+                enabled: '_.enabled'
+            }                        				                
+        ]
+    },
+	IN = {
+        enabled: '_.enabled',
+        hasAgent: I_agent,
+        hasDataset: 'dataset__test_5gl_server',
+        hasKw: 'testapp:contact',
+        schema: Schema,
+        rowTemplate: 'style=\"background-color: ###{_.contact:hasBackgroundColor.to}##\"//class=\"#{_.contact:hasBackgroundColor.to}\"',
+        includedProperties: [
+            'contact:hasName',
+            'contact:hasBackgroundColor'
+        ]
+    },
+    Label = {
+        type: label,
+        size: 'h4',
+        d: 'En este ejemplo se muestra reemplazo de atributo \"contact:hasBackgroundColor\" usando notación ## para los estilos de fila en atributo \"rowTemplate\".'
+    },
+    Label2 = {
+        type: label,
+        size: 'h4',
+        d: 'Además, la segunda columna muestra el color usando reemplazo en plantilla dentro de atributo \"schema\" sin usar notación ##.'
+    },
+    Label3 = {
+        type: label,
+        size: 'h4',
+        d: 'En ambos casos llevan concatenado el caracter \'#\'. Es decir, el valor nos llega sin \'#\' en origen.'
+    },
+    Obj_kresult = {  
+        type : 'kresult',
+        in : IN,
+        overrides: OVERRIDES,
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT
+    },
+    Obj_assembly = {
+        type: assembly,
+        cols: 1,
+        children:[
+            Label, Label2, Label3, Obj_kresult
+        ]
+    },
+	Obj_class = {  
+        type : 'rprocess',
+        in : IN,
+        hasKw: template_replace_rowTemplate,
+        gui_out: Obj_assembly,
+        hasDsca: [('es', 'Reemplazo en fila')],
+        hasIcon: 'horizontal',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'replace_rowTemplate_kpivotGrid'(_CTX, OBJ_IN, _CTX, OBJ_OUT):-
+    obj_get(in:schema:data, OBJ_IN,  SCHEMA),
+    obj_get(in:rowTemplate, OBJ_IN,  ROWTEMPLATE),
+    obj_get(in:hasKw, OBJ_IN,  KW),
+    obj_get(in:hasAgent, OBJ_IN,  AGENT),
+    obj_get(in:hasDataset, OBJ_IN,  DS),
+    obj_get(in:includedProperties, OBJ_IN,  INCLUDED),
+    IN = {
+        hasKw: KW,
+        hasAgent: AGENT,
+        hasDataset: DS,
+        rowTemplate: ROWTEMPLATE,
+        schema : SCHEMA,
+        hasIncludedProperties: INCLUDED,
+        inlineCount: true,
+        orderByOneColumn: true,
+        searchType: rem,
+        stmtFilter: '[HASKW]',
+        rootElement: true,
+        expanded: false,
+        limit: 20,
+        persistence: remote,
+        schemaHeader: true,
+        resizable: true
+    },
+    newKw('replace_rowTemplate_', BUSID),
+     OBJ_OUT = {    
+            type : 'kpivotgrid',
+            do_exec: true, 
+            busId: BUSID,        
+            in : IN,
+            proc: {
+                type: 'sequence',
+                hasProcess: [
+                    {
+                        type: method,
+                        name: schemaToQuery,
+                        module: 'QueryFilterService'
+                    },
+                    {
+                        type: function,
+                        name: remql,
+                        context: { delegatedTo: builderweb }
+                    },
+                    {
+                        type: function,
+                        name: insert_separator_line,
+                        context: { delegatedTo: builderweb }
+                    }
+                ]
+            }
+    }.
+
+'insert_separator_line'(_CTX, Obj_in, _CTX, Obj_out):-
+    obj_fetch( result, Obj_in, RESULTSET),
+
+    splitAt( 4, RESULTSET, PrimeraLista, SegundaLista ),
+    RED_LINE = [{ type: 'separator', color: 'red'}],
+    appendN( [ PrimeraLista, RED_LINE, SegundaLista], ListaOut),
+
+    obj_set( result, Obj_in, ListaOut, Obj_out).
+
+'staber_template_replace::schema_template'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),
+    newKw('bus__kresult', BUSID_RESULT),
+    'staber_kresult::schema::usecase__test_replace'(Schema),
+	IN = {
+        % enabled: true,
+        enabled: '_.enabled',
+        hasAgent: I_agent,
+        hasDataset: 'dataset__test_5gl_server',
+        hasKw: 'testapp:contact',
+        schema: Schema,
+        includedProperties: [
+            'contact:hasName',
+            'contact:hasAge',
+            'contact:hasBackgroundColor'
+        ]
+    },
+    Label = {
+        type: label,
+        size: 'h4',
+        d: 'En este ejemplo se muestra reemplazo de atributo \"contact:hasBackgroundColor\" sin usar notación ## para los estilos de celda en atributo \"template\" del \"schema\".'
+    },
+    Label2 = {
+        type: label,
+        size: 'h4',
+        d: 'La segunda columna muestra el nombre usando reemplazo en plantilla dentro de atributo \"schema\" sin usar notación ##.'
+    },
+    Label3 = {
+        type: label,
+        size: 'h4',
+        d: 'La tercera columna muestra el Kw usando reemplazo en plantilla dentro de atributo \"schema\" usando notación ## y además, usando el atributo \"ignore_suffix\" de reemplazo.'
+    },
+    Obj_kresult = {  
+        type : 'kresult',
+        in : IN,
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT
+    },
+    Obj_assembly = {
+        type: assembly,
+        cols: 1,
+        children:[
+            Label, Label2, Label3, Obj_kresult
+        ]
+    },
+	Obj_class = {  
+        type : 'rprocess',
+        in : IN,
+        hasKw: template_replace_schema_template,
+        gui_out: Obj_assembly,
+        hasDsca: [('es', 'Reemplazo en celda')],
+        hasIcon: 'columns',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kresult::schema::usecase__test_replace'(OBJ_out):-
+    Table_Schema = [                   
+        {
+            label: {
+                d: 'Columna de control'
+            },
+            enabled: false,
+            class: 'user',
+            arc: 'contact:hasName'
+        },
+        {
+            label: {
+                d: 'Nombre reemplazado sin usar notación ##'
+            },
+            enabled: '_.enabled',
+            arc: 'contact:hasName',
+            template:'<div style=\"background-color: #{_.contact:hasBackgroundColor.to}\">{_.contact:hasName.to}</div>',
+            enabled: false
+        },
+        {
+            label: {
+                d: 'Kw de instancia reemplazado usando notación ## y usando el atributo de reemplazo \"ignore_suffix\"'
+            },
+            arc: 'contact:hasAge',
+            enabled: '_.enabled',
+            template:'<div style=\"background-color: #{_.contact:hasBackgroundColor.to}\">##{_.hasKw.to}##</div>'
+            % class=\'##{_.contact:hasName.to}##\'
+        }                        				                
+    ],
+    OBJ_out = {data: Table_Schema }.
+
+'staber_template_replace::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder_template_replace_kresult,
+        isRoot: false,
+        hasIcon: 'table',
+        hasDsca: 'Reemplazo de variables en tablas usando plantillas',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            template_replace_rowTemplate,
+            template_replace_schema_template
+        ]
+	},	
+	create_rprocess(_, Conf_folder, _, _).
+

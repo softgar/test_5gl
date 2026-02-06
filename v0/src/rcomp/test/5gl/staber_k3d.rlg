@@ -1,0 +1,1508 @@
+﻿/**staber_k
+@descr	staber_k3d <br>
+		staber_k3d
+@author CCP
+@date	2024_07_08
+**/
+rc_class('staber_k3d') :-
+	class +$ 'staber_k3d' d ( es,'Patrón rproc para k3d') sc function,
+    'staber_k3d::euler_engine'(_, _, _, _),
+    'staber_k3d::ada_engine'(_, _, _, _),
+    'staber_k3d::ada_engine_rt'(_, _, _, _),
+    'staber_k3d::folders'(_, _, _, _).
+
+'staber_k3d::euler_engine'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__container', CHANNEL_RPROC),  
+    newKw('busid__container', BUS_RPROC),    
+    newKw('channel__toolbar_', CHANNEL_KTOOLBAR),
+    newKw('busid__toolbar_', BUSID_KTOOLBAR),
+    newKw('channel__k3d_euler', CHANNEL_K3D),
+    newKw('busid__k3d_euler', BUSID_K3D),
+
+    get_k3d_camera_config(Camera),
+    get_k3d_render_config(Render),
+    get_k3d_hud_config_euler(HUD),
+
+    get_generic_toolbar(BUSID_K3D, CHANNEL_KTOOLBAR, BUSID_KTOOLBAR, Obj_toolbar),
+    
+    Obj_k3d = {
+        type : 'k3d',
+        busId: BUSID_K3D,
+        hasChannel: CHANNEL_K3D,  
+        hasEngine: 'euler',          
+        in: {
+            camera: Camera,
+            render: Render,
+            hud: HUD
+        },
+        % ToDo Must subscribe to TAB CHANNEL.
+        evtSubscribe: [{ topic: "setNode", channel: "channel__testapp_app_session__ktab" }]
+    },
+
+    Obj_container = {
+        type: 'assembly',
+        children:[
+            Obj_toolbar,
+            Obj_k3d
+        ]
+    },
+
+    Obj_class = {
+        type : 'rprocess',
+        busId: BUS_RPROC,
+        hasChannel: CHANNEL_RPROC,
+        hasKw: k3d_euler_engine,
+        hasDsca: [('es', 'K3D - Motor Gráfico (EULER) ')],
+        hasIcon: 'rocket',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_container,
+        isSession: true,
+        hasNavbar: false   
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_k3d::ada_engine'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__container', CHANNEL_RPROC),  
+    newKw('busid__container', BUS_RPROC),    
+    newKw('channel__toolbar_', CHANNEL_KTOOLBAR),
+    newKw('busid__toolbar_', BUSID_KTOOLBAR),
+    newKw('channel__k3d_ada', CHANNEL_K3D),
+    newKw('busid__k3d_ada', BUSID_K3D),
+
+    get_k3d_camera_config(Camera),
+    get_k3d_render_config(Render),
+    get_k3d_hud_config_ada(HUD),
+    get_generic_toolbar(BUSID_K3D, CHANNEL_KTOOLBAR, BUSID_KTOOLBAR, Obj_toolbar),
+    
+    Obj_k3d = {
+        type : 'k3d',
+        busId: BUSID_K3D,
+        hasChannel: CHANNEL_K3D,
+        hasEngine: 'ada',    
+        in: {
+            camera: Camera,
+            render: Render,
+            hud: HUD
+        },
+        % ToDo Must subscribe to TAB CHANNEL.
+        evtSubscribe: [{ topic: "setNode", channel: "channel__testapp_app_session__ktab" }]
+    },
+
+    Obj_container = {
+        type: 'assembly',
+        children:[
+            Obj_toolbar,
+            Obj_k3d
+        ]
+    },
+
+    Obj_class = {
+        type : 'rprocess',
+        busId: BUS_RPROC,
+        hasChannel: CHANNEL_RPROC,
+        hasKw: k3d_ada_engine,
+        hasDsca: [('es', 'K3D - Motor Gráfico (ADA) ')],
+        hasIcon: 'rocket-line',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_container,
+        isSession: true,
+        hasNavbar: false   
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_k3d::ada_engine_rt'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__container_rt_', CHANNEL_RPROC),  
+    newKw('busid__container_rt_', BUS_RPROC),    
+    newKw('channel__toolbar_rt_', CHANNEL_KTOOLBAR),
+    newKw('busid__toolbar_rt_', BUSID_KTOOLBAR),
+    newKw('channel__k3d_ada_rt_', CHANNEL_K3D),
+    newKw('busid__k3d_ada_rt_', BUSID_K3D),
+
+    get_k3d_camera_config(Camera),
+    get_k3d_render_config_ada_rt(Render),
+    get_k3d_hud_config_ada(HUD),
+    get_ada_rt_toolbar(BUSID_K3D, CHANNEL_KTOOLBAR, BUSID_KTOOLBAR, Obj_toolbar),
+    
+    Obj_k3d = {
+        type : 'k3d',
+        busId: BUSID_K3D,
+        hasChannel: CHANNEL_K3D,
+        hasEngine: 'ada',        
+        in: {
+            deploy: 'deploy__streaming',
+            realization: 'realization__hydra',
+            camera: Camera,
+            render: Render,
+            hud: HUD
+        },
+        % ToDo Must subscribe to TAB CHANNEL.
+        evtSubscribe: [{ topic: "setNode", channel: "channel__testapp_app_session__ktab" }]
+    },
+
+    Obj_container = {
+        type: 'assembly',
+        children:[
+            Obj_toolbar,
+            Obj_k3d
+        ]
+    },
+
+    Obj_class = {
+        type : 'rprocess',
+        busId: BUS_RPROC,
+        hasChannel: CHANNEL_RPROC,
+        hasKw: k3d_ada_engine_rt,
+        hasDsca: [('es', 'K3D - Motor Gráfico (ADA) Ray Tracing  ')],
+        hasIcon: 'rocket-line',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_container,
+        isSession: true,
+        hasNavbar: false   
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_k3d::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_k3d,
+        hasDsca: 'k3d: Componente Motor Gráfico',
+        hasIcon: 'search',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            k3d_euler_engine,
+            k3d_ada_engine,
+            k3d_ada_engine_rt
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).
+
+get_generic_toolbar(BUSID_K3D, CHANNEL_KTOOLBAR, BUSID_KTOOLBAR, Obj_toolbar):-
+    After_proc = {
+        type: 'sequence',
+        hasProcess: [
+             { 
+                type: "method", 
+                name: "getPhysicalAgent", 
+                module: "Auth"
+            },
+            {
+                type: "method",
+                name: "merge_in",
+                busId: BUSID_KTOOLBAR
+            }
+        ]
+    },
+
+    CONTEXT =  {
+        delegatedTo: {
+            ras: {
+                path: "/staber/Execute",
+                transport: "http"
+            },
+            implementedBy: "prolog",
+            physicalAgent: "$.in.physicalAgent"
+        }
+    },
+    
+    CONTEXT_EXPORT_USD_FROM_EULER =  {
+        delegatedTo: {
+            ras: {
+                path: "/staber/Execute",
+                transport: "http"
+            },
+            implementedBy: 'C',
+            module: 's3d_web_agent_proxy',
+            physicalAgent: "$.in.physicalAgent"
+        }
+    },
+
+    IN_TOOLBAR = {
+        actions: [
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Añadir escena Mitsuba'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_K3D,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [             
+                                { 
+                                    type: 'function',                                
+                                    name: 'new_scene_mitsuba',
+                                    context: CONTEXT
+                                }, 
+                                {
+                                    type: 'method',                                   
+                                    name: 'changeView',
+                                    in: { view:  'r3d:perspective', notify_now: false },
+                                    busId: BUSID_K3D
+                                },                  
+                                {
+                                    type: 'method',
+                                    name: 'loadScene',
+                                    in: { auto_center: true },
+                                    busId: BUSID_K3D
+                                }                                  
+                            ]
+                        }
+                    }
+                ]  
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Cambiar el color/imagen de fondo'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_K3D,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'method',
+                                    name: 'getRC3D',
+                                    busId: BUSID_K3D
+                                },      
+                                { 
+                                    type: 'function',                                
+                                    name: 'alternate_mitsuba_environment',
+                                    context: CONTEXT
+                                },                      
+                                {
+                                    type: 'method',
+                                    name: 'changeEnvironment',
+                                    in: { notify_now: true },
+                                    busId: BUSID_K3D
+                                }                  
+                            ]
+                        }
+                }
+                ]      
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Añadir mitsuba'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BUSID_K3D,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            {
+                                type: 'method',
+                                name: 'getRC3D',
+                                busId: BUSID_K3D
+                            },                   
+                            { 
+                                type: 'function',                                
+                                name: 'add_mitsuba',
+                                context: CONTEXT
+                            },
+                            {
+                                type: 'method',
+                                name: 'updateScene',
+                                in: { auto_center: false },
+                                busId: BUSID_K3D
+                            }                       
+                        ]
+                    }
+                }]      
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Eliminar mitsuba'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_K3D,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'method',
+                                    name: 'getRC3D',
+                                    busId: BUSID_K3D
+                                },                        
+                                { 
+                                    type: 'function',                                
+                                    name: 'del_mitsuba',
+                                    context: { delegatedTo: 'builderweb' }
+                                },
+                                {
+                                    type: 'method',
+                                    name: 'updateScene',
+                                    in: { auto_center: false },
+                                    busId: BUSID_K3D
+                                }                                           
+                            ]
+                        }
+                    }
+                ]      
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Cambiar shader'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_K3D,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [     
+                                {
+                                    type: 'method',
+                                    name: 'getRC3D',
+                                    busId: BUSID_K3D
+                                },              
+                                { 
+                                    type: 'function',                                
+                                    name: 'change_mitsuba_shader',
+                                    context: CONTEXT
+                                },                      
+                                {
+                                    type: 'method',
+                                    name: 'updateScene',                              
+                                    busId: BUSID_K3D
+                                }                     
+                            ]
+                        }
+                    }
+                ]      
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Alternar vista (persp/top)'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BUSID_K3D,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [         
+                            {
+                                type: 'method',
+                                name: 'getRC3D',
+                                busId: BUSID_K3D
+                            },                 
+                            { 
+                                type: 'function',                                
+                                name: 'alternate_mitsuba_view',
+                                context: { delegatedTo: 'builderweb' }
+                            },
+                            {
+                                type: 'method',                                   
+                                name: 'changeView',
+                                in: { notify_now: true },
+                                busId: BUSID_K3D
+                            } 
+                        ]
+                    }
+                }]      
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Exportar escena en formato USD'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_K3D,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [         
+                                {
+                                    type: 'method',
+                                    name: 'getInfoData',
+                                    busId: BUSID_K3D
+                                },                                  
+                                {
+                                    type: 'function',                                   
+                                    name: 'SaveUSD',
+                                    in: { usd_path: '../data/tmp/mitsubas.usdz' },
+                                    context: CONTEXT_EXPORT_USD_FROM_EULER
+                                } 
+                            ]
+                        }
+                    }
+                ]      
+            }    
+        ]
+    },
+    Obj_toolbar = {
+        type: 'ktoolbar',
+        in : IN_TOOLBAR,
+        after_proc: After_proc,
+        hasChannel: CHANNEL_KTOOLBAR,
+        busId: BUSID_KTOOLBAR        
+    }.
+
+get_ada_rt_toolbar(BUSID_K3D, CHANNEL_KTOOLBAR, BUSID_KTOOLBAR, Obj_toolbar):-
+    After_proc = {
+        type: 'sequence',
+        hasProcess: [
+             { 
+                type: "method", 
+                name: "getPhysicalAgent", 
+                module: "Auth"
+            },
+            {
+                type: "method",
+                name: "merge_in",
+                busId: BUSID_KTOOLBAR
+            }
+        ]
+    },
+
+    CONTEXT =  {
+        delegatedTo: {
+            ras: {
+                path: "/staber/Execute",
+                transport: "http"
+            },
+            implementedBy: "prolog",
+            physicalAgent: "$.in.physicalAgent"
+        }
+    },
+
+    CONTEXT_ADA =  {
+        delegatedTo: {
+            ras: {
+                path: "/staber/Execute",
+                transport: "http"
+            },
+            implementedBy: 'C',
+            module: 's3d_web_agent_proxy',
+            physicalAgent: "$.in.physicalAgent"
+        }
+    },
+    
+    IN_TOOLBAR = {
+        actions: [
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Cargar cabina ascensor'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_K3D,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [             
+                                {
+                                    type: 'method',
+                                    name: 'getRC3D',
+                                    busId: BUSID_K3D
+                                },  
+                                { 
+                                    type: 'function',                                
+                                    name: 'new_scene_car',
+                                    context: CONTEXT
+                                }, 
+                                {
+                                    type: 'method',                                   
+                                    name: 'changeView',
+                                    in: { view:  'r3d:perspective', notify_now: false },
+                                    busId: BUSID_K3D
+                                },    
+                                {
+                                    type: 'method',
+                                    name: 'changeEnvironment',
+                                    in: { 
+                                        environment: 'portland', 
+                                        show_environment: true, 
+                                        background_color: [1.0, 1.0, 1.0, 1.0], 
+                                        notify_now: false 
+                                    },
+                                    busId: BUSID_K3D
+                                },                  
+                                {
+                                    type: 'method',
+                                    name: 'loadScene',
+                                    in: { auto_center: true },
+                                    busId: BUSID_K3D
+                                }                                  
+                            ]
+                        }
+                    }
+                ]  
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Acabados de madera'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BUSID_K3D,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [     
+                            {
+                                type: 'method',
+                                name: 'getRC3D',
+                                busId: BUSID_K3D
+                            },              
+                            { 
+                                type: 'function',                                
+                                name: 'set_car_wood_finish',
+                                in: { auto_center: false },         
+                                context: CONTEXT
+                            },                      
+                            {
+                                type: 'method',
+                                name: 'updateScene',                              
+                                busId: BUSID_K3D
+                            }                     
+                        ]
+                    }
+                }]      
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Acabados de metal'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BUSID_K3D,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [     
+                            {
+                                type: 'method',
+                                name: 'getRC3D',
+                                busId: BUSID_K3D
+                            },              
+                            { 
+                                type: 'function',                                
+                                name: 'set_car_metal_finish',
+                                context: CONTEXT
+                            },                      
+                            {
+                                type: 'method',
+                                name: 'updateScene',
+                                in: { auto_center: false },                          
+                                busId: BUSID_K3D
+                            }                     
+                        ]
+                    }
+                }]      
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Cambiar luces techo'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BUSID_K3D,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [     
+                            {
+                                type: 'method',
+                                name: 'getRC3D',
+                                busId: BUSID_K3D
+                            },              
+                            { 
+                                type: 'function',                                
+                                name: 'set_car_ceiling',
+                                context: CONTEXT
+                            },                      
+                            {
+                                type: 'method',
+                                name: 'updateScene',
+                                in: { auto_center: false },                          
+                                busId: BUSID_K3D
+                            }                     
+                        ]
+                    }
+                }]      
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Alternar ventana lateral'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BUSID_K3D,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [     
+                            {
+                                type: 'method',
+                                name: 'getRC3D',
+                                busId: BUSID_K3D
+                            },              
+                            { 
+                                type: 'function',                                
+                                name: 'toogle_car_window',
+                                context: CONTEXT
+                            },                      
+                            {
+                                type: 'method',
+                                name: 'updateScene',
+                                in: { auto_center: false },                          
+                                busId: BUSID_K3D
+                            }                     
+                        ]
+                    }
+                }]      
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Cargar mesa comedor'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_K3D,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [             
+                                {
+                                    type: 'method',
+                                    name: 'getRC3D',
+                                    busId: BUSID_K3D
+                                },  
+                                { 
+                                    type: 'function',                                
+                                    name: 'new_dinning_table',
+                                    context: CONTEXT
+                                },   
+                                 {
+                                    type: 'method',
+                                    name: 'changeEnvironment',
+                                    in: { environment: 'studio_dim', show_environment: true, background_color: [1.0, 1.0, 1.0, 1.0], notify_now: false },
+                                    busId: BUSID_K3D
+                                },               
+                                {
+                                    type: 'method',
+                                    name: 'loadScene',
+                                    in: { auto_center: true },
+                                    busId: BUSID_K3D
+                                }                                  
+                            ]
+                        }
+                    }
+                ]  
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Salvar la escena en formato USD'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BUSID_K3D,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [         
+                            {
+                                type: 'method',
+                                name: 'getRC3D',
+                                busId: BUSID_K3D
+                            },
+                            {
+                                type: 'method',
+                                name: 'getAgRoot',
+                                busId: BUSID_K3D
+                            },                  
+                            {
+                                type: 'function',                                   
+                                name: 'SaveUSD',
+                                in: { usd_path: '../data/tmp/car.usdz' },
+                                context: CONTEXT_ADA
+                            } 
+                        ]
+                    }
+                }]      
+            }    
+        ]
+    },
+    Obj_toolbar = {
+        type: 'ktoolbar',
+        in : IN_TOOLBAR,
+        after_proc: After_proc,
+        hasChannel: CHANNEL_KTOOLBAR,
+        busId: BUSID_KTOOLBAR        
+    }.
+
+get_k3d_camera_config(ObjCamera):-
+    ObjCamera = { 
+        type: 'perspective'
+    }.
+
+get_k3d_render_config(ObjRender):-
+    ObjRender = {
+        type: 'physically-based',
+        indirect_lighting: {
+            type: 'distance_light_probe',
+            catalog_probe: 'skylit_garage',
+            show_skybox: true,
+            background: [0.74, 0.74, 0.74, 0.0]
+        }
+    }.
+
+get_k3d_render_config_ada_rt(ObjRender):-
+    ObjRender = {
+        types: ['r3d:renderRTXPT'],
+        initial: 'r3d:renderRTXPT',
+        indirect_lighting: {
+            type: 'distance_light_probe',
+            catalog_probe: 'skylit_garage',
+            show_skybox: true,
+            background: [0.74, 0.74, 0.74, 0.0]
+        }
+    }.
+
+get_k3d_hud_config_ada(ObjHUD):-
+    ObjHUD = {
+        fonts_size: 18,
+        icons_font:[
+            {url: 'fonts/Roboto-Medium.ttf', range:['0x0000', '0x0000']},
+            {url: 'fonts/icons.ttf', range:['0xF000', '0xF400']}
+        ],
+        toolbox: {
+            layout: 'top',
+            toolbars: [ 
+                {
+                    key: 'camera',
+                    buttons: [ 
+                        {
+                            key: 'guiZoomCamera',
+                            label: 'Zoom',
+                            font_icon: 'f1f6',
+                            stateless: true,
+                            enabled: true
+                        }, 
+                        {
+                            key: 'guiOrbitCamera',
+                            label: 'Orbit',
+                            font_icon: 'f10c',
+                            stateless: true,
+                            enabled: true
+                        },
+                        {
+                            key: 'guiRestartCamera',
+                            label: 'Restart camera',
+                            font_icon: 'f1ca',
+                            stateless: true,
+                            enabled: true
+                        }
+                    ]
+                },
+                {
+                    key: 'view',
+                    buttons: [ 
+                        {
+                            key: 'guiPerspectiveView',
+                            label: 'Perpective view, with camera in examine mode',
+                            labels: [{es: 'Vista en perspectiva, con camara en modo examinar'}, {en: 'Perpective view, with camera in examine mode'}],
+                            font_icon: 'f1b9',
+                            stateless: false,
+                            enabled: true
+                        },                     
+                        {
+                            key: 'guiTopView',
+                            label: 'Top view',
+                            labels: [{es: 'Vista en planta'}, {en: 'Top view'}],
+                            font_icon: 'f1b6',
+                            stateless: false,
+                            enabled: true
+                        }
+                    ]
+			    } 
+            ]
+        }
+    }.
+
+get_k3d_hud_config_euler(ObjHUD):-
+    ObjHUD = {
+        fonts_size: 18,
+        icons_font: {
+            url: './r3d/fonticons/icons.ttf',
+            range:['0xF000', '0xF400']
+        },
+        toolbox: {
+            layout: 'top',
+            toolbars: [ 
+                {
+                    key: 'camera',
+                    buttons: [ 
+                        {
+                            key: 'guiZoomCamera',
+                            label: 'Zoom',
+                            font_icon: 'f1f6',
+                            stateless: true,
+                            enabled: true
+                        }, 
+                        {
+                            key: 'guiOrbitCamera',
+                            label: 'Orbit',
+                            font_icon: 'f10c',
+                            stateless: true,
+                            enabled: true
+                        },
+                        {
+                            key: 'guiRestartCamera',
+                            label: 'Restart camera',
+                            font_icon: 'f1ca',
+                            stateless: true,
+                            enabled: true
+                        }
+                    ]
+                } 
+            ]
+        }
+    }.
+
+new_scene_mitsuba( _, Obj_in, _, Obj_out):-
+    ( dicc( _, urlSpec__3D_demo_ss ) ->
+        true
+    ;
+        urlSpec +$ urlSpec__3D_demo_ss  d (es, 'Apunta a los datos de prueba del 3D')
+            p [resourcePath ¬> 'fileserver/repository/']
+    ),
+    new_scene_mitsuba( AgMitsuba),
+    obj_merge( Obj_in, { root: AgMitsuba }, Obj_out).
+
+
+new_scene_mitsuba(I_root):- 	  		
+	newR3DAGItem('r3d:agItem', d [(es,'ag_root_mitsuba'),(en,'ag_root_mitsuba')], I_root),
+
+	newR3DAGItem('r3d:agItem', d [(es,'I_mitsuba_gold'),(en,'I_mitsuba_gold')], I_mitsuba_gold),
+	newR3DAGItem('r3d:agItem', d [(es,'I_mitsuba_ceramic'),(en,'I_mitsuba_ceramic')], I_mitsuba_ceramic),
+
+	newR3DAGItem('r3d:agItem', d [(es,'I_mitsuba_ceramic_clone'),(en,'I_mitsuba_ceramic_clone')], I_mitsuba_ceramic_clone),
+	
+	newR3DDielectricMaterial( d [(es, 'ceramica'), (en, 'ceramic')], [1.0, 1.0, 1.0], 'ceramic', I_white_ceramic),
+	newR3DCustomMaterial( d [(es, 'custom metal'), (en, 'custom metal')], [1.0, 0.86, 0.54], 1.0, 0.05, I_metallic_gold),
+
+	newR3DExternal( _, d (es, 'I_p_mitsuba_gold'), urlSpec__3D_demo_ss, 'data/3D Models/Mitsuba/mitsuba-a_3-a_3.bdp', I_metallic_gold, _, I_p_mitsuba_gold),
+	newR3DExternal( _, d (es, 'I_p_mitsuba_ceramic'), urlSpec__3D_demo_ss, 'data/3D Models/Mitsuba/mitsuba-a_3-a_3.bdp', I_white_ceramic, _, I_p_mitsuba_ceramic),
+	
+	addGPart( I_root, I_mitsuba_gold, 0),			
+	addGPart( I_mitsuba_gold, I_p_mitsuba_gold),
+	addGPart( I_root, I_mitsuba_ceramic, 1),
+	addGPart( I_mitsuba_ceramic, I_p_mitsuba_ceramic),
+
+	addGPart( I_root, I_mitsuba_ceramic_clone, 2),
+	addGPart( I_mitsuba_ceramic_clone, I_p_mitsuba_ceramic),
+	setTranslation( I_mitsuba_ceramic, [2.5, 0.0, 0.0]),
+	setTranslation( I_mitsuba_ceramic_clone, [5.0, 0.0, 0.0]).
+
+add_mitsuba(_Obj_ctx, Obj_in, _Obj_ctx, Obj_out):-
+    obj_fetch( repcon3d, Obj_in, Repcon3D),
+    stmt( hasComponentScope, Repcon3D, I_root),
+    sortedFindall( 
+        Orda, Orda,
+        (   stmt( 'r3d:hasPartG', I_root, Ag, Orda),
+            isInstance( Ag)
+        ),
+        LOrda
+    ),
+    ( LOrda == [] ->
+        newR3DAGItem('r3d:agItem', d [(es,'I_mitsuba_gold'),(en,'I_mitsuba_gold')], I_new_mitsuba),
+        newR3DDielectricMaterial( d [(es, 'ceramica'), (en, 'ceramic')], [1.0, 1.0, 1.0], 'ceramic', I_white_ceramic),
+        newR3DExternal( _, d (es, 'I_p_mitsuba_ceramic'), urlSpec__3D_demo_ss, 'data/3D Models/Mitsuba/mitsuba-a_3-a_3.bdp', I_white_ceramic, _, I_p_mitsuba_ceramic),
+        addGPart( I_new_mitsuba, I_p_mitsuba_ceramic),
+        addGPart( I_root, I_new_mitsuba),
+        setTranslation( I_new_mitsuba, [0.0, 0.0, 0.0]),
+        L_Items = [I_new_mitsuba]
+    ;
+        head( LOrda, FirstOrda),
+        stmt( 'r3d:hasPartG', I_root, Ag, FirstOrda),
+        copyInst( Ag, AgCopy),
+        addGPart( I_root, AgCopy),
+        stmt( 'r3d:hasPartG', I_root, AgCopy, Orda),
+        PosX is 2.5 * Orda,
+        setTranslation( AgCopy, [PosX, 0.0, 0.0]),
+        L_Items = [AgCopy]
+    ),
+    
+    Obj_out = { repcon3d : Repcon3D, items: L_Items }.
+
+del_mitsuba(_Obj_ctx, Obj_in, _Obj_ctx, Obj_out):-
+    obj_fetch( repcon3d, Obj_in, Repcon3D),
+    stmt( hasComponentScope, Repcon3D, I_root),
+    sortedFindall( 
+        Orda, Orda,
+        (   stmt( 'r3d:hasPartG', I_root, Ag, Orda),
+            isInstance( Ag)
+        ),
+        LOrda
+    ),
+    ( LOrda == [] ->
+        L_Items = []
+    ;
+        last( LOrda, LastOrda ),
+        delStmt( 'r3d:hasPartG', I_root, _, LastOrda),
+        addEvent3D(upd, I_root),
+        L_Items = [I_root]
+    ),
+    
+    Obj_out = { repcon3d : Repcon3D, items: L_Items }.
+
+
+change_mitsuba_shader(_Obj_ctx, Obj_in, _Obj_ctx, Obj_out):-
+    obj_fetch( repcon3d, Obj_in, Repcon3D),
+    stmt( hasComponentScope, Repcon3D, I_root),
+    sortedFindall( 
+        Orda, Orda,
+        (   stmt( 'r3d:hasPartG', I_root, Ag, Orda),
+            isInstance( Ag)
+        ),
+        LOrda
+    ),
+    ( LOrda == [] ->
+        L_Items = []
+    ;
+        head( LOrda, FirstOrda ),
+        stmt( 'r3d:hasPartG', I_root, Ag, FirstOrda),
+        stmt( 'r3d:hasPartG', Ag, 'r3d:externalGeometry', PgExternal, _),
+        ( stmt( 'r3d:hasShader', PgExternal, 'r3d:brdfShader', I_shader, _), stmt( 'r3d:metallic', I_shader, 0.0) ->
+            newR3DCustomMaterial( d [(es, 'custom metal'), (en, 'custom metal')], [1.0, 0.86, 0.54], 1.0, 0.05, I_metallic_gold),
+            setShader( PgExternal, I_metallic_gold)
+        ;
+            newR3DDielectricMaterial( d [(es, 'ceramica'), (en, 'ceramic')], [1.0, 1.0, 1.0], 'ceramic', I_white_ceramic),
+            setShader( PgExternal, I_white_ceramic)
+        ),
+        L_Items = [PgExternal]
+    ),
+
+    Obj_out = { repcon3d : Repcon3D, items: L_Items }.
+
+
+alternate_mitsuba_environment(_Obj_ctx, Obj_in, _Obj_ctx, Obj_out):-
+    obj_fetch( repcon3d, Obj_in, Repcon3D),
+    stmt( 'r3d:hasScene', Repcon3D, I_Scene),
+    stmt( 'r3d:useIBL', I_Scene, I_ibl),
+    ( stmt( 'r3d:useCatalogLightProbe', I_ibl, 'breezeway') ->
+        I_env = 'office'
+    ;
+        I_env = 'breezeway'
+    ),
+
+    ( stmt( 'r3d:useAsBackground', I_ibl, true) ->
+        B_show_env = false,
+        random( 0.0, 1.0, R),
+        random( 0.0, 1.0, G),
+        random( 0.0, 1.0, B),
+        I_bckgnd_color = [R, G, B, 1.0]
+    ;
+        B_show_env = true,
+        I_bckgnd_color = [1.0, 1.0, 1.0, 1.0]
+    ),
+
+    Obj_out = { 
+        repcon3d: Repcon3D, 
+        environment: I_env, 
+        show_environment: B_show_env, 
+        background_color: I_bckgnd_color 
+    }.
+
+alternate_mitsuba_view(_Obj_ctx, Obj_in, _Obj_ctx, Obj_out):-
+    obj_fetch( repcon3d, Obj_in, Repcon3D),
+    stmt( 'r3d:hasScene', Repcon3D, I_Scene),
+    ( stmt( 'r3d:defaultCamera', I_Scene, 'r3d:perspective') ->
+        I_camera = 'r3d:top'
+    ;
+        I_camera = 'r3d:perspective'
+    ),
+
+    Obj_out = { repcon3d : Repcon3D, view: I_camera }.
+
+save_to_usd(_Obj_ctx, Obj_in, _Obj_ctx, Obj_out):-
+    obj_fetch( repcon3d, Obj_in, Repcon3D),
+    stmt( hasComponentScope, Repcon3D, I_ag_root),
+
+    Obj_out = { r3d : Repcon3D, root_kw: I_ag_root }.
+
+new_scene_car( _, Obj_in, _, Obj_out):-
+    ( dicc( _, urlSpec__3D_demo_ss ) ->
+        true
+    ;
+        urlSpec +$ urlSpec__3D_demo_ss  d (es, 'Apunta a los datos de prueba del 3D')
+            p [resourcePath ¬> 'fileserver/repository/']
+    ),
+    ( not( isInstance( root_car )) ->
+        obj_fetch( repcon3d, Obj_in, Repcon3D),
+        new_scene_car( AgCar, Repcon3D)
+    ;
+        AgCar = root_car,
+        %% Restaurar posibles cambios
+        setStmt( 'r3d:hasBindPose', 'default_examine_cam', car_bind_pose),
+        setStmt( 'r3d:lookAt', 'default_examine_cam', car_target),
+        setShader( 'r3d:externalGeometry',  pg_left_wall, koloro_black),
+        setShader( 'r3d:externalGeometry',  pg_right_inf_wall, koloro_black),
+        setShader( 'r3d:externalGeometry',  pg_front_inf_wall, koloro_black),
+        setShader( 'r3d:externalGeometry',  pg_floor, granite_gray),
+        setShader( 'r3d:externalGeometry',  pg_right_sup_wall, mirror)
+    ),
+    obj_merge( Obj_in, { root: AgCar }, Obj_out).
+
+
+new_scene_car(I_root, I_repcon3D):-
+    newR3DDielectricTexturedMaterial( _, 'data/textures/floor/G03.jpg', 0.2, granite_gray),
+    setR3DuvScale( granite_gray, 4.0, 4.0),
+
+    newR3DMetallicTexturedMaterial( _, 'data/textures/floor/G53.jpg', 0.25, granite_black),
+    setR3DuvScale( granite_black, 4.0, 4.0),
+
+    newR3DDielectricTexturedMaterial( _, 'data/textures/floor/G02.jpg', 0.6, vinyl),
+    setR3DuvScale( vinyl, 2.0, 2.0),
+
+    newR3DDielectricTexturedMaterial( _, 'data/textures/wall/bosque.jpg', 0.4, fusion),
+    newR3DCustomMaterial( _, [1.0, 1.0, 1.0], 1.0, 0.01, mirror),
+    newR3DCustomMaterial( _, [0.98, 0.97, 0.96], 1.0, 0.1, aluminium),
+    newR3DCustomMaterial( _, [0.77, 0.78, 0.78], 1.0, 0.3, steel),
+    newR3DCustomMaterial( _, [1.0, 1.0, 1.0], 0.0, 0.0, glass),
+    setR3DMaterialBaseColor(glass, [1.0, 1.0, 1.0, 0.0]),    
+    newR3DCustomMaterial( _, [0.1, 0.1, 0.1], 0.0, 0.3, dark_plastic),
+    newR3DCustomMaterial( _, [0.7, 0.7, 0.7], 1.0, 0.15, metallic_frame),
+    newR3DCustomMaterial( _, [0.0, 1.0, 0.0], 0.0, 0.6, koloro_green),
+    newR3DCustomMaterial( _, [0.0, 0.0, 1.0], 0.0, 0.6, koloro_blue),
+    newR3DCustomMaterial( _, [0.0, 0.0, 0.0], 0.85, 0.65, koloro_black),
+    newR3DCustomMaterial( _, [1.0, 1.0, 1.0], 0.0, 0.4, digit),
+    newR3DCustomMaterial( _, [0.0, 1.0, 0.0], 0.0, 0.4, push_button),
+    newR3DCustomMaterial( _, [1.0, 1.0, 0.0], 0.0, 0.4, emergency),
+    
+    newR3DAGItem('r3d:agItem', _, root_car),
+    I_root = root_car,
+
+    %%% Case
+    newR3DAGItem('r3d:agItem', _, ag_case),
+    newR3DAGItem('r3d:agItem', _, ag_case_frames),
+    newR3DAGItem('r3d:agItem', _, ag_doors),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/cabina.rgm',       steel, _, pg_case),
+    %%newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/cabina_dcha.rgm',  steel, _, pg_case_right),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/cabina_front.rgm', steel, _, pg_case_front),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/cabina_izda.rgm',  steel, _, pg_case_left),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/marcos.rgm',       steel, _, pg_case_frames),
+    %%newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/puertas.rgm',      steel, _, pg_doors),
+    addGPart(I_root, ag_case),
+    addGPart(I_root, ag_case_frames),
+    addGPart(ag_case, pg_case),
+    %%addGPart(ag_case, pg_case_right),
+    addGPart(ag_case, pg_case_front),
+    addGPart(ag_case, pg_case_left),
+    addGPart(ag_case_frames, pg_case_frames),
+
+    %%% Floor
+    newR3DAGItem('r3d:agItem', _, ag_floor),
+    newR3DAGItem('r3d:agItem', _, ag_baseboard_left),
+    newR3DAGItem('r3d:agItem', _, ag_baseboard_right),
+    newR3DAGItem('r3d:agItem', _, ag_baseboard_front),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/suelo.rgm',          granite_gray, _, pg_floor),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/zocalo_izda.rgm',    dark_plastic, _, pg_baseboard_left),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/zocalo_dcha.rgm',    dark_plastic, _, pg_baseboard_right),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/zocalo_frontal.rgm', dark_plastic, _, pg_baseboard_front),
+    addGPart(I_root, ag_floor),
+    addGPart(I_root, ag_baseboard_left),
+    addGPart(I_root, ag_baseboard_right),
+    addGPart(I_root, ag_baseboard_front),
+    addGPart(ag_floor, pg_floor),
+    addGPart(ag_baseboard_left, pg_baseboard_left),
+    addGPart(ag_baseboard_right, pg_baseboard_right),
+    addGPart(ag_baseboard_front, pg_baseboard_front),
+
+    %%% Ceiling
+    newR3DAGItem('r3d:agItem', _, ag_ceiling),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/techo_L90.rgm',  dark_plastic, _,   pg_ceiling),
+    addGPart(I_root, ag_ceiling),
+    addGPart(ag_ceiling, pg_ceiling),
+
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/techo_L40.rgm',  dark_plastic, _,   pg_ceiling_spot),
+
+    %%% Walls
+    newR3DDielectricTexturedMaterial( _, 'data/textures/wall/NA4.jpg', 0.4, na04),
+    newR3DMetallicTexturedMaterial( _, 'data/textures/wall/X02.jpg', 0.4, x02),
+    setR3DuvScale(x02, 4.0, 4.0),
+
+    newR3DAGItem('r3d:agItem', _, ag_right_wall),
+    newR3DAGItem('r3d:agItem', _, ag_left_wall),
+    newR3DAGItem('r3d:agItem', _, ag_front_wall),
+    newR3DAGItem('r3d:agItem', _, ag_front_railing),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/parcial_dcha_inf.rgm',      koloro_black,  _, pg_right_inf_wall),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/parcial_dcha_banda.rgm',    steel,         _, pg_right_mid_wall),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/parcial_dcha_sup.rgm',      mirror,        _, pg_right_sup_wall),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/pano_izda.rgm',             koloro_black,  _, pg_left_wall),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/parcial_frontal_banda.rgm', steel,         _, pg_front_mid_wall),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/parcial_frontal_sup.rgm',   mirror,        _, pg_front_sup_wall),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/parcial_frontal_inf.rgm',   koloro_black,  _, pg_front_inf_wall),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/pasamanos_p13.rgm',         aluminium,     _, pg_front_railing),
+
+    addGPart(I_root, ag_right_wall),
+    addGPart(I_root, ag_left_wall),
+    addGPart(I_root, ag_front_wall),
+    addGPart(I_root, ag_front_railing),
+    addGPart(ag_right_wall, pg_right_inf_wall),
+    addGPart(ag_right_wall, pg_right_sup_wall),
+    addGPart(ag_right_wall, pg_right_mid_wall),
+    addGPart(ag_left_wall, pg_left_wall),
+    addGPart(ag_front_wall, pg_front_inf_wall),
+    addGPart(ag_front_wall, pg_front_sup_wall), 
+    addGPart(ag_front_wall, pg_front_mid_wall),
+    addGPart(ag_front_railing, pg_front_railing),   
+
+    %%% Control panel 
+    newR3DAGItem('r3d:agItem', _, ag_control_panel_plate),
+    newR3DAGItem('r3d:agItem', _, ag_control_panel_frame),
+    newR3DAGItem('r3d:agItem', _, ag_buttons),
+    newR3DAGItem('r3d:agItem', _, ag_digits),
+    newR3DAGItem('r3d:agItem', _, ag_emergency_digit),
+    newR3DAGItem('r3d:agItem', _, ag_buttons_frame),
+    newR3DAGItem('r3d:agItem', _, ag_buttons_edge),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/botonera/placa_botonera.rgm',            mirror,         _, pg_control_panel_plate),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/botonera/marco_botonera.rgm',            metallic_frame, _, pg_control_panel_frame),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/botonera/placas_botones.rgm',            dark_plastic,   _, pg_buttons),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/botonera/placas_botones_2.rgm',          dark_plastic,   _, pg_buttons_b),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/botonera/digitos.rgm',                   digit,          _, pg_digits),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/botonera/digito_emergencia.rgm',         emergency,      _, pg_emergency_digit),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/botonera/marcos_botones.rgm',            steel,          _, pg_buttons_frame),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/botonera/bordes_botones.rgm',            dark_plastic,   _, pg_buttons_edge),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/botonera/borde_boton_0.rgm',             push_button,    _, pg_push_button_edge),
+    addGPart(I_root, ag_control_panel_plate),
+    addGPart(I_root, ag_control_panel_frame),
+    addGPart(I_root, ag_buttons),
+    addGPart(I_root, ag_digits),
+    addGPart(I_root, ag_emergency_digit),
+    addGPart(I_root, ag_buttons_frame),
+    addGPart(I_root, ag_buttons_edge),
+    addGPart(ag_control_panel_plate, pg_control_panel_plate),
+    addGPart(ag_control_panel_frame, pg_control_panel_frame),
+    addGPart(ag_buttons, pg_buttons),
+    addGPart(ag_buttons, pg_buttons_b),
+    addGPart(ag_digits, pg_digits),
+    addGPart(ag_emergency_digit, pg_emergency_digit),
+    addGPart(ag_buttons_frame, pg_buttons_frame),
+    addGPart(ag_buttons_edge, pg_buttons_edge),
+    addGPart(ag_buttons_edge, pg_push_button_edge),
+    
+    %% Rellano
+    %%newR3DDielectricTexturedMaterial( _, 'data/textures/Mosaic_Vines_Ceramic_Tiles_baseColor.png', 0.2, mosaic),
+    %%setR3DNormalMap(mosaic, 'data/textures/Mosaic_Vines_Ceramic_Tiles_normal.png'),
+    %%setR3DuvScale( mosaic, 4.0, 4.0),
+
+    newR3DDielectricTexturedMaterial( _, 'data/textures/rellano/Fresco_Oak_Flooring_baseColor.png', 0.25, marble),
+    setR3DNormalMap(marble, 'data/textures/rellano/Fresco_Oak_Flooring_normal.png'),
+    setR3DuvScale( marble, 2.0, 5.0),
+
+    newR3DCustomMaterial( _, [0.43, 0.15, 0.06], 0.0, 0.6, mosaic),
+
+    /*
+    newR3DDielectricTexturedMaterial( _, 'data/textures/rellano/Bianco_Statuario_Marble_Tiles_baseColor.png', 0.15, marble),
+    setR3DNormalMap(marble, 'data/textures/rellano/Bianco_Statuario_Marble_Tiles_normal.png'),
+    setR3DuvScale( marble, 2.0, 5.0),
+    */
+
+    newR3DCustomMaterial( _, [1.0, 1.0, 1.0], 0.0, 0.6, ceiling),
+    
+    newR3DAGItem(_, _, ag_wall),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/rellano/pared_ppal_rellano.rgm', mosaic, _, pg_floor_main_wall),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/rellano/suelo_rellano.rgm', marble, _, pg_floor_ground),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/rellano/pared_frontal_rellano.rgm', mosaic, _, pg_floor_front_wall),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/rellano/pared_izda_rellano.rgm', mosaic, _, pg_floor_left_wall),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/rellano/pared_dcha_rellano.rgm', mosaic, _, pg_floor_right_wall),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/rellano/rodapie_izda_rellano.rgm', marble, _, pg_floor_left_baseboard),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/rellano/rodapie_dcha_rellano.rgm', marble, _, pg_floor_right_baseboard),
+    newR3DExternal( _, _, urlSpec__3D_demo_ss, 'data/3D Models/lift_car/rellano/techo_rellano.rgm', ceiling, _, pg_floor_ceiling),
+    
+    addGPart( I_root, ag_wall),
+    addGPart( ag_wall, pg_floor_ground),
+    addGPart( ag_wall, pg_floor_main_wall),
+    addGPart( ag_wall, pg_floor_front_wall),
+    addGPart( ag_wall, pg_floor_left_wall),
+    addGPart( ag_wall, pg_floor_right_wall),
+    addGPart( ag_wall, pg_floor_left_baseboard),
+    addGPart( ag_wall, pg_floor_right_baseboard),
+    addGPart( ag_wall, pg_floor_ceiling),
+
+    %% Camara con posici,on inicial, target y limites de rotación
+    newR3DCameraBindPose(2.52, 1.547489, -0.006, car_bind_pose),
+    newR3DCameraTarget([-0.0835, 1.2465, -0.1925], car_target),
+
+    ( not( isInstance( 'default_examine_cam' )) ->
+        newR3DExamineCamera(0.785, [0, 3.14], [-1.54, 1.54], car_bind_pose, car_target, 'default_examine_cam'),
+        connectExamineCamera(I_repcon3D, 'default_examine_cam')
+    ;
+        setStmt( 'r3d:hasBindPose', 'default_examine_cam', car_bind_pose),
+        setStmt( 'r3d:lookAt', 'default_examine_cam', car_target)
+    ),
+      
+    newR3DRectangularLight(_, 
+                        [-0.091, 2.34, -0.211], 
+                        [0.0, 0.0],
+                        0.595,
+                        0.595,                              
+                        6000,
+                        20, 
+                        false,
+                        true, 
+                        _,
+                        'square_panel_L95'),
+    
+    connectLight(I_repcon3D, 'square_panel_L95'),
+
+    newR3DDiskLight(_, 
+         [0.366, 2.291, -0.519],
+         [0.0, 0.0],
+         0.024,                            
+         6000,
+         30, 
+         false,
+         true, 
+         spotlight_0),
+
+    newR3DDiskLight(_, 
+         [0.366, 2.291, 0.097],
+         [0.0, 0.0],
+         0.024,                            
+         6000,
+         30, 
+         false,
+         true, 
+         spotlight_1),
+
+    newR3DDiskLight(_, 
+         [-0.548, 2.291, 0.097], 
+         [0.0, 0.0],
+         0.024,                            
+         6000,
+         30, 
+         false,
+         true, 
+         spotlight_2),
+
+    newR3DDiskLight(_, 
+         [-0.548, 2.291, -0.519], 
+         [0.0, 0.0],
+         0.024,                            
+         6000,
+         30,
+         false,
+         true, 
+         spotlight_3).
+
+set_car_wood_finish(_Obj_ctx, Obj_in, _Obj_ctx, Obj_out):-
+    obj_fetch( repcon3d, Obj_in, Repcon3D),
+    setShader( 'r3d:externalGeometry',  pg_left_wall, na04),
+    setShader( 'r3d:externalGeometry',  pg_right_inf_wall, na04),
+    setShader( 'r3d:externalGeometry',  pg_front_inf_wall, na04),
+    setShader( 'r3d:externalGeometry',  pg_floor, vinyl),
+
+    L_Items = [pg_left_wall, pg_right_inf_wall, pg_front_inf_wall, pg_floor],
+
+    Obj_out = { repcon3d : Repcon3D, items: L_Items }.
+
+set_car_metal_finish(_Obj_ctx, Obj_in, _Obj_ctx, Obj_out):-
+    obj_fetch( repcon3d, Obj_in, Repcon3D),
+    ( not( isInstance( root_car )) ->
+        L_Items = []
+    ;
+        setShader( 'r3d:externalGeometry',  pg_right_inf_wall, x02),
+        setShader( 'r3d:externalGeometry',  pg_front_inf_wall, x02),
+        setShader( 'r3d:externalGeometry',  pg_left_wall, x02),
+        setShader( 'r3d:externalGeometry',  pg_floor, granite_black),
+    
+        L_Items = [pg_left_wall, pg_right_inf_wall, pg_front_inf_wall, pg_floor]
+    ),
+
+    Obj_out = { repcon3d : Repcon3D, items: L_Items }.
+
+set_car_ceiling(_Obj_ctx, Obj_in, _Obj_ctx, Obj_out):-
+    obj_fetch( repcon3d, Obj_in, Repcon3D),
+    ( not( isInstance( root_car )) ->
+        L_Items = []
+    ;
+        ( stmt( 'r3d:hasPartG', ag_ceiling, pg_ceiling) ->
+            
+            delStmt('r3d:hasPartG', ag_ceiling, pg_ceiling),
+            addGPart( ag_ceiling, pg_ceiling_spot), 
+            disconnectLight( Repcon3D, 'square_panel_L95' ),
+            connectLight( Repcon3D, spotlight_0 ),
+            connectLight( Repcon3D, spotlight_1 ),
+            connectLight( Repcon3D, spotlight_2 ),
+            connectLight( Repcon3D, spotlight_3 )
+        ;
+            delStmt('r3d:hasPartG', ag_ceiling, pg_ceiling_spot),
+            addGPart( ag_ceiling, pg_ceiling), 
+            connectLight( Repcon3D, 'square_panel_L95' ),
+            disconnectLight( Repcon3D, spotlight_0 ),
+            disconnectLight( Repcon3D, spotlight_1 ),
+            disconnectLight( Repcon3D, spotlight_2 ),
+            disconnectLight( Repcon3D, spotlight_3 )
+        ),
+        %% los cambios de luces los notificamos incluyendo la instancia de r3d:scene en los eventos
+        stmt('r3d:hasScene', Repcon3D, Scene),
+        L_Items = [ag_ceiling, Scene]
+    ),
+    Obj_out = { repcon3d : Repcon3D, items: L_Items }.
+
+toogle_car_window(_Obj_ctx, Obj_in, _Obj_ctx, Obj_out):-
+    obj_fetch( repcon3d, Obj_in, Repcon3D),
+    ( not( isInstance( root_car )) ->
+        L_Items = []
+    ;
+        ( stmt( 'r3d:hasShader', pg_right_sup_wall, mirror) ->
+            setShader( 'r3d:externalGeometry',  pg_right_sup_wall, glass)
+        ;
+            setShader( 'r3d:externalGeometry',  pg_right_sup_wall, mirror)
+        ),
+      
+        L_Items = [pg_right_sup_wall]
+    ),
+    Obj_out = { repcon3d : Repcon3D, items: L_Items }.
+
+new_dinning_table( _, Obj_in, _, Obj_out):-
+    ( dicc( _, urlSpec__3D_demo_ss ) ->
+        true
+    ;
+        urlSpec +$ urlSpec__3D_demo_ss  d (es, 'Apunta a los datos de prueba del 3D')
+            p [resourcePath ¬> 'fileserver/repository/']
+    ),
+
+    ( not( isInstance( root_dinning_table )) ->
+        obj_fetch( repcon3d, Obj_in, Repcon3D),
+        new_dinning_table( AgTable, Repcon3D)
+    ;
+        AgTable = root_dinning_table,
+        setStmt( 'r3d:hasBindPose', 'default_examine_cam', table_bind_pose),
+        setStmt( 'r3d:lookAt', 'default_examine_cam', table_target)
+    ),
+    obj_merge( Obj_in, { root: AgTable }, Obj_out).
+
+
+new_dinning_table(I_root, I_repcon3D):-
+	
+        newR3DDielectricTexturedMaterial( d [(es, 'roble')], 'data/textures/oak_wood.jpg', 0.15, floor_shader),
+        setR3DuvScale( floor_shader, 4.0, 4.0),
+        newR3DDielectricTexturedMaterial( d [(es, 'fresno')], 'data/textures/ash_wood.png', 0.15, table_top_shader),
+        newR3DDielectricTexturedMaterial( d [(es, 'cuero granulado')], 'data/textures/grainy_leather.png', 0.20, chair_seat_shader),
+        newR3DDielectricTexturedMaterial( d [(es, 'ebano')], 'data/textures/ebony.jpg', 0.25, chair_frame_shader),
+        newR3DCustomMaterial( d [(es, 'plastico claro')], [0.73, 0.73, 0.73],  0.0, 0.2, table_frame_shader),
+
+        newR3DExternal( _, d (es, 'suelo'), urlSpec__3D_demo_ss, 'data/3D Models/DinningTable/ground.rgm', floor_shader, _, parquet_shape),
+        newR3DExternal( _, d (es, 'encimera'), urlSpec__3D_demo_ss, 'data/3D Models/DinningTable/table_top.rgm', table_top_shader, _, table_top),
+        newR3DExternal( _, d (es, 'patas y base'), urlSpec__3D_demo_ss, 'data/3D Models/DinningTable/table_frame.rgm', table_frame_shader, _, table_frame),
+        newR3DExternal( _, d (es, 'asiento'), urlSpec__3D_demo_ss, 'data/3D Models/DinningTable/chair_seat_1.rgm', chair_seat_shader, _, chair_seat_1),
+        newR3DExternal( _, d (es, 'cuerpo de silla'), urlSpec__3D_demo_ss, 'data/3D Models/DinningTable/chair_frame_1.rgm', chair_frame_shader, _, chair_frame_1),
+        newR3DExternal( _, d (es, 'asiento'), urlSpec__3D_demo_ss, 'data/3D Models/DinningTable/chair_seat_3.rgm', chair_seat_shader, _, chair_seat_3),
+        newR3DExternal( _, d (es, 'cuerpo de silla'), urlSpec__3D_demo_ss, 'data/3D Models/DinningTable/chair_frame_3.rgm', chair_frame_shader, _, chair_frame_3),
+        newR3DExternal( _, d (es, 'asiento'), urlSpec__3D_demo_ss, 'data/3D Models/DinningTable/chair_seat_4.rgm', chair_seat_shader, _, chair_seat_4),
+        newR3DExternal( _, d (es, 'cuerpo de silla'), urlSpec__3D_demo_ss, 'data/3D Models/DinningTable/chair_frame_4.rgm', chair_frame_shader, _, chair_frame_4),
+        
+        /*
+        * Todas las geometrias (RGM) han sido exportadas con las posicion/rotacion aplicada a los vertices, por lo que aparecen
+        * directamente en su posicion sin necesidad de aplicar traslacion/rotacion a sus agItem.
+        * Unicamente se necesita un agItem por cada geometria si se desea seleccionar cada una de ellas individualmente (o si se quisiesen
+        * mover individualmente)
+        * Aqui, a modo de ejemplo, se va a montar una estructura en la que la mesa, que tiene dos "partes", y cada una de las sillas (que tambien
+        * tienen "dos partes") se comportan como si fuesen de una unica "pieza" tanto al moverlas como al seleccionarlas
+        */
+
+        newR3DAGItem('r3d:agItem', d [(es,'ag_root_dinning_table')], root_dinning_table),
+        newR3DAGItem('r3d:agItem', d [(es,'ag_root_table')], root_table),
+        newR3DAGItem('r3d:agItem', d [(es,'ag_floor')], parquet),
+        newR3DAGItem('r3d:agItem', d [(es,'ag_table')], table),
+        newR3DAGItem('r3d:agItem', d [(es,'ag_chair_1')], chair_1),
+        newR3DAGItem('r3d:agItem', d [(es,'ag_chair_2')], chair_2),
+        newR3DAGItem('r3d:agItem', d [(es,'ag_chair_3')], chair_3),
+        newR3DAGItem('r3d:agItem', d [(es,'ag_chair_4')], chair_4),
+
+        I_root = root_dinning_table,
+
+        setHighLightMode( root_table, 'r3d:bvHighlight'),
+
+        /*
+        * La mesa esta ligeramente elevado sobre el plano del suelo.
+        * Tal como se comenta mas arriba reusamos las dos geometrias de una de las sillas
+        */
+        setTranslation( table, [0.0, -6.52, 0.0]),
+        setTranslation( chair_2, [-45.0, 0.0, -12.0]),
+        setStmt('r3d:hasYaw', chair_2, float, 0.75, _),
+
+        addGPart(I_root, parquet),
+        addGPart(I_root, root_table),
+        addGPart(root_table, table),
+        addGPart(root_table, chair_1),
+        addGPart(root_table, chair_2),
+        addGPart(root_table, chair_3),
+        addGPart(root_table, chair_4),
+        addGPart(parquet, parquet_shape),
+        addGPart(table, table_top),
+        addGPart(table, table_frame),
+        addGPart(chair_1, chair_seat_1),
+        addGPart(chair_1, chair_frame_1),
+        addGPart(chair_2, chair_seat_1),
+        addGPart(chair_2, chair_frame_1),
+        addGPart(chair_3, chair_seat_3),
+        addGPart(chair_3, chair_frame_3),
+        addGPart(chair_4, chair_seat_4),
+        addGPart(chair_4, chair_frame_4),
+
+        newR3DCameraBindPose(195, 1.047, -0.52, table_bind_pose),
+        newR3DCameraTarget([0, 0, 0], table_target),
+
+        ( not( isInstance( 'default_examine_cam' )) ->
+            newR3DExamineCamera(0.785, [-3.14, 3.14], [-3.14, 3.14], table_bind_pose, table_target, 'default_examine_cam'),
+            connectExamineCamera(I_repcon3D, 'default_examine_cam')
+        ;
+            setStmt( 'r3d:hasBindPose', 'default_examine_cam', table_bind_pose),
+            setStmt( 'r3d:lookAt', 'default_examine_cam', table_target)
+        ).
+
+isViewerInApp(_):-
+    !.

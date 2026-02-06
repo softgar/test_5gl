@@ -1,0 +1,31 @@
+﻿/**
+@descr	rc_test_5gl_kgraph_model <br>
+		rc_test_5gl_kgraph_model
+@author XXX
+@date	20XX_XX_XX
+**/
+
+rc_class('rc_test_5gl_kgraph_model'):-
+	class +$ 'rc_test_5gl_kgraph_model'  d ( 'es', 'rc_test_5gl_kgraph_model' )
+		sc [ 'rComponent' ].
+    %'rc_test_5gl_kgraph_model:unitary__test1'(_Ctx_in, _Obj_in, _Ctx_out, _Obj_out).
+
+
+
+
+
+'rc_test_5gl_kgraph_model:object_sequence'(_Ctx_in, _Obj_in, _Ctx_out, Obj_out):-
+    newKw('sequence', SEQ),
+    getPathHome(PH),
+    concatAtoms([PH,'repconGPT/v0/test/dataset__oOrder_RAG.json'], HLU),    
+    get_chars_url_utf8( HLU, Example_c),  
+    json_read(Example_c, Obj_json),    
+    Obj_out =
+        {type:'rg',
+         hasRoot: SEQ,
+         format: 'obj',
+         data: {
+             SEQ : Obj_json
+         }
+        }.
+    

@@ -1,0 +1,1162 @@
+﻿/**
+@descr	staber_ktab <br>
+		staber_ktab
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_ktab') :-
+	class +$ 'staber_ktab' d ( es,'Patrón rproc para ktab') sc function,
+    
+
+    'staber_ktab::usecase__1'(_, _, _, _),    
+    'staber_ktab::usecase__2'(_, _, _, _),   
+    'staber_ktab::conection_with_personalized_rprocess'(_, _, _, _),
+    'staber_ktab::usecase__4'(_, _, _, _),   
+    'staber_ktab::folders'(_, _, _, _).
+
+
+'staber_ktab::tab'(LEVEL, BUS, BUS_TAB, CHANNEL_TAB, IN, Obj_out):-
+    numberToAtom(LEVEL, LEVEL_A),
+    concatAtoms(['level ', LEVEL_A], LEVEL_X),
+    'staber_ktab::in'(LEVEL_X,BUS_TAB, IN),   
+    'staber_ktab::actions'(BUS_TAB, ACTIONS),
+  
+    concatAtoms([LEVEL_X,'_Ejemplo 2'],Ejemplo2),    
+    concatAtoms([LEVEL_X,'_Ejemplo 3'],Ejemplo3),    
+    concatAtoms(['Set Active Tab [', Ejemplo2, ']'], ActiveTab_Ejemplo2),
+    concatAtoms(['Close all tabs but the ','"', Ejemplo3, '"'], CloseAllTabs_Ejemplo2),
+    concatAtoms(['Create Tab [', Ejemplo3, ']'], Tab_Ejemplo3),
+    concatAtoms(['Delete Tab [', Ejemplo3, ']'], DeleteTab_Ejemplo3),
+    concatAtoms(['Create SubLevel in  [', LEVEL_X, ']'], SubLEVEL_X),    
+    Obj_tab = {
+        type: 'ktab',
+        busId: BUS_TAB,
+        hasChannel: CHANNEL_TAB,
+        in: IN,                        
+        hasIcon: 'group',
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: BUS_TAB,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_ktab::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+
+        }]         
+    },    
+    Obj_new_del = {
+        hasIcon: 'folder',  hasKw: 'kw3', hasDsca: Ejemplo3, close: true, selected: true, actions: ACTIONS
+    },
+    Obj_button1 ={
+        type:'button',
+        appearance: line,
+        label: {
+            d: Tab_Ejemplo3
+        },
+        events: [{
+            type: 'click',
+            targetBusId: BUS,
+            method: 'log',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [            
+                    { type: 'method', name: 'publish', module: 'PubSub', 
+                        in: { publish:[
+                                 { topic: 'setSelected', channel: CHANNEL_TAB, in: {hasKw: 'kw2'}},
+                                { topic: 'append', channel: CHANNEL_TAB, in: Obj_new_del}                        
+                            ]
+                        }                        
+                    }                   
+                ]
+            }
+        }]
+    },
+    Obj_button2 ={
+        type:'button',
+        appearance: line,
+        label: {
+            d: DeleteTab_Ejemplo3
+        },
+        events: [{
+            type: 'click',
+            targetBusId: BUS,
+            method: 'log',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [            
+                    { type: 'method', name: 'publish', module: 'PubSub', 
+                        in: { publish:[
+                                { topic: 'delete', channel: CHANNEL_TAB, in: Obj_new_del}
+                            ]
+                        }                        
+                    }                   
+                ]
+            }
+        }]
+    },
+     Obj_button3 ={
+        type:'button',
+        appearance: line,
+        label: {
+            d: ActiveTab_Ejemplo2
+        },
+        events: [{
+            type: 'click',
+            targetBusId: BUS,
+            method: 'log',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [            
+                    { type: 'method', name: 'publish', module: 'PubSub', 
+                        in: { publish:[
+                                { topic: 'setSelected', channel: CHANNEL_TAB, in: {hasKw: 'kw2'}}
+                            ]
+                        }                        
+                    }                   
+                ]
+            }
+        }]
+    },
+    Obj_button5 = {
+        type:'button',
+        appearance: line,
+        label: {
+            d: CloseAllTabs_Ejemplo2
+        },
+        events: [{
+            type: 'click',
+            targetBusId: BUS,
+            method: 'log',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [            
+                    { type: 'method', name: 'close', busId: BUS_TAB, 
+                        in: {
+                            closeInARow: true,
+                            data: [
+                                { hasKw: 'kw1' },
+                                { hasKw: 'kw2' }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }]
+    },
+     Obj_button4 = {
+        type:assembly,
+        children:  [{
+            type:'button',
+            class: 'white-color red-bg',
+            label: {
+                d: SubLEVEL_X
+            },
+            events: [{
+                type: 'click',
+                targetBusId: BUS_CHILD,
+                method: 'log',
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [ 
+                            { type: 'function', in: {level: LEVEL}, name: 'staber_ktab::newTab', context: { delegatedTo: 'builderweb' }},
+                            { type: 'method',  name: 'set_gui_out', busId: BUS_CHILD }
+                    ]
+                }
+            }]},
+            {
+            type:'r-button',
+            class: 'white-color red-bg',
+            label: {
+                d: SubLEVEL_X
+            },
+            events: [{
+                type: 'click',
+                targetBusId: BUS_CHILD,
+                method: 'log',
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [ 
+                            { type: 'function', in: {level: LEVEL}, name: 'staber_ktab::newTab', context: { delegatedTo: 'builderweb' }},
+                            { type: 'method',  name: 'set_gui_out', busId: BUS_CHILD }
+                    ]
+                }
+            }
+            ]}]
+     },
+    newKw('bus__', BUS_CHILD),
+    newKw('channel__', CHANNEL_CHILD),
+    Obj_child = {
+        type: 'rprocess',
+        busId: BUS_CHILD,
+        hasChannel: CHANNEL_CHILD,
+        gui_out: Obj_button4
+    },
+    Obj_buttons = {
+        type: assembly,
+        children:[
+            Obj_button1,
+            Obj_button2,
+            Obj_button3,
+            Obj_button5
+        ]        
+    },
+    Obj_out= {
+        type: assembly,
+        children:[
+            Obj_tab,
+            Obj_buttons,
+            Obj_child
+        ]
+    }.
+'staber_ktab::newTab'(Ctx, Obj_in, Ctx, Obj_out_x):-
+    obj_get(level, Obj_in, LEVEL),
+    NEWLEVEL is LEVEL + 1,
+    newKw('channel__tab', CHANNEL_TAB),
+    newKw(bus, BUS),
+    newKw(bus__tab, BUS_TAB),   
+    'staber_ktab::tab'(NEWLEVEL, BUS, BUS_TAB, CHANNEL_TAB, IN, Obj_out),
+     Obj_out_x = {
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        gui_out: Obj_out
+     }.
+    
+'staber_ktab::in'(LEVEL_X, BUS, IN):-
+    'staber_ktab::close_action'(BUS, CLOSE_ACTION),
+    'staber_ktab::actions'(BUS, ACTIONS),
+    concatAtoms([LEVEL_X,'_Ejemplo 1'],Ejemplo1),    
+    concatAtoms([LEVEL_X,'_Ejemplo 2'],Ejemplo2),    
+    IN = {
+       data:[
+            {
+                hasIcon: 'project',  hasKw: 'kw1', hasDsca: Ejemplo1, close: CLOSE_ACTION, actions: ACTIONS
+            },
+            {
+                hasIcon: 'paper', hasKw: 'kw2', hasDsca: Ejemplo2, close: CLOSE_ACTION,  selected: true, actions : ACTIONS
+            }
+       ]       
+    }.       
+
+'staber_ktab::close_action'(BUS, Action):-
+    Action = {
+         label: {
+            icon: 'cancel'
+        },
+        collapse: false,
+        events:[{
+            type: 'click',
+            method:'close',
+            payload: {},
+            targetBusId: BUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_ktab::doClose', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }]
+    }.
+
+'staber_ktab::actions'(BUS, Actions):-
+    Actions =  [       
+            {
+                label: {
+                    icon: 'add',
+                    d: 'Acción 1'
+                },
+                collapse: true,
+                events:[{
+                    type: 'click',
+                    method:'log',
+                    payload: {},  
+                    targetBusId: BUS,      
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [                                
+                            { type: 'function', name: 'staber_ktab::doAction', context: { delegatedTo: 'builderweb' } }
+                        ]
+                    }   
+                }]
+            },                
+            {
+                'label': {
+                    'd': 'Acción 2'
+                },
+                'collapse': true
+            }
+        ].
+
+'staber_ktab::usecase__1'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__tab', CHANNEL_TAB),
+    newKw(bus, BUS),
+    newKw(bus__tab, BUS_TAB),
+    LEVEL_X = 1, 
+    'staber_ktab::tab'(LEVEL_X, BUS, BUS_TAB, CHANNEL_TAB, IN, Obj_out),
+    Title = 'Tab horizontal con publicación y acciones',    
+    Obj_class = {
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasKw: rproc__4gl_ktab__001,
+        hasDsca: Title,
+        hasIcon: 'group',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_out,
+        isSession: true,
+        hasNavbar: false
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+
+'staber_ktab::usecase__2'(_, _OBJ_in, _, OBJ_out) :-
+    CLOSE_ACTION = {
+        label: {
+            icon: 'cancel'
+        },
+        collapse: false,
+        events:[{
+            type: 'click',
+            method:'close',
+            payload: {},
+            targetBusId: BUS_TAB,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_ktab::doClose', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }]
+    }, 
+    ACTIONS =  [       
+        {
+            label: {
+                icon: 'add',
+                d: 'Acción 1'
+            },
+            collapse: true,
+            events:[{
+                type: 'click',
+                method:'log',
+                payload: {},  
+                targetBusId: BUS_TAB,      
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [                                
+                        { type: 'function', name: 'staber_ktab::doAction', context: { delegatedTo: 'builderweb' } }
+                    ]
+                }   
+            }]
+        },                
+        {
+            'label': {
+                'd': 'Acción 2'
+            },
+            'collapse': true
+        }
+    ],
+    IN = {
+       orientation: 'vertical', 
+       data:[
+            {
+                hasIcon: 'project',  hasKw: 'kw1', hasDsca: 'Ejemplo 1', close: CLOSE_ACTION, actions: ACTIONS
+            },
+            {
+                hasIcon: 'paper', hasKw: 'kw2', hasDsca: 'Ejemplo 2', close: CLOSE_ACTION,  selected: true, actions : ACTIONS
+            }
+       ]       
+    },       
+    newKw('channel__tab', CHANNEL_TAB),
+    newKw(bus, BUS),
+    newKw(bus__tab, BUS_TAB),
+    Title = 'Tab vertical con publicación y acciones',
+    Obj_tab = {
+        type: 'ktab',
+        busId: BUS_TAB,
+        hasChannel: CHANNEL_TAB,
+        in: IN,                        
+        hasIcon: 'group',
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: BUS_TAB,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_ktab::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+
+        }]         
+    },    
+    Obj_new_del = {
+        hasIcon: 'folder',  hasKw: 'kw3', hasDsca: 'Ejemplo 3', close: true, selected: true, actions: ACTIONS
+    },
+    Obj_button1 ={
+        type:'button',
+        label: {
+            d: 'Create Tab [Example 3]'
+        },
+        events: [{
+            type: 'click',
+            targetBusId: BUS,
+            method: 'log',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [            
+                    { type: 'method', name: 'publish', module: 'PubSub', 
+                        in: { publish:[
+                                { topic: 'append', channel: CHANNEL_TAB, in: Obj_new_del}
+                            ]
+                        }                        
+                    }                   
+                ]
+            }
+        }]
+    },
+    Obj_button2 ={
+        type:'button',
+        label: {
+            d: 'Delete Tab [Example 3]'
+        },
+        events: [{
+            type: 'click',
+            targetBusId: BUS,
+            method: 'log',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [            
+                    { type: 'method', name: 'publish', module: 'PubSub', 
+                        in: { publish:[
+                                { topic: 'delete', channel: CHANNEL_TAB, in: Obj_new_del}
+                            ]
+                        }                        
+                    }                   
+                ]
+            }
+        }]
+    },
+    Obj_button3 ={
+        type:'button',
+        label: {
+            d: 'Set Active Tab [Example 2]'
+        },
+        events: [{
+            type: 'click',
+            targetBusId: BUS,
+            method: 'log',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [            
+                    { type: 'method', name: 'publish', module: 'PubSub', 
+                        in: { publish:[
+                                { topic: 'setSelected', channel: CHANNEL_TAB, in: {hasKw: 'kw2'}}
+                            ]
+                        }                        
+                    }                   
+                ]
+            }
+        }]
+    },    
+    Obj_buttons = {
+        type: assembly,
+        children:[
+            Obj_button1,
+            Obj_button2,
+            Obj_button3
+        ]        
+    },
+    Obj_assembly = {
+        type: assembly,
+        children:[
+            Obj_tab,
+            Obj_buttons
+        ]
+    },
+    Obj_class = {
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasKw: rproc__4gl_ktab__002,
+        hasDsca: Title,
+        hasIcon: 'group',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_assembly,
+        isSession: true,
+        hasNavbar: false
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_ktab::conection_with_personalized_rprocess'(_, _OBJ_in, _, OBJ_out) :-
+    % channel and busid defintions
+    newKw('bus__container', BUS_RPROC),
+    newKw('channel__container', CHANNEL_RPROC),   
+    newKw('channel__tab', CHANNEL_TAB),
+    newKw('bus__tab', BUS_TAB),   
+    newKw('channel__workarea', CHANNEL_WORKAREA),
+    newKw('bus__workarea', BUS_WORKAREA),   
+
+    CLOSE_ACTION = {
+         label: {
+            icon: 'cancel'
+        },
+        collapse: false,
+        events:[
+            {
+                type: 'click',
+                method:'log',
+                targetBusId: BUS_TAB,
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        {
+                            type: 'method',
+                            name: 'close',
+                            busId: BUS_TAB
+                        },                        
+                        { 
+                            type: 'function', 
+                            % in: {
+                            %     hasKw: '_.nextToShow.hasKw',
+                            %     hasDsca: '_.nextToShow.hasDsca'
+                            % },
+                            name: 'staber_ktab::getNextTabContent',
+                            context: { delegatedTo: 'builderweb' } 
+                        },
+                        { 
+                            type: 'method',
+                            name: 'set_gui_out',
+                            busId: BUS_WORKAREA
+                        }                                                   
+                    ]
+                }
+            }
+        ]
+    },
+
+    % CLOSE_OTHERS = {
+    %     label: {
+    %         icon: 'cancel'
+    %     },
+    %     collapse: false,
+    %     events:[
+    %         {
+    %             type: 'click',
+    %             method:'log',
+    %             targetBusId: BUS_TAB,
+    %             p_exec: {
+    %                 type: 'sequence',
+    %                 hasProcess: [
+    %                     { 
+    %                         type: 'function', 
+    %                         name: 'staber_ktab::closeOthersTabs',
+    %                         context: { delegatedTo: 'builderweb' }
+    %                     },
+    %                     {
+    %                         type: 'method',
+    %                         name: 'close',
+    %                         busId: BUS_TAB
+    %                     },                                                
+    %                     { 
+    %                         type: 'method',
+    %                         name: 'set_gui_out',
+    %                         busId: BUS_WORKAREA
+    %                     }                                                   
+    %                 ]
+    %             }
+    %         }
+    %     ]
+    % },
+
+
+    INITIAL_TABS_DATA = {
+       data: [
+            {
+                hasIcon: 'project',  hasKw: 'kw1', hasDsca: 'Ejemplo 1', close: CLOSE_ACTION
+            },
+            {
+                hasIcon: 'paper', hasKw: 'kw2', hasDsca: 'Ejemplo 2', close: CLOSE_ACTION, selected: true
+            },
+            {
+                hasIcon: 'paper', hasKw: 'kw3', hasDsca: 'Ejemplo 3', close: CLOSE_ACTION
+            },
+            {
+                hasIcon: 'paper', hasKw: 'kw4', hasDsca: 'Ejemplo 4', close: CLOSE_ACTION
+            },
+            {
+                hasIcon: 'paper', hasKw: 'kw5', hasDsca: 'Ejemplo 5', close: CLOSE_ACTION
+            }
+       ]       
+    },
+  
+    % Auxiliary objects
+    Obj_append_bt = {
+        type:'button',
+        label: {
+            d: 'Añadir pestaña final'
+        },
+        events: [
+            {
+                type: 'click',
+                targetBusId: BUS_TAB,
+                method: 'log',
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        { 
+                            type: 'method',
+                            in: {
+                                hasIcon: 'folder',  
+                                hasKw: 'kwFinal', 
+                                hasDsca: 'Pestaña añadida', 
+                                selected: true
+                            },
+                            name: 'append',                    
+                            busId: BUS_TAB
+                        },
+                        { 
+                            type: 'function', 
+                            in: {
+                                hasKw: 'kwFinal'
+                            },
+                            name: 'staber_ktab::getTabContent', 
+                            context: { delegatedTo: 'builderweb' } 
+                        },
+                        { 
+                            type: 'method',
+                            name: 'set_gui_out',
+                            busId: BUS_WORKAREA
+                        }                                
+                    ]
+                }        
+            }
+        ]
+    },
+
+    Obj_replace_datatab_selected_bt = {
+        type:'button',
+        label: {
+            d: 'Actualizar contenido pestaña'
+        },
+        events: [
+            {
+                type: 'click',
+                method: 'log',                            
+                targetBusId: BUS_TAB,
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [            
+                        { 
+                            type: 'method', name: 'publish', module: 'PubSub',
+                            in: { 
+                                publish: [
+                                    { 
+                                        topic: 'setNode',
+                                        channel: CHANNEL_RPROC,     
+                                        in: { 
+                                            hasKw: 'kw2', 
+                                            hasIcon: 'magic',                                            
+                                            hasDsca: 'Pestaña actualizada'                                        
+                                        }
+                                    }
+                                ]
+                            }                        
+                        }                  
+                    ]
+                }                            
+            }
+        ]
+    },
+
+    Obj_replace_datatab_no_selected_bt = {
+        type:'button',
+        label: {
+            d: 'Actualizar contenido de pestaña no seleccionada'
+        },
+        events: [
+            {
+                type: 'click',
+                method: 'log',                            
+                targetBusId: BUS_TAB,
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [            
+                        { 
+                            type: 'method', name: 'publish', module: 'PubSub',
+                            in: { 
+                                publish: [
+                                    { 
+                                        topic: 'setNode',
+                                        channel: CHANNEL_RPROC,     
+                                        in: { 
+                                            hasKw: 'kw1', 
+                                            hasIcon: 'pushpin',                                            
+                                            hasDsca: 'Pestaña actualizada y seleccionada'                                        
+                                        }
+                                    }
+                                ]
+                            }                        
+                        }                  
+                    ]
+                }                            
+            }
+        ]
+    },
+
+    % Obj_append_bt2 = {
+    %     type:'button',
+    %     label: {
+    %         d: 'Añadir pestaña final 2'
+    %     },
+    %     events: [
+    %         {
+    %             type: 'click',
+    %             targetBusId: BUS_TAB,
+    %             method: 'log',
+    %             p_exec: {
+    %                 type: 'sequence',
+    %                 hasProcess: [
+    %                     { 
+    %                         type: 'method',
+    %                         in: {
+    %                             hasIcon: 'folder',  
+    %                             hasKw: 'kwFinal2', 
+    %                             hasDsca: 'Pestaña añadida 2', 
+    %                             selected: true
+    %                         },
+    %                         name: 'append',                    
+    %                         busId: BUS_TAB
+    %                     },
+    %                     { 
+    %                         type: 'function', 
+    %                         in: {
+    %                             hasKw: 'kwFinal2'
+    %                         },
+    %                         name: 'staber_ktab::getTabContent', 
+    %                         context: { delegatedTo: 'builderweb' } 
+    %                     },
+    %                     { 
+    %                         type: 'method',
+    %                         name: 'set_gui_out',
+    %                         busId: BUS_WORKAREA
+    %                     }                                
+    %                 ]
+    %             }        
+    %         }
+    %     ]
+    % },
+    % Obj_closeother_bt = {
+    %     type:'button',
+    %     label: {
+    %         d: 'Añadir pestaña con close especial'
+    %     },
+    %     events: [
+    %         {
+    %             type: 'click',
+    %             targetBusId: BUS_TAB,
+    %             method: 'log',
+    %             p_exec: {
+    %                 type: 'sequence',
+    %                 hasProcess: [
+    %                     { 
+    %                         type: 'method',
+    %                         in: {
+    %                             hasIcon: 'folder',  
+    %                             hasKw: 'kwothers', 
+    %                             hasDsca: 'Cierra demás pestañas', 
+    %                             selected: true,
+    %                             close: CLOSE_OTHERS
+    %                         },
+    %                         name: 'append',                    
+    %                         busId: BUS_TAB
+    %                     },
+    %                     { 
+    %                         type: 'function', 
+    %                         in: {
+    %                             hasKw: 'kwothers'
+    %                         },
+    %                         name: 'staber_ktab::getTabContent', 
+    %                         context: { delegatedTo: 'builderweb' } 
+    %                     },
+    %                     { 
+    %                         type: 'method',
+    %                         name: 'set_gui_out',
+    %                         busId: BUS_WORKAREA
+    %                     }                                
+    %                 ]
+    %             }        
+    %         }
+    %     ]
+    % },
+
+    % Rprocess childs definition
+    Obj_buttons = {
+        type: 'assembly',
+        children:[ 
+            Obj_append_bt,
+            Obj_replace_datatab_selected_bt,
+            Obj_replace_datatab_no_selected_bt
+            % Obj_append_bt2
+            % Obj_closeother_bt        
+        ]        
+    },
+    Obj_tab = {
+        type: 'ktab',
+        busId: BUS_TAB,
+        hasChannel: CHANNEL_TAB,
+        in: INITIAL_TABS_DATA,                        
+        events:[{
+            type: 'click',
+            method: 'log',
+            targetBusId: BUS_TAB,    
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    {
+                        type: 'method',
+                        name: 'setSelected',
+                        busId: BUS_TAB
+                    },                
+                    { 
+                        type: 'function', 
+                        in: {
+                            hasKw: '_.hasKw'
+                        },
+                        name: 'staber_ktab::getTabContent', 
+                        context: { delegatedTo: 'builderweb' } 
+                    },
+                    { 
+                        type: 'method', 
+                        name: 'publish', 
+                        module: 'PubSub', 
+                        in: { 
+                            publish:[                                
+                                { 
+                                    topic: 'set_gui_out', 
+                                    channel: CHANNEL_WORKAREA                         
+                                }                                                                                            
+                            ]
+                        }                        
+                    }                    
+                ]
+            }        
+            % p_exec: {
+            %     type: 'sequence',
+            %     hasProcess: [
+            %         { 
+            %             type: 'method', 
+            %             name: 'publish', 
+            %             module: 'PubSub', 
+            %             in: { 
+            %                 publish:[                                
+            %                     { 
+            %                         topic: 'exec', 
+            %                         channel: CHANNEL_WORKAREA                         
+            %                     }                                                                                            
+            %                 ]
+            %             }                        
+            %         }                  
+            %     ]
+            % }
+        }],
+        evtSubscribe: [
+            { topic: 'setNode', channel: CHANNEL_RPROC}
+        ]                  
+    },  
+    Obj_workarea_rprocess = {
+        type : 'rprocess',
+        busId: BUS_WORKAREA,
+        hasChannel: CHANNEL_WORKAREA,        
+        gui_out: {
+            type: 'sequence',
+            hasProcess: [
+                { 
+                    type: 'function', 
+                    in: {
+                        hasKw: 'kw2'
+                    },
+                    name: 'staber_ktab::getTabContent', 
+                    context: { delegatedTo: 'builderweb' } 
+                }
+            ]
+        },
+        isSession: false,
+        hasNavbar: false,
+        evtSubscribe: [
+            { topic: 'set_gui_out', channel: CHANNEL_WORKAREA}
+        ]        
+    },
+
+    % Rprocess CONTAINER definition
+    Obj_container = {
+        type: 'assembly',
+        children:[
+            Obj_buttons,
+            Obj_tab,
+            Obj_workarea_rprocess
+        ]
+    },
+    IN_RPROC = {
+    },
+    Obj_class = {
+        in : IN_RPROC,
+        type : 'rprocess',
+        busId: BUS_RPROC,
+        hasKw: rproc__4gl_ktab__003,
+        hasDsca: 'Componente configurado con conexion entre pestañas y área de trabajo',
+        hasIcon: 'conect',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_container,
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+
+
+
+'staber_ktab::usecase__4'(_, _OBJ_in, _, OBJ_out) :-   
+    IN = {
+       orientation: 'vertical', 
+       data:[
+            {
+                hasIcon: 'project',  hasKw: 'kw1', hasDsca: 'Ejemplo 1'
+            }            
+       ]       
+    },       
+    newKw('channel__tab', CHANNEL_TAB),
+    newKw(bus, BUS),
+    newKw(bus, BUS_FORM),
+    newKw(bus__tab, BUS_TAB),
+    Obj_proc = {
+        type: 'rprocess',
+        busId: BUS_FORM,
+        do_exec: true,
+        in: {},     
+        proc : {
+            type: sequence,
+            hasProcess: [
+                { type: 'function', name: 'staber_ktab::getNewContent', context: { delegatedTo: 'builderweb' } }             
+            ]
+        },
+        gui_out: { type: 'method', name: 'set_gui_out', busId: BUS_FORM }
+    },
+    Obj_button1 ={
+        type:'button',
+        appearance: line,
+        label: {
+            d: 'DISPLAY'
+        },
+        events: [{
+            type: 'click',
+            targetBusId: BUS,
+            method: 'log',
+            p_exec: { type: 'method', name: 'display', busId: BUS_FORM }
+        }]
+    },
+    Obj_button2 ={
+        type:'button',
+        appearance: line,
+        label: {
+            d: 'EXEC'
+        },
+        events: [{
+            type: 'click',
+            targetBusId: BUS,
+            method: 'log',
+            p_exec: { type: 'method', name: 'exec', busId: BUS_FORM }
+        }]
+    },
+    Obj_button3 ={
+        type:'button',
+        appearance: line,
+        label: {
+            d: 'PROCESS'
+        },
+        events: [{
+            type: 'click',
+            targetBusId: BUS,
+            method: 'log',
+            p_exec: { type: 'method', name: 'process', busId: BUS_FORM }
+        }]
+    },
+    Obj_buttons = {
+        type: assembly,
+        children:[
+            Obj_button1,
+            Obj_button2,
+            Obj_button3
+        ]        
+    },
+    Title = 'Tab con un componente, que guarda su estado y al hacer click no debe ejecutarlo de nuevo',
+    Obj_tab = {
+        type: 'ktab',
+        busId: BUS_TAB,
+        hasChannel: CHANNEL_TAB,
+        in: IN,                        
+        hasIcon: 'group',
+        events:[{
+            type: 'click',
+            method: 'log',
+            targetBusId: BUS_TAB,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'method', name: 'exec', busId: BUS_FORM }
+                ]
+            }
+
+        }]         
+    },          
+    Obj_assembly = {
+        type: assembly,
+        children:[
+            Obj_tab,
+            Obj_buttons,
+            Obj_proc
+        ]
+    },
+    Obj_class = {
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasKw: rproc__4gl_ktab__004,
+        hasDsca: Title,
+        hasIcon: 'group',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_assembly,
+        isSession: true,
+        hasNavbar: false
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_ktab::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_ktab,
+        hasDsca: 'ktab (Ejemplos)',
+        hasIcon: 'ellipsis',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+        hasERCPart:[
+            rproc__4gl_ktab__001,
+            rproc__4gl_ktab__002,
+            rproc__4gl_ktab__003,
+            rproc__4gl_ktab__004
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).
+
+'staber_ktab::getNewContent'(Ctx, _Obj_in, Ctx, Obj_out):-
+    newKw('i_', Value),       
+    concatAtoms(['Este contador no debe cambiar ', Value], Dsca ),
+    Obj_label = {
+        type: 'label',
+        d: Dsca,        
+        size: h2,
+        class: block        
+    },
+    Obj_out = {
+        type: 'assembly',
+        children : [Obj_label]    
+    }.
+
+    
+'staber_ktab::doSelect'(Ctx, Obj_in, Ctx, Obj_out):-
+    % obj_ppd(Obj_in),
+    obj_get(hasKw, Obj_in, Kw),
+    obj_get(hasDsca, Obj_in, Dsca),
+    wAddInfoMsgML('Aviso', 'Se ha seleccionado, <b>?a{1}</b>, <b>?a{2}</b>', [Kw,Dsca],{showTime:3}),
+    Obj_out = Obj_in.
+
+'staber_ktab::getTabContent'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_ppd(Obj_in),
+    obj_get(hasKw, Obj_in, Kw),
+
+    ( Kw == 'kw1' ->
+        Text = 'Pestaña 1'
+    ; Kw == 'kw2' ->
+        Text = 'Pestaña 2'
+    ; Kw == 'kw3' ->
+        Text = 'Pestaña 3'
+    ; Kw == 'kw4' ->
+        Text = 'Pestaña 4'
+    ; Kw == 'kw5' ->
+        Text = 'Pestaña 5'    
+    ; otherwise ->
+        Text = 'Otra pestana'
+    ),
+
+    Obj_out = {
+        type: 'assembly',
+        hasKw: Kw,
+        toReload: false,
+        children:[            
+            {
+                type: 'label',
+                d: Text
+            }
+        ]  
+    }.
+
+'staber_ktab::getNextTabContent'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_ppd(Obj_in),
+    obj_get(nextToShow:hasKw, Obj_in, Kw),
+
+    ( Kw == 'kw1' ->
+        Text = 'Pestaña 1'
+    ; Kw == 'kw2' ->
+        Text = 'Pestaña 2'
+    ; Kw == 'kw3' ->
+        Text = 'Pestaña 3'
+    ; Kw == 'kw4' ->
+        Text = 'Pestaña 4'
+    ; Kw == 'kw5' ->
+        Text = 'Pestaña 5'    
+    ; otherwise ->
+        Text = 'Otra pestana'
+    ),
+
+    Obj_out = {
+        type: 'assembly',
+        hasKw: Kw,
+        toReload: false,
+        children:[            
+            {
+                type: 'label',
+                d: Text
+            }
+        ]  
+    }.
+
+% 'staber_ktab::closeOthersTabs'(Ctx, Obj_in, Ctx, Obj_out):-
+%     obj_ppd(Obj_in),
+%     obj_fetch(data, Obj_in, LData_old),
+%     obj_fetch(hasKw, Obj_in, RootKw),
+
+%     findall(Obj, (
+%         member(Obj_0, LData_old),
+%         obj_fetch(hasKw, Obj, RootKw),
+%         Obj = Obj_0
+%     ), LData_new),
+%     obj_set(data, Obj_in, LData_new, Obj_out),
+%     obj_ppd(Obj_in).
+
+'staber_ktab::doClose'(Ctx, Obj_in, Ctx, Obj_out):-
+    % obj_ppd(Obj_in),
+    obj_get(hasKw, Obj_in, Kw),
+    obj_get(hasDsca, Obj_in, Dsca),
+    wAddInfoMsgML('Aviso', 'Se ha borrado, <b>?a{1}</b>, <b>?a{2}</b>', [Kw,Dsca],{showTime:3}),
+    Obj_out = Obj_in.
+
+    
+'staber_ktab::doAction'(Ctx, Obj_in, Ctx, Obj_out):-
+    % obj_ppd(Obj_in),
+    obj_get(hasKw, Obj_in, Kw),
+    obj_get(hasDsca, Obj_in, Dsca),
+    wAddInfoMsgML('Aviso', 'Se ha ejecutado, <b>?a{1}</b>, <b>?a{2}</b>', [Kw,Dsca],{showTime:3}),
+    Obj_out = Obj_in.

@@ -1,0 +1,2944 @@
+﻿/**
+@descr	staber_uiux <br>
+		staber_uiux
+@author ccp
+@date	2023_11_13
+**/
+rc_class('staber_uiux') :-
+	class +$ 'staber_uiux' d ( es,'Escenarios UI/UX') sc function,
+    'staber_uiux::table'(_, _, _, _),
+    'staber_uiux::graph'(_, _, _, _),
+    'staber_uiux::dlg_heights'(_, _, _, _),
+    'staber_uiux::form_automatic'(_, _, _, _),
+    'staber_uiux::form_aggrupationapi'(_, _, _, _),
+    'staber_uiux::form_dialog_help'(_,_,_,_),
+    'staber_uiux::form_kmgt'(_, _, _, _),
+    'staber_uiux::form_template_controls'(_, _, _, _),
+    'staber_uiux::form_template_tabs'(_, _, _, _),
+    'staber_uiux::form_template_colapsible'(_, _, _, _),
+    'staber_uiux::form_template_assembly'(_, _, _, _),
+    'staber_uiux::form_template_help_info_panel'(_, _, _, _),
+    'staber_uiux::form_template_text_validation'(_, _, _, _),
+    'staber_uiux::customizationmodel'(_, _, _, _),
+    % configuración contra modelo propio testapp:contacto en Default configuración stylesVars
+    'staber_kmgt::usecase__autocols'(_, _, _, _),
+    'staber_kmgt::usecase__stylesVars'(_, _, _, _),
+    'staber_kmgt::usecase__display'(_, _, _, _),
+    'staber_kform::usecase__stylesVars'(_, _, _, _),
+    'staber_uiux::kdetail__stylesVars'(_, _, _, _),
+    'staber_uiux::autocols'(_, _, _, _),
+    'staber_kmgt::form__stylesVars'(_, _, _, _),
+    'staber_uiux::text__stylesVars'(_, _, _, _),
+    'staber_uiux::controls_checkbox_with_multiple_states'(_, _, _, _),
+    'staber_kmgt::form__stylesVars_compare'(_, _, _, _),
+    'staber_uiux::form_stylevar__folder'(_, _, _, _),
+    'staber_uiux::ktoolbar_stylesvars'(_, _, _, _),
+    'staber_uiux::kdetail_stylesvars'(_, _, _, _),
+    'staber_uiux::form__folders'(_, _, _, _).
+    
+'staber_uiux::table'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('channel__uiux__', CHANNEL_UIUX),
+    newKw('bus__uiux__', BUSID_UIUX),  
+    Table_Schema = [                   
+        {
+            label: {
+                d: 'KW'
+            },
+            arc: 'hasKw',
+            selectable: true,
+            enabled: false,
+            sorted: true,
+            filter: true
+        },
+        {
+            label: {
+                d: 'Descripcion'
+            },
+            arc: 'hasDsca',         
+            sorted: true,
+            filter: true
+        },  
+        {
+            label: {
+                d: 'Edad'
+            },
+            arc: 'contact:hasAge',
+            filter: true,
+            enabled: false,
+            inputtype: 'integer'
+        }                           				                
+	],
+    Schema = {data: Table_Schema },
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        enabled: true,
+        stylesVars: {
+            primaryColor: 'green',
+            fontSize: 'small',
+            fontFamily: 'Arial'
+        },
+        schema: Schema,
+        hasKw: 'testapp:contact'
+    },
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,          
+        hasNavbar: false,    
+        hasKw: ui_ux_for_table,   
+        hasDsca: ui_ux_for_table_uiML,
+        hasIcon: 'table',
+        hasChannel: CHANNEL_UIUX,
+        busId :BUSID_UIUX,     
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_uiux::graph'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+    newKw('bus', BUS),
+    IN = {                
+        enabled: false,        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact'
+    },    
+	Obj_class = {
+        type: 'kgraph',
+        in: IN,        
+        hasKw: ui_ux_for_graph,
+        hasDsca: ui_ux_for_graph_uiML,
+        hasIcon: 'database1',   
+        busId: BUS,    
+        hasNavbar: false,                  
+        diagramType:'ontology',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest]
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_uiux::dlg_heights'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+
+    newKw('channel__pivot', CHANNEL_PIVOT),
+
+    newKw('bus_master', BUS_RPROCESS),
+    newKw('bus_dladata', BUS_DLG_DATA),
+    newKw('bus_pivot', BUS_PIVOT),
+
+    OBJ_DLG_DATA_TABLE = {
+        type: 'kresult',
+        do_exec: true,
+        busId: BUS_DLG_DATA,
+        in: {
+            hasDataset: I_dataset,
+            hasAgent: I_agent,
+            hasKw: 'testapp:contact'
+        }
+    },
+    OBJ_DLG_DATA_LABEL = {
+        type: 'assembly',
+        id: 'assembly_simple', 
+        label: {
+            d: 'Mostrar solo titulo del área'
+        }
+    },
+    /*Pivot configuration*/    
+    IN_PIVOT = {
+        absoluteQuery: true,
+        enabled:false,
+        hasDataset: 'Default',
+        query: 'stmt( hasDsca, HASKW, _), member( HASKW,[\'testapp:contact\'])',
+        searchType: 'rql',
+        hasDsca: '*',
+        rql_before: 'staber_kmgt::ontology::get_root_classes',
+        predicate: 'staber_kmgt::ontology::get_elements',
+        expanded: false,
+        hasOntologyItems:['classes', 'properties', 'instances'],
+        hasIncludedProperties:  ['hasKw', 'hasDsca', 'hasIDI', 'type'],
+        hasClass: 'testapp:contact',
+        schemaHeader: false,
+        limit: 10,
+        case: false,
+        fullWord: '',
+        persistence: 'remote',
+        getCount: false,
+        hasConfiguration: 'noConfig',
+        schema:[
+            {
+                label: {
+                    d: 'Keyword'
+                },
+                arc: 'hasKw',
+                events: [{
+                    type: 'click',
+                    method: 'nav',
+                    targetBusId: '$.busId',
+                    payload:{
+                        hasTag :'myProfile',
+                        navOptions: {
+                            isSession: true
+                        }
+                    }
+                }]
+            },
+            {
+                label: {
+                    d: 'Descripción'
+                },
+                arc: 'hasDsca',
+                selectable: true,                  
+                events: [{
+                    type: 'click',
+                    method: 'nav',
+                    targetBusId: '$.busId',
+                    payload:{
+                        hasTag :'myProfile',
+                        navOptions: {
+                            isSession: true
+                        }
+                    }
+                }]
+            },            
+            {
+                label: {
+                    d: 'Tipo de la propiedad (control)'
+                },
+                arc: 'type',
+                selectable: false,
+                control: {
+                    type: 'label',
+                     d: '_.type',
+                    events: [{
+                        type: 'click',
+                        method: 'nav',
+                        targetBusId: '$.busId',
+                        payload:{
+                            hasTag :'myProfile',
+                            navOptions: {
+                                isSession: true
+                            }
+                        }
+                    }]
+                }
+            }        
+        ]
+    },
+    NAV = [{ hasProperty: 'children', in: IN_PIVOT}],
+    OBJ_DLG_DATA_PIVOT = {
+        type: 'kpivotgrid',
+        scroll: 'main',
+        enabled:false,
+        hasChannel: CHANNEL_PIVOT,
+        busId:BUS_PIVOT,
+        in: IN_PIVOT,
+        do_exec: true,
+        nav: NAV,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                { type: 'function', name: 'rql', context: { delegatedTo: I_agent } }
+            ]
+        },
+        autoRows: true
+    },
+    OBJ_DLG = {
+        type: 'rdlg',
+        busId: '$.dlg.busId',
+        in: {
+            height: '600px'
+        }        
+    },
+    Obj_dlg_heights = {  
+        type: 'assembly',
+        id: 'assembly_dlg_heights', 
+        label: {
+            d: 'Mostrando diálogos con diferentes alturas'
+        },       
+        children: [   
+            {
+                type: 'button',
+                id: 'button-table',
+                label: {
+                    d: 'Mostrando una tabla'
+                },
+                appearance: 'line',
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_RPROCESS,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'method',
+                                    in: { dlg_data: OBJ_DLG_DATA_TABLE, dlg: OBJ_DLG},
+                                    name: 'dialog_exec',
+                                    busId: BUS_RPROCESS    
+                                }                                
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                type: 'button',
+                id: 'button-label',
+                label: {
+                    d: 'Mostrando un título de área'
+                },
+                appearance: 'line',
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_RPROCESS,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'method',
+                                    in: { dlg_data: OBJ_DLG_DATA_LABEL, dlg: OBJ_DLG},
+                                    name: 'dialog_exec',
+                                    busId: BUS_RPROCESS    
+                                }                                
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                type: 'button',
+                id: 'button-pivot',
+                label: {
+                    d: 'Mostrando un arbol'
+                },
+                appearance: 'line',
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_RPROCESS,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'method',
+                                    in: { dlg_data: OBJ_DLG_DATA_PIVOT, dlg: OBJ_DLG},
+                                    name: 'dialog_exec',
+                                    busId: BUS_RPROCESS    
+                                }                                
+                            ]
+                        }
+                    }
+                ]
+            }       
+        ]
+    },
+    OBJ_in = {
+        type: 'rprocess',
+        hasKw: ui_ux_dlg_heights,
+        hasDsca: ui_ux_dlg_heights_uiML,
+        busId: BUS_RPROCESS,
+        hasIcon: 'folder-open',
+        hasDlg: true,
+        isSession: true,
+        hasNavbar: true,        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_dlg_heights
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+'staber_uiux::form_automatic'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_001',
+        hasKwc: 'testapp:contact',
+        stylesVars: {
+            cols: 3,
+            columnLayout: true,
+            spaceElements: 'extra',
+            colSpace: 'extra'            
+        }
+    },
+	Obj_class = {  
+        type : 'kdetail',
+        in : IN,        
+        hasKw: ui_ux_form_automatic,
+        hasDsca: ui_ux_form_automatic_uiML,
+        hasIcon: 'pencil',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+'staber_uiux::form_aggrupationapi'(_, _OBJ_in, _, OBJ_out) :-
+    % I_dataset = 'dataset__test_5gl_server',
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        hasAggrupationLegacy: true
+        % hasConfiguration: 'configuration__staber_testapp_server'
+    },
+	Obj_class = {
+        type : 'kdetail',
+        in : IN,        
+        hasKw: ui_ux_form_aggrupationapi,
+        hasDsca: ui_ux_form_aggrupationapi_uiML,
+        hasIcon: 'pencil',
+        hasNavbar: true,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+'staber_uiux::form_kmgt'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb', 
+
+    Extra_Actions ={
+        state_edit:[
+            {
+                type: 'es6button',
+                icon: 'navigate',
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events: [
+                    {
+                        type: 'click',
+                        method: 'refresh_gui',
+                        targetBusId: '$.busId',
+
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'function',      
+                                    in: { hasKw: 'testapp:contact' },                             
+                                    name: 'staber_test_fake_call',
+                                    context: {
+                                        delegatedTo: '$.hasAgent'
+                                    }
+                                },
+                                {
+                                    type: 'method',
+                                    name: 'merge_in',
+                                    busId: '$.busId'
+                                },    
+                                {
+                                    type: 'method',                                    
+                                    name: 'navigateTo',
+                                    busId: '$.busId'
+                                }     
+                            ]
+                        }
+                    }
+                ]            
+            }
+        ],
+        state_noedit:[
+            {
+                type: 'es6button',
+                icon: 'print',
+                enabled: false,
+                classList:[
+                    "text-button"
+                ]
+            }
+        ]
+    },
+	IN = {
+        hasTitle: 'Contactos modelo de Tests',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_001',
+        hasKwc: 'testapp:contact',        
+        selectable: true,
+        hasArea: {
+            detail: {
+                navigationFilter: 'all',
+                showAllProperties: false,
+                extraAction: Extra_Actions,
+                stylesVars: {
+                    cols: 2,
+                    spaceElements: 'extra'
+                }
+            },
+            result: {
+                schema : {
+                    data: [   
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'hasDsca',
+                            sorted: true
+                        },                
+                        {
+                            label: {
+                                d: 'Clave'
+                            },
+                            arc: 'hasKw'                                       
+                        }                    
+                    ]
+                }                 
+            },
+            search: {
+                fieldsToSearchFromSchema: true    
+            }
+        }
+    },   
+    OBJ_out = {
+        type: 'kmgt',
+        in: IN,
+        hasKw: ui_ux_form_kmgt,
+        hasDsca: ui_ux_form_kmgt_uiML,
+        hasIcon: 'document',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+'staber_uiux::form_template_controls'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    'staber_uiux::generate_template_to_configure_controls'(Obj_Template),
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        template: Obj_Template,
+        navigationFilter: all,
+        showAllProperties: true,
+        hasEvent: 'e_edit',
+        stylesVars: {
+            cols: 3,
+            columnLayout: true,
+            colSpace: 'extra'  
+        }        
+    },
+	Obj_class = {  
+        type : 'kdetail',
+        in : IN,        
+        hasKw: ui_ux_form_template_controls,
+        hasDsca: ui_ux_form_template_controls_uiML,
+        hasIcon: 'cog-alt',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+'staber_uiux::form_template_tabs'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    'staber_uiux::generate_template_to_configure_tabs'(Obj_Template),
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        template: Obj_Template,
+        navigationFilter: all,
+        showAllProperties: true,
+        hasEvent: 'e_edit'        
+    },
+	Obj_class = {  
+        type : 'kdetail',
+        in : IN,        
+        hasKw: ui_ux_form_template_tabs,
+        hasDsca: ui_ux_form_template_tabs_uiML,
+        hasIcon: 'cog-alt',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+'staber_uiux::form_template_colapsible'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    'staber_uiux::generate_template_to_configure_colapsible'(Obj_Template),
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        template: Obj_Template,
+        navigationFilter: all,
+        showAllProperties: true,
+        hasEvent: 'e_edit'        
+    },
+	Obj_class = {  
+        type : 'kdetail',
+        in : IN,        
+        hasKw: ui_ux_form_template_colapsible,
+        hasDsca: ui_ux_form_template_colapsible_uiML,
+        hasIcon: 'cog-alt',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+'staber_uiux::form_template_assembly'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    'staber_uiux::generate_template_to_configure_assemblies'(Obj_Template),
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        template: Obj_Template,
+        navigationFilter: all,
+        showAllProperties: true,
+        hasEvent: 'e_edit'        
+    },
+	Obj_class = {  
+        type : 'kdetail',
+        in : IN,        
+        hasKw: ui_ux_form_template_assembly,
+        hasDsca: ui_ux_form_template_assembly_uiML,
+        hasIcon: 'cog-alt',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+'staber_uiux::form_template_help_info_panel'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    'staber_uiux::generate_template_to_configure_helpinfo'(Obj_Template),
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        template: Obj_Template,
+        navigationFilter: all,
+        showAllProperties: true,
+        hasEvent: 'e_edit'        
+    },
+	Obj_class = {  
+        type : 'kdetail',
+        in : IN,        
+        hasKw: ui_ux_form_template_helpinfo,
+        hasDsca: ui_ux_form_template_helpinfo_uiML,
+        hasIcon: 'cog-alt',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+'staber_uiux::generate_template_to_configure_controls'(Obj_Template):-
+    Obj_Template = {
+        type: assembly,            
+        label: {
+            d: 'Configurando campos de texto'
+        },
+        cols: 3,        
+        columnLayout: true,
+        colSpace: 'extra',         
+        children: [
+            {
+                arc: 'contact:hasName',
+                label: {
+                    d: 'Campo solo de lectura'
+                },
+                enabled: true,
+                maxlength: 3
+            },
+            {
+                arc: 'contact:hasPassword',                
+                label: {
+                    d: 'Campo de contraseña con asteriscos'
+                },
+                inputtype: 'password'
+            },
+            {
+                arc: 'contact:hasEmail',                
+                label: {
+                    d: 'Campo de email con vinculo al cliente de correo',
+                    icon: 'email'
+                },
+                inputtype: 'mailto',
+                enabled: false
+            },
+            {
+                arc: 'contact:hasResidenceCountry',
+                label: {
+                    d: 'Campo con múltiples opciones y autocompletado'
+                },
+                autocomplete: true
+            },
+            {
+                arc: 'contact:hasAge',
+                label: {
+                    d: 'Campo obligatorio'
+                },
+                required: true
+            },
+            {
+                arc: 'contact:hasPhoneNumber',
+                label: {
+                    d: 'Campo con leyenda fijada'
+                },                
+                legendleft: {
+                    d: '34'
+                }
+            },
+            {
+                arc: 'contact:hasIdNumber',
+                label: {
+                    d: 'Campo que contiene un error'
+                },
+                class: 'r-error'
+            },
+            {
+                arc: 'contact:hasProfessionalProfile',
+                label: {
+                    d: 'Campo de edición de texto inicializado'
+                },              
+                value: '<h2>Ejemplo de <strong> HtmlEditor</strong>&nbsp;</h2><p><br></p><blockquote><p>sin configuraciones, es la configuracion por defecto!</p></blockquote>'
+            }
+        ]       
+    }.
+
+'staber_uiux::generate_template_to_configure_tabs'(Obj_Template):-
+    Obj_Template = {
+        type: tab, 
+        id: 'controls_tab_001',
+        children: [
+            {
+                id: 'init_tab_001',
+                type: tabchild,
+                active: true,
+                label: {
+                    d: 'Pestaña inicial',
+                    icon: 'car'
+                },               
+                children: [
+                    {
+                        arc: 'contact:hasName'                        
+                    }
+                ]
+            },
+            {
+                id: 'tab_002',
+                type: tabchild,
+                label: {
+                    d: 'Pestaña secundaria',
+                    icon: 'airplane-line'
+                },                
+                children: [
+                    {
+                        arc: 'contact:hasEmail'                        
+                    }
+                ]
+            }
+        ]
+    }.
+
+'staber_uiux::generate_template_to_configure_colapsible'(Obj_Template):-
+    Obj_Template = {
+        type: collapsible,         
+        id: 'controls_tab_001',
+        children: [
+            {
+                id: 'collapsible_001',
+                type: collapsiblechild,
+                active: true,
+                label: {
+                    d: 'Área colapsible uno',
+                    icon: 'car'
+                },               
+                children: [
+                    {
+                        arc: 'contact:hasName'                        
+                    }
+                ]
+            },
+            {
+                id: 'collapsible_002',
+                type: collapsiblechild,
+                scroll: main,
+                label: {
+                    d: 'Área colapsible ',
+                    icon: 'airplane-line'
+                },                
+                children: [
+                    {
+                        arc: 'contact:hasEmail'                        
+                    }
+                ]
+            }
+        ]
+    }.
+
+'staber_uiux::generate_template_to_configure_mix'(Obj_Template):-
+    Obj_Template = {
+        type: 'assembly', 
+        id: 'assembly_container',        
+        children: [
+            {
+                type: collapsible, 
+                id: 'controls_collapsible_001',
+                children: [
+                    {
+                        id: 'collapsible_001',
+                        type: collapsiblechild,
+                        active: true,
+                        label: {
+                            d: 'Área colapsible uno',
+                            icon: 'car'
+                        },               
+                        children: [
+                            {
+                                arc: 'contact:hasName'                        
+                            }
+                        ]
+                    },
+                    {
+                        id: 'collapsible_002',
+                        type: collapsiblechild,
+                        label: {
+                            d: 'Área colapsible ',
+                            icon: 'airplane-line'
+                        },                
+                        children: [
+                            {
+                                arc: 'contact:hasEmail'                        
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                type: tab, 
+                id: 'controls_tab_001',
+                children: [
+                    {
+                        id: 'init_tab_001',
+                        type: tabchild,
+                        active: true,
+                        label: {
+                            d: 'Pestaña inicial',
+                            icon: 'car'
+                        },               
+                        children: [
+                            {
+                                arc: 'contact:hasPhoneNumber'                        
+                            }
+                        ]
+                    },
+                    {
+                        id: 'tab_002',
+                        type: tabchild,
+                        label: {
+                            d: 'Pestaña secundaria',
+                            icon: 'airplane-line'
+                        },                
+                        children: [
+                            {
+                                arc: 'contact:hasAge'                        
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }.
+
+'staber_uiux::generate_template_to_configure_mix_style'(Obj_out):-
+    Obj_out = {
+        layout: 'box'
+    }.
+
+'staber_uiux::generate_template_to_configure_assemblies'(Obj_Template):-
+    Obj_Template = {
+        type: 'assembly', 
+        id: 'assembly_parent',
+        children: [
+            {
+                id: 'assembly_principal',
+                type: assembly,
+                children: [
+                    {
+                        id: 'assembly_principal_left',
+                        type: assembly,
+                        label: {
+                            d: 'Área principal con 70% de anchura'
+                        },               
+                        width: 70,
+                        children: [
+                            {
+                                arc: 'contact:hasName'                        
+                            },
+                            {
+                                arc: 'contact:hasAge'                        
+                            }
+                        ]
+                    },
+                    {
+                        id: 'assembly_principal_rigth',
+                        type: assembly,
+                        label: {
+                            d: 'Área principal - derecha',
+                            icon: 'airplane-line'
+                        },     
+                        width: 30,           
+                        children: [
+                            {
+                                arc: 'contact:hasEmail'                        
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'assembly_secundary',
+                type: assembly,
+                label: {
+                    d: 'Área secundaria'
+                },
+                children: [
+                    {
+                        arc: 'contact:hasProfessionalProfile'                        
+                    }
+                ]
+            }            
+        ]
+    }.
+
+'staber_uiux::generate_template_to_configure_helpinfo'(Obj_Template):-
+    Obj_Template = {
+        type: 'assembly', 
+        id: 'assembly_parent',
+        children: [
+            {
+                id: 'assembly_principal',
+                type: assembly,
+                width: 70,            
+                children: [
+                    {
+                        arc: 'contact:hasPassword',
+                        label: {
+                            d: 'Área con ayuda configurada'
+                        },   
+                        hasHelp: true
+                    },
+                    {
+                        arc: 'contact:hasVacationCountry',
+                        label: {
+                            d: '(LIST) Lista de selección con ayuda configurada'
+                        },   
+                        hasHelp: true
+                    },
+                    {
+                        arc: 'contact:hasMothersCountry',
+                        label: {
+                            d: '(COMBOBOX) Lista de selección con ayuda configurada'
+                        },   
+                        % hasHelp: true                        
+                        hasHelpFocus: true
+                    },
+                    {
+                        arc: 'contact:hasMaster',
+                        label: {
+                            d: 'Campo booleano con ayuda configurada'
+                        },   
+                        hasHelp: true
+                    }, 
+                    {
+                        type: 'gallery',
+                        id: 'gallery-8',
+                        scroll: true,
+                        hasHelp: true,
+                        elements: [
+                            {
+                                label: {
+                                    icon: 'support'
+                                },
+                                tabIndex: 0,
+                                datavalue: 'r_1720178129502'
+                            },
+                            {
+                                label: {
+                                    icon: 'weights'
+                                },
+                                datavalue: 'r_1720178129512'
+                            },
+                            {
+                                label: {
+                                    icon: 'investigation'
+                                },
+                                datavalue:'r_1720178129522'
+                            },
+                            {
+                                label: {
+                                    icon: 'college'
+                                },
+                                datavalue: 'r_1720178129532'
+                            },
+                            {
+                                label: {
+                                    icon: 'weights'
+                                },
+                                datavalue: 'r_1720178129512'
+                            },
+                            {
+                                label: {
+                                    icon: 'investigation'
+                                },
+                                datavalue:'r_1720178129522'
+                            },
+                            {
+                                label: {
+                                    icon: 'college'
+                                },
+                                datavalue: 'r_1720178129532'
+                            },
+                            {
+                                label: {
+                                    icon: 'weights'
+                                },
+                                datavalue: 'r_1720178129512'
+                            },
+                            {
+                                label: {
+                                    icon: 'investigation'
+                                },
+                                datavalue:'r_1720178129522'
+                            },
+                            {
+                                label: {
+                                    icon: 'college'
+                                },
+                                datavalue: 'r_1720178129532'
+                            },
+                            {
+                                label: {
+                                    icon: 'weights'
+                                },
+                                datavalue: 'r_1720178129512'
+                            },
+                            {
+                                label: {
+                                    icon: 'investigation'
+                                },
+                                datavalue:'r_1720178129522'
+                            },
+                            {
+                                label: {
+                                    icon: 'college'
+                                },
+                                datavalue: 'r_1720178129532'
+                            },
+                            {
+                                label: {
+                                    icon: 'weights'
+                                },
+                                datavalue: 'r_1720178129512'
+                            },
+                            {
+                                label: {
+                                    icon: 'investigation'
+                                },
+                                datavalue:'r_1720178129522'
+                            },
+                            {
+                                label: {
+                                    icon: 'college'
+                                },
+                                datavalue: 'r_1720178129532'
+                            },
+                            {
+                                label: {
+                                    icon: 'weights'
+                                },
+                                datavalue: 'r_1720178129512'
+                            },
+                            {
+                                label: {
+                                    icon: 'investigation'
+                                },
+                                datavalue:'r_1720178129522'
+                            },
+                            {
+                                label: {
+                                    icon: 'college'
+                                },
+                                datavalue: 'r_1720178129532'
+                            },
+                            {
+                                label: {
+                                    icon: 'weights'
+                                },
+                                datavalue: 'r_1720178129512'
+                            },
+                            {
+                                label: {
+                                    icon: 'investigation'
+                                },
+                                datavalue:'r_1720178129522'
+                            },
+                            {
+                                label: {
+                                    icon: 'college'
+                                },
+                                datavalue: 'r_1720178129532'
+                            },
+                            {
+                                label: {
+                                    icon: 'weights'
+                                },
+                                datavalue: 'r_1720178129512'
+                            },
+                            {
+                                label: {
+                                    icon: 'investigation'
+                                },
+                                datavalue:'r_1720178129522'
+                            },
+                            {
+                                label: {
+                                    icon: 'college'
+                                },
+                                datavalue: 'r_1720178129532'
+                            },
+                            {
+                                label: {
+                                    icon: 'weights'
+                                },
+                                datavalue: 'r_1720178129512'
+                            },
+                            {
+                                label: {
+                                    icon: 'investigation'
+                                },
+                                datavalue:'r_1720178129522'
+                            },
+                            {
+                                label: {
+                                    icon: 'college'
+                                },
+                                datavalue: 'r_1720178129532'
+                            }
+                        ]
+                    }                                                     
+                ]
+            },
+            {
+                id: 'assembly_panel_help_info',
+                type: assembly,
+                width: 30,                   
+                children: [
+                     {
+                        type: 'help',
+                        busId: 'helpBusId',
+                        fixed: true
+                    }
+                ]           
+            }
+        ]
+    }.
+
+'staber_uiux::form_dialog_help'(_, _OBJ_in, _, OBJ_out) :-
+    
+    I_agent   = 'builderweb',
+    I_dataset = 'Default',
+    newKw('busId__', BUSID_KFORM),
+    newKw('busId__', BUSID_KFORM_DIALOG),
+    newKw('busId__', Bus_id),
+
+    Obj_out_info = {
+        type: 'help',
+        classList: ['info-font-icon'],
+        busId: 'infoBusId'
+    },
+    Obj_out_help = {
+        type: 'help',
+        busId: 'helpBusId'
+    },
+    
+    addHelp( user, hasPassword,
+        es,
+        [ title( 'Recomendaciones de contraseña'),
+        '<p>De un mínimo de 8 caractéres, y que contenga algún número o mayúscula. Evitar fechas y demás datos personales conocidos.</p>'
+    ]),
+    addInfo( user, hasLoginId,
+        es,
+        [ '<p>Cadena de caracteres única con la que se identifica al usuario en el sistema.</p>']),
+
+    'create_form_with_help'(I_agent, I_dataset, BUSID_KFORM, OBJ_form),
+    'create_form_with_help'(I_agent, I_dataset, BUSID_KFORM_DIALOG, OBJ_form_dlg),
+    Dlg_data= {
+        type:'assembly',
+        children: [
+            {
+                type: 'assembly',
+                width: 70,
+                children:[ OBJ_form_dlg]
+            },
+            {
+                type: 'assembly',
+                width: 30,
+                children:[Obj_out_help,Obj_out_info]
+            }
+        ]
+    },
+    Obj_button = {
+        type: button,
+        label: {
+            icon: 'eye',
+            d: 'Sacar dlg'
+        },
+        events:[{
+            type: click,
+            method: log,
+            targetBusId: Bus_id,
+            p_exec:{
+                type: secuence,
+                hasProcess:[{ type: method, in: {dlg_data: Dlg_data}, name: dialog_exec, busId: Bus_id}]
+            }
+        }]
+
+    },
+    OBJ_Main={
+        type: 'assembly',
+        children: [
+            {
+                type:'assembly',
+                children: [
+                    {
+                        type: 'assembly',
+                        width: 70,
+                        children:[Obj_button, OBJ_form]
+                    },
+                    {
+                        type: 'assembly',
+                        width: 30,
+                        children:[Obj_out_help,Obj_out_info]
+                    }
+                ]
+            }
+        ]
+    },
+    Rproc = {
+        type: 'rprocess',
+        hasDlg: true,
+        busId: Bus_id,
+        gui_out: OBJ_Main,
+        hasKw: ui_ux_form_help_dlg,
+        hasIcon: 'group',
+        hasDsca: ui_ux_form_help_dlg_uiML,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'create_form_with_help'(I_agent, I_dataset, BUSID_KFORM, OBJ_form):-
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'repcon',
+        hasCKDIStatusFrom: ckdiStatusKD,
+        enabled: true,
+        template: {
+            type: 'assembly',
+            children: [
+                {
+                    arc: hasPassword,
+                    hasHelp: true,
+                    inputtype: 'password'
+                },
+                {
+                    arc: hasLoginId,
+                    hasInfo: true
+                }
+            ]
+        }
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',
+        in: IN,
+        proc: PROC,
+        busId: BUSID_KFORM
+    }.
+
+'staber_kmgt::usecase__autocols'(_, OBJ_in, _, OBJ_proc) :-
+
+    obj_get(isSession, OBJ_in, Session, true),
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('kmgt_test_autocols_', BusId),
+    Extra_Actions ={
+        state_edit:[
+            {
+                type: 'es6button',
+                icon: 'navigate',
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events: [
+                    {
+                        type: 'click',
+                        method: 'refresh_gui',
+                        targetBusId: '$.busId',
+
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'function',      
+                                    in: { hasKw: 'testapp:contact' },                             
+                                    name: 'staber_test_fake_call',
+                                    context: {
+                                        delegatedTo: '$.hasAgent'
+                                    }
+                                },
+                                {
+                                    type: 'method',
+                                    name: 'merge_in',
+                                    busId: '$.busId'
+                                },    
+                                {
+                                    type: 'method',                                    
+                                    name: 'navigateTo',
+                                    busId: '$.busId'
+                                }     
+                            ]
+                        }
+                    }
+                ]            
+            }
+        ],
+        state_noedit:[
+            {
+                type: 'es6button',
+                icon: 'print',
+                enabled: false,
+                classList:[
+                    "text-button"
+                ]
+            }
+        ]
+    },
+    ACTIONS = [
+		{
+			label:{
+				icon: 'send'
+			},
+			collapse:false,
+			events:[{
+				type:'click',
+				method:'openInBrowser',
+				targetBusId : BusId
+			}]
+		}
+	],
+	IN = {
+        hasTitle: 'Contactos modelo de Tests autocols',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',        
+        selectable: true,
+        collapsible: {
+            floating: true
+        },                
+        hasArea: {
+            detail: {
+                navigationFilter: 'all',
+                showAllProperties: false,
+                extraAction: Extra_Actions,
+                stylesVars:{
+                    cols: 'auto'
+                }
+            },
+            result: {                
+                includedProperties:['hasIcon','contact:hasIdPhoto' ,'contact:hasName', 'contact:hasEmail', 'contact:hasProfessionalProfile','contact:hasBirthCountry', 'contact:hasAddress'],
+                navigableProperties: ['contact:hasIdPhoto','resourcePath', 'remoteURL', 'contact:hasBirthCountry', 'contact:hasAddress'],                
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            class: 'user',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+            },
+            search: {
+                fieldsToSearchFromSchema: true,
+                isCollapsible: true
+            }
+        }
+    },   
+    OBJ_proc = {
+        type: 'kmgt',
+        busId: BusId,
+        in: IN,
+        hasKw: kmgt_test_autocols,
+        hasDsca: ui_ux_kmgt_test_autocols_uiML,
+        hasIcon: 'document',
+        isRoot: false,
+        isSession: Session,
+        actions: ACTIONS,
+        hasNavbar: true,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_proc,_,_).
+
+'staber_kmgt::usecase__stylesVars'(_, OBJ_in, _, OBJ_proc) :-
+    obj_get(isSession, OBJ_in, Session, true),
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('kmgt_test_stylesVars_', BusId),
+    Extra_Actions ={
+        state_edit:[
+            {
+                type: 'es6button',
+                icon: 'navigate',
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events: [
+                    {
+                        type: 'click',
+                        method: 'refresh_gui',
+                        targetBusId: '$.busId',
+
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'function',      
+                                    in: { hasKw: 'testapp:contact' },                             
+                                    name: 'staber_test_fake_call',
+                                    context: {
+                                        delegatedTo: '$.hasAgent'
+                                    }
+                                },
+                                {
+                                    type: 'method',
+                                    name: 'merge_in',
+                                    busId: '$.busId'
+                                },    
+                                {
+                                    type: 'method',                                    
+                                    name: 'navigateTo',
+                                    busId: '$.busId'
+                                }     
+                            ]
+                        }
+                    }
+                ]            
+            }
+        ],
+        state_noedit:[
+            {
+                type: 'es6button',
+                icon: 'print',
+                enabled: false,
+                classList:[
+                    "text-button"
+                ]
+            }
+        ]
+    },
+    ACTIONS = [
+		{
+			label:{
+				icon: 'send'
+			},
+			collapse:false,
+			events:[{
+				type:'click',
+				method:'openInBrowser',
+				targetBusId : BusId
+			}]
+		}
+	],
+	IN = {
+        hasTitle: 'Contactos modelo de Tests stylesVars auto cols, layout sheet, showIcons...',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',        
+        selectable: true,
+        collapsible: {
+            floating: true
+        },                
+        hasArea: {
+            detail: {
+                navigationFilter: 'all',
+                showAllProperties: false,
+                extraAction: Extra_Actions,
+                stylesVars:{
+                    cols: 'auto',
+                    showIcons: true,
+                    layout: 'sheet',
+                    spaceElements: 'big',
+                    colSpace: 'big'
+                }
+            },
+            result: {                
+                includedProperties:['hasIcon','contact:hasIdPhoto' ,'contact:hasName', 'contact:hasEmail', 'contact:hasProfessionalProfile','contact:hasBirthCountry', 'contact:hasAddress'],
+                navigableProperties: ['contact:hasIdPhoto','resourcePath', 'remoteURL', 'contact:hasBirthCountry', 'contact:hasAddress'],                
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            class: 'user',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+            },
+            search: {
+                fieldsToSearchFromSchema: true,
+                isCollapsible: true
+            }
+        }
+    },   
+    OBJ_proc = {
+        type: 'kmgt',
+        busId: BusId,
+        in: IN,
+        hasKw: kmgt_test_stylesVars,
+        hasDsca: ui_ux_kmgt_test_stylesVars_uiML,
+        hasIcon: 'group',
+        isRoot: false,
+        isSession: Session,
+        actions: ACTIONS,
+        hasNavbar: true,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_proc,_,_).
+
+'staber_kmgt::usecase__display'(_, OBJ_in, _, OBJ_proc) :-
+
+    obj_get(isSession, OBJ_in, Session, true),
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('kmgt_test_display_', BusId),
+    Extra_Actions ={
+        state_edit:[
+            {
+                type: 'es6button',
+                icon: 'navigate',
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events: [
+                    {
+                        type: 'click',
+                        method: 'refresh_gui',
+                        targetBusId: '$.busId',
+
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'function',      
+                                    in: { hasKw: 'testapp:contact' },                             
+                                    name: 'staber_test_fake_call',
+                                    context: {
+                                        delegatedTo: '$.hasAgent'
+                                    }
+                                },
+                                {
+                                    type: 'method',
+                                    name: 'merge_in',
+                                    busId: '$.busId'
+                                },    
+                                {
+                                    type: 'method',                                    
+                                    name: 'navigateTo',
+                                    busId: '$.busId'
+                                }     
+                            ]
+                        }
+                    }
+                ]            
+            }
+        ],
+        state_noedit:[
+            {
+                type: 'es6button',
+                icon: 'print',
+                enabled: false,
+                classList:[
+                    "text-button"
+                ]
+            }
+        ]
+    },
+    ACTIONS = [
+		{
+			label:{
+				icon: 'send'
+			},
+			collapse:false,
+			events:[{
+				type:'click',
+				method:'openInBrowser',
+				targetBusId : BusId
+			}]
+		}
+	],
+	IN = {
+        hasTitle: 'Contactos modelo de Tests stylesVars auto cols, layout sheet, showIcons...',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',        
+        selectable: true,
+        collapsible: {
+            floating: true
+        },                
+        hasArea: {
+            detail: {
+                navigationFilter: 'all',
+                showAllProperties: false,
+                extraAction: Extra_Actions,
+                stylesVars:{
+                    cols: 'auto',
+                    showIcons: true,
+                    layout: 'sheet',
+                    spaceElements: 'big',
+                    colSpace: 'big',
+                    display: 'inline'
+                }
+            },
+            result: {                
+                includedProperties:['hasIcon','contact:hasIdPhoto' ,'contact:hasName', 'contact:hasEmail', 'contact:hasProfessionalProfile','contact:hasBirthCountry', 'contact:hasAddress'],
+                navigableProperties: ['contact:hasIdPhoto','resourcePath', 'remoteURL', 'contact:hasBirthCountry', 'contact:hasAddress'],                
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            class: 'user',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+            },
+            search: {
+                fieldsToSearchFromSchema: true,
+                isCollapsible: true
+            }
+        }
+    },   
+    OBJ_proc = {
+        type: 'kmgt',
+        busId: BusId,
+        in: IN,
+        hasKw: kmgt_test_display,
+        hasDsca: ui_ux_kmgt_test_display_uiML,
+        hasIcon: 'document',
+        isRoot: false,
+        isSession: Session,
+        actions: ACTIONS,
+        hasNavbar: true,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_proc,_,_).
+
+'staber_kform::usecase__stylesVars'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_005',
+        hasCKDIStatusFrom: ckdiStatusK,
+        hasCKDIStatusArc: ckdiStatusK,
+        hasCKDIStatusTo: ckdiStatusK,
+        enabled: false,
+        navigationFilter: 'all',
+        allowNavigation: true,        
+        stylesVars: {
+            cols: 'auto',
+            layout: 'sheet',
+            spaceElements: 'big',
+            colSpace: 'extra',
+            showIcons: true
+        }
+    },     
+    
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: { options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',
+        in: IN,
+        proc: PROC,
+        do_exec: true,
+        hasKw: formulario_contactos_simple_stylesVars,
+        hasDsca: ui_ux_formulario_contactos_simple_stylesVars_uiML,
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasDlg: true,
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_uiux::kdetail__stylesVars'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasDlg: true,
+        hasKw: 'rform_fileInputTest_001',
+        hasKwc: 'testapp:fileInputTest',
+        hasEvent: 'e_init',
+        applyRules: false,
+        keyNavigation: tab,
+        enabled: true,        
+        stylesVars: {
+            cols: 'auto',
+            layout: 'sheet',
+            spaceElements: 'big',
+            colSpace: 'extra',
+            showIcons: true
+        }
+    },
+	Obj_class = {  
+        in : IN,
+        type : 'kdetail',
+        hasDlg: true,
+        hasKw: kdetail_test_stylesVars,
+        hasDsca: ui_ux_kdetail_test_stylesVars_uiML,
+        hasIcon: 'pencil',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+'staber_uiux::generate_template_to_test_vaidation'(Template):-
+    Template = {
+        type: 'assembly',
+        children: [
+            {
+                label:{
+                    d: ui_ux_form_template_validation_name_tip_uiML,
+                    i18n: d
+                },
+                arc: 'contact:hasName',
+                validation:{
+                    pattern: '^([A..Z]{1}[a..z]+)(\\s[A..Z]{1}[a..z]+)*$',
+                    altText:{
+                        d: ui_ux_form_template_validation_name_uiML,
+                        i18n: d,
+                        targets: [tip]
+                    }
+                }
+            },
+            {
+                label:{
+                    d: ui_ux_form_template_validation_mail_action_uiML,
+                    i18n: d
+                },
+                arc: 'contact:hasEmail',
+                validation:{
+                    pattern: '[-A-Za-z0-9!#$%&\'*+/=?^_`{|}~]+(?:\\.[-A-Za-z0-9!#$%&\'*+/=?^_`{|}~]+)*@(?:[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?\\.)+[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?',
+                    altText:{
+                        d: ui_ux_form_template_validation_mail_uiML,
+                        i18n: d,
+                        targets: [info]
+                    }
+                }
+            },
+            {
+                label:{
+                    d: ui_ux_form_template_validation_idNumer_placeholder_uiML,
+                    i18n: d
+                },
+                arc: 'contact:hasIdNumber',
+                validation:{
+                    pattern: '^[0-9]{9}[A-Z]$',
+                    altText:{
+                        d: ui_ux_form_template_validation_idNumer_uiML,
+                        i18n: d,
+                        targets: [placeholder]
+                    }
+                }
+            },
+            {
+                label:{
+                    d: ui_ux_form_template_validation_phoneNumber_all_uiML,
+                    i18n: d
+                },
+                arc: 'contact:hasPhoneNumber',
+                validation:{
+                    pattern: '^\\d{3}(\\s{1}\\d{2}){3}$',
+                    altText:{
+                        d: ui_ux_form_template_validation_phoneNumber_uiML,
+                        i18n: d,
+                        targets: ['tip', 'info', 'placeholder']
+                    }
+                }
+            }
+        ]
+    }.
+
+'staber_uiux::form_template_text_validation'(_, _OBJ_in, _, OBJ_out):-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    'staber_uiux::generate_template_to_test_vaidation'(Obj_Template),
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        template: Obj_Template,
+        navigationFilter: all,
+        showAllProperties: true,
+        hasEvent: 'e_edit'        
+    },
+	Obj_class = {  
+        type : 'kdetail',
+        in : IN,        
+        hasKw: ui_ux_form_template_validation,
+        hasDsca: ui_ux_form_template_validation_uiML,
+        hasIcon: 'ok',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+'staber_uiux::customizationmodel'(_, _, _, _):-    
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder_ui_ux_customizationmodel,
+            hasDsca: folder_ui_ux_customizationmodel_uiML,  
+            hasIcon: 'folder',
+            isRoot: false,
+            hasERCPart: [
+                ui_ux_form_template_controls,
+                ui_ux_form_template_tabs,
+                ui_ux_form_template_colapsible,
+                ui_ux_form_template_assembly,
+                ui_ux_form_template_helpinfo,
+                ui_ux_form_template_validation
+            ],
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },_,_).
+
+'staber_uiux::autocols'(_, _, _, _):-    
+    create_rprocess(_,
+    {
+        type: 'krp:folder',
+        hasKw: folder_ui_ux_autocols,
+        hasDsca: ui_ux_folder_ui_ux_autocols_uiML,  
+        hasIcon: 'folder-line',
+        isRoot: false,
+        hasERCPart: [
+            kmgt_test_autocols,
+            kmgt_test_stylesVars,
+            kmgt_test_display,
+            formulario_contactos_simple_stylesVars,
+            kdetail_test_stylesVars
+        ],
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },_,_).
+
+'staber_kmgt::form__stylesVars'(_, _OBJ_in, _, OBJ_proc) :-
+    % obj_get(isSession, OBJ_in, Session, true),
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('kmgt_test_form_stylesVars_', BusId),
+    Extra_Actions ={
+        state_edit:[
+            {
+                type: 'es6button',
+                icon: 'navigate',
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events: [
+                    {
+                        type: 'click',
+                        method: 'refresh_gui',
+                        targetBusId: '$.busId',
+
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'function',      
+                                    in: { hasKw: 'testapp:contact' },                             
+                                    name: 'staber_test_fake_call',
+                                    context: {
+                                        delegatedTo: '$.hasAgent'
+                                    }
+                                },
+                                {
+                                    type: 'method',
+                                    name: 'merge_in',
+                                    busId: '$.busId'
+                                },    
+                                {
+                                    type: 'method',                                    
+                                    name: 'navigateTo',
+                                    busId: '$.busId'
+                                }     
+                            ]
+                        }
+                    }
+                ]            
+            }
+        ],
+        state_noedit:[
+            {
+                type: 'es6button',
+                icon: 'print',
+                enabled: false,
+                classList:[
+                    "text-button"
+                ]
+            }
+        ]
+    },
+    ACTIONS = [
+		{
+			label:{
+				icon: 'send'
+			},
+			collapse:false,
+			events:[{
+				type:'click',
+				method:'openInBrowser',
+				targetBusId : BusId
+			}]
+		}
+	],
+	IN = {
+        hasTitle: 'Contactos: dataset Default stylesVars propertyColor, fontSize',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',        
+        selectable: true,
+        collapsible: {
+            floating: true
+        },                
+        hasArea: {
+            detail: {
+                navigationFilter: 'all',
+                showAllProperties: false,
+                extraAction: Extra_Actions,
+                stylesVars:{
+                    propertyColor: 'Maroon',
+                    fontSize: '20px'
+                }
+            },
+            result: {                
+                includedProperties:['hasIcon','contact:hasIdPhoto' ,'contact:hasName', 'contact:hasEmail', 'contact:hasProfessionalProfile','contact:hasBirthCountry', 'contact:hasAddress'],
+                navigableProperties: ['contact:hasIdPhoto','resourcePath', 'remoteURL', 'contact:hasBirthCountry', 'contact:hasAddress'],                
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            class: 'user',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+            },
+            search: {
+                fieldsToSearchFromSchema: true,
+                isCollapsible: true
+            }
+        }
+    },   
+    OBJ_proc = {
+        type: 'kmgt',
+        busId: BusId,
+        in: IN,
+        hasKw: kmgt_test_forms_tylesVars,
+        hasDsca: ui_ux_kmgt_test_form_stylesVars_uiML,
+        hasIcon: 'user-add',
+        isRoot: false,
+        isSession: true,
+        hasNavbar: true,
+        actions: ACTIONS,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_proc,_,_).
+
+'staber_uiux::text__stylesVars'(_, _OBJ_in, _, OBJ_out) :-
+    OBJ_form = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'text',
+                class: 'number',
+                value: 1.567,
+                enabled: false,
+                id: 'textStylesVars',
+                label: {
+                    text: 'Título del control'
+                },
+                stylesVars: {
+                    fontSize: '34px',
+                    color: 'purple',
+                    fontWeight: 'bold',
+                    border: '3px solid purple',
+                    borderRadius: '4px'
+                }
+            }
+        ]
+	},
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ_form,
+        hasKw: text_stylesVars,
+        hasDsca: ui_ux_text_stylesVars_uiML,
+        hasIcon: 'cog-alt',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+% Customize and testing controls
+'showChecked'(_, _OBJ_in, _, _OBJ_out) :-
+    wAddInfoMsgML('Aviso', 'Checked', [],{showTime:3}).
+
+'staber_uiux::controls_checkbox_with_multiple_states'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__checkboxstates__', CHANNEL_CHECKBOX_STATES),
+    newKw('bus__checkboxstates__', BUSID_CHECKBOX_STATES),
+
+    newKw('channel__checkboxstates__', CHANNEL_CHECKBOX_TABLE),
+    newKw('bus__checkboxstates__', BUSID_CHECKBOX_TABLE),
+
+    newKw('channel__checkboxstates__', CHANNEL_CHECKBOX_DETAIL),
+    newKw('bus__checkboxstates__', BUSID_CHECKBOX_DETAIL),
+
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+
+    OBJ_checkbox_control = {
+        type: 'assembly',
+        children: [
+            {            
+                type: 'assembly',
+                children: [
+                    {
+                        type: 'checkbox',
+                        label: {
+                            d: 'Probando checkbox con varios estados.'
+                        },
+                        value: '1',
+                        events: [
+                            {
+                                type: 'click',
+                                targetBusId: BUSID_CHECKBOX_STATES,
+                                method: 'log',
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [          
+                                        { 
+                                            type: 'function', 
+                                            name: 'showChecked', 
+                                            context: { delegatedTo: 'builderweb' }
+                                        }                                            
+                                    ]
+                                }
+                            }
+                        ],
+                        status: [
+                            {
+                                label: {
+                                    icon: 'empty'
+                                },
+                                datavalue: 'vacio'
+                            },
+                            {
+                                label: {
+                                    icon: 'rocket'
+                                },
+                                datavalue: 'cohete'
+                            },
+                            {
+                                label: {
+                                    icon: 'user'
+                                },
+                                datavalue: 'ultimo'
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+	},
+
+    Schema_withchecbox = { 
+        data: [
+            {
+                arc: 'contact:hasName',
+                 label: {
+                    d: 'Nombre'
+                }              
+            },
+            {
+                arc: 'contact:hasMaster',
+                label: {
+                    d: 'Ha cursado master'
+                },
+                control: {
+                    type: 'checkbox',                   
+                    value: '1',
+                    events: [
+                        {
+                            type: 'click',
+                            targetBusId: BUSID_CHECKBOX_STATES,
+                            method: 'log',
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [          
+                                    { 
+                                        type: 'function', 
+                                        name: 'showChecked', 
+                                        context: { delegatedTo: 'builderweb' }
+                                    }                                            
+                                ]
+                            }
+                        }
+                    ],
+                    status: [
+                        {
+                            label: {
+                                icon: 'empty'
+                            },
+                            datavalue: 'empty'
+                        },
+                        {
+                            label: {
+                                icon: 'thumbs-up'
+                            },
+                            datavalue: 'finished'
+                        },
+                        {
+                            label: {
+                                icon: 'thumbs-up-alt'
+                            },
+                            datavalue: 'incurse'
+                        }
+                    ]
+                }    
+            }               
+        ]
+    },
+
+    IN_KRESULT = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        searchType: 'rem',
+        schema: Schema_withchecbox,
+        pagination: true,
+        limit: 5,
+        multiselection: true,
+        enabled: true
+    },
+
+    OBJ_checkbox_table = {
+        type : 'kresult',
+        hasChannel: CHANNEL_CHECKBOX_TABLE,
+        busId: BUSID_CHECKBOX_TABLE,
+        in : IN_KRESULT    
+    },
+
+	IN_KDETAIL = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_001',
+        hasKwc: 'testapp:contact',
+        hasEvent: 'e_edit',
+        % hasState: 'state_edit__form_notoolbar',
+        applyRules: false,
+        showAllProperties: false,
+        includedProperties: [
+            'contact:hasName',
+            'contact:hasHeritage'
+        ],
+        template: {
+            type: assembly,
+            children: [
+                { 
+                    arc: 'contact:hasName'                                    
+                },
+                {
+                    arc: 'contact:hasMaster',
+                    type: 'checkbox',                   
+                    value: '1',
+                    events: [
+                        {
+                            type: 'click',
+                            targetBusId: BUSID_CHECKBOX_STATES,
+                            method: 'log',
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [          
+                                    { 
+                                        type: 'function', 
+                                        name: 'showChecked', 
+                                        context: { delegatedTo: 'builderweb' }
+                                    }                                            
+                                ]
+                            }
+                        }
+                    ],
+                    status: [
+                        {
+                            label: {
+                                icon: 'empty'
+                            },
+                            datavalue: 'empty'
+                        },
+                        {
+                            label: {
+                                icon: 'thumbs-up'
+                            },
+                            datavalue: 'finished'
+                        },
+                        {
+                            label: {
+                                icon: 'thumbs-up-alt'
+                            },
+                            datavalue: 'incurse'
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    OBJ_checkbox_form = {          
+        type : 'kdetail',
+        hasChannel: CHANNEL_CHECKBOX_DETAIL,
+        busId: BUSID_CHECKBOX_DETAIL,
+        in : IN_KDETAIL
+    },
+
+    OBJ_guiout = {
+        type: 'assembly',
+        children: [
+            OBJ_checkbox_control,
+            OBJ_checkbox_table,
+            OBJ_checkbox_form
+        ]
+    },
+
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ_guiout,    
+        hasKw: controls_checkbox_with_multiple_states,
+        hasDsca: ui_ux_controls_checkbox_uiML,
+        hasChannel: CHANNEL_CHECKBOX_STATES,
+        busId: BUSID_CHECKBOX_STATES,
+        hasIcon: 'eye',
+        isRoot: false,
+        isSession: true,
+        hasNavbar: false,    
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_kmgt::form__stylesVars_compare'(_, _ObjIn, _, ObjOut):-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('BusId__uiux_stylesvars_compare_automatic__', BusIdAutomatic),
+    newKw('BusId__uiux_stylesvars_compare_aggrupation__', BusIdAggrupation),
+    newKw('BusId__uiux_stylesvars_compare_Legacy__', BusIdLegacyAggrupation),
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact'
+        % stylesVars: {
+        %     cols: 3,
+        %     columnLayout: true,
+        %     spaceElements: 'extra',
+        %     colSpace: 'extra'            
+        % }
+    },
+    getContactAgrupation(collapsible, HasAggrupation),
+    obj_merge(IN, {hasAggrupation: HasAggrupation}, INAggrupation),
+    obj_merge(IN, {hasAggrupationLegacy: true}, INLegacy),
+    AutomaticFormText = {
+        type: label,
+        i18n: d,
+        size: h3,
+        d: ui_ux_stylevar_form_compare_automatic_uiML
+    },
+    AggrupationFormText = {
+        type: label,
+        i18n: d,
+        size: h3,
+        d: ui_ux_stylevar_form_compare_aggrupation_uiML
+    },
+    AggrupationLegacyFormText = {
+        type: label,
+        i18n: d,
+        size: h3,
+        d: ui_ux_stylevar_form_compare_legacy_uiML
+    },
+	AutomaticForm = {  
+        type : 'kdetail',
+        busId: BusIdAutomatic,
+        in : IN
+    },
+
+    AggrupationForm = {
+        type : 'kdetail',
+        busId: BusIdAggrupation,
+        in : INAggrupation
+    },
+    AggrupationLegacyForm = {
+        type : 'kdetail',
+        busId: BusIdLegacyAggrupation,
+        in : INLegacy
+    },
+    FormContainer = {
+        type : 'rprocess',
+        hasKw: ui_ux_stylevar_form_compare,
+        hasDsca: ui_ux_stylevar_form_compare_uiML,
+        hasIcon: 'list-alt',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[permissionProfile__repositorioTests_KRP],
+        gui_out:{
+            type: assembly,
+            children:[
+                {
+                    type: label,
+                    size: h2,
+                    d: 'Ejemplo de stylesVars en diferentes tipos de formulario. Es necesario tener las ramas de radcore (gbl-feature/stylesvars-to-form-aggrupation) y staber_builder40 (sam/get_formInfo_autotemplate)'
+                },
+                {
+                    type: tab,
+                    children:[
+                        {
+                            type: tabchild,
+                            label:{
+                                d: 'automatic form'
+                            },
+                            children: [AutomaticFormText, AutomaticForm]
+                        }, {
+                            type: tabchild,
+                            label:{
+                                d: 'hasAggrupation form'
+                            },
+                            children: [AggrupationFormText, AggrupationForm]
+                        },{
+                            type: tabchild,
+                            label:{
+                                d: 'hasAggrupationLegacy form'
+                            },
+                            children: [AggrupationLegacyFormText, AggrupationLegacyForm]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    create_rprocess(_,FormContainer,_, ObjOut).
+
+% STYLEVARS TESTS <-> hasStyle
+'staber_uiux::ktoolbar_stylesvars'(_, _Obj_in, _, Obj_out) :- 
+    newKw('bus__container', BUS_RPROC), 
+    newKw('channel__container', CHANNEL_RPROC), 
+    newKw('channel_grouped_toolbar1_', CHANNEL_GROUPEDKTOOLBAR1),
+    newKw('busid_grouped_toolbar1_', BUSID_GROUPEDKTOOLBAR1),
+    newKw('channel_grouped_toolbar2_', CHANNEL_GROUPEDKTOOLBAR2),
+    newKw('busid_grouped_toolbar2_', BUSID_GROUPEDKTOOLBAR2),
+    newKw('channel_grouped_toolbar3_', CHANNEL_GROUPEDKTOOLBAR3),
+    newKw('busid_grouped_toolbar3_', BUSID_GROUPEDKTOOLBAR3),
+
+    Obj_ktoolbar1 = {
+        type: 'ktoolbar',
+        in : {
+            hasTitle: 'ui_ux_toolbar_title',
+            hasTitleSize: 'h3',
+            actions: [
+                {
+                    type: 'button',
+                    appearance: 'text',
+                    label: {
+                        icon: 'comment-line',
+                        tip: {
+                            value: 'Botón 1',
+                            delay: 0,
+                            position: 'bottom'
+                        }
+                    }
+                },              
+                {
+                    type: 'actions',
+                    actions: [
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            enabled: false,
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 3',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            }                            
+                        },
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 4',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'actions',
+                    hasLayout: 'combo',
+                    hasLayoutData: {
+                        % hasTitle: 'Combo botones',
+                        hasIcon: 'add',
+                        hasTip: 'ui_ux_toolbar_tip'
+                    },
+                    actions: [
+                        {
+                            type: 'button',
+                            enabled: false,
+                            label: {
+                                d: 'Botón 5',
+                                icon: 'comment-line'
+                            }
+                        },
+                        {
+                            type: 'button',
+                            label: {
+                                d: 'Botón 6',
+                                icon: 'comment-line'
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'actions',
+                    enabled: false,
+                    actions: [
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 7',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            }
+                        }                        
+                    ]
+                }
+            ]
+        },
+        hasChannel: CHANNEL_GROUPEDKTOOLBAR1,
+        busId: BUSID_GROUPEDKTOOLBAR1        
+    },
+
+    Obj_ktoolbar2 = {
+        type: 'ktoolbar',
+        in : {
+            actions: [
+                {
+                    type: 'button',
+                    appearance: 'text',
+                    label: {
+                        icon: 'comment-line',
+                        tip: {
+                            value: 'Botón 1',
+                            delay: 0,
+                            position: 'bottom'
+                        }
+                    }
+                },
+                {
+                    type: 'button',
+                    appearance: 'text',
+                    label: {
+                        icon: 'comment-line',
+                        tip: {
+                            value: 'Botón 2',
+                            delay: 0,
+                            position: 'bottom'
+                        }
+                    }
+                },
+                {
+                    type: 'actions',
+                    actions: [
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            enabled: false,
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 3',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            }
+                        },
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 4',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'actions',
+                    hasLayout: 'combo',
+                    enabled: false,
+                    hasLayoutData: {
+                        hasTitle: 'ui_ux_toolbar_combo_title',
+                        hasIcon: 'add'
+                    },
+                    actions: [
+                        {
+                            type: 'button',
+                            label: {
+                                d: 'Botón 5',
+                                icon: 'comment-line'
+                            }
+                        },
+                        {
+                            type: 'button',
+                            label: {
+                                d: 'Botón 6',
+                                icon: 'comment-line'
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'actions',
+                    enabled: false,
+                    actions: [
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 7',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            }
+                        },
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 8',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        hasChannel: CHANNEL_GROUPEDKTOOLBAR2,
+        busId: BUSID_GROUPEDKTOOLBAR2,
+        hasStyle: {
+            layout: "compact"
+        }
+    },
+
+    Obj_ktoolbar3 = {
+        type: 'ktoolbar',
+        in : {
+            hasTitle: 'ui_ux_toolbar_title',
+            hasTitleSize: 'h3',
+            actions: [
+                {
+                    type: 'button',
+                    appearance: 'text',
+                    label: {
+                        icon: 'comment-line',
+                        tip: {
+                            value: 'Botón 1',
+                            delay: 0,
+                            position: 'bottom'
+                        }
+                    }
+                },              
+                {
+                    type: 'actions',
+                    actions: [
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            enabled: false,
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 3',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            }                            
+                        },
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 4',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'actions',
+                    hasLayout: 'combo',
+                    hasLayoutData: {
+                        % hasTitle: 'Combo botones',
+                        hasIcon: 'add',
+                        hasTip: 'ui_ux_toolbar_tip'
+                    },
+                    actions: [
+                        {
+                            type: 'button',
+                            enabled: false,
+                            label: {
+                                d: 'Botón 5',
+                                icon: 'comment-line'
+                            }
+                        },
+                        {
+                            type: 'button',
+                            label: {
+                                d: 'Botón 6',
+                                icon: 'comment-line'
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'actions',
+                    enabled: false,
+                    actions: [
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 7',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            }
+                        }                        
+                    ]
+                }
+            ]
+        },
+        hasChannel: CHANNEL_GROUPEDKTOOLBAR3,
+        busId: BUSID_GROUPEDKTOOLBAR3,
+        hasStyle: {
+            layout: "color"
+        }
+    },
+
+    Obj_container = {
+        type: 'assembly',
+        children:[
+            {
+                type: 'label',
+                size: 'h3',
+                d: 'Toolbar con LAYOUT por defecto (json)'
+            },
+            Obj_ktoolbar1,
+            {
+                type: 'label',
+                size: 'h3',
+                d: 'Toolbar con LAYOUT compacto'
+            },
+            Obj_ktoolbar2,
+            {
+                type: 'label',
+                size: 'h3',
+                d: 'Toolbar con LAYOUT con color de fondo'
+            },
+            Obj_ktoolbar3
+        ]
+    },
+
+    IN_RPROC = {
+    },
+    Obj_class = {
+        in : IN_RPROC,
+        type : 'rprocess',
+        busId: BUS_RPROC,
+        hasChannel: CHANNEL_RPROC,
+        hasKw: ui_ux_ktoolbar_stylesvars,
+        hasDsca: 'Configuración de estilos para botoneras (ktoolbar)',
+        hasIcon: 'params',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_container,
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,Obj_out).
+
+'staber_uiux::kdetail_stylesvars'(_, _Obj_in, _, Obj_out) :- 
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+
+    newKw('bus__container', BUS_RPROC), 
+    newKw('channel__container', CHANNEL_RPROC), 
+
+    newKw('channel_form_box_', CHANNEL_BOXKDETAIL),
+    newKw('busid_form_box_', BUSID_BOXKDETAIL),
+
+    newKw('channel_form_default_', CHANNEL_DEFAULTKDETAIL),
+    newKw('busid_form_default_', BUSID_DEFAULTKDETAIL),
+
+    'staber_uiux::generate_template_to_configure_mix'(Obj_Template),
+    'staber_uiux::generate_template_to_configure_mix_style'(Obj_style),
+    % obj_set(hasStyle, Obj_Template, Obj_style, Obj_Template_with_style),
+    obj_set(stylesVars, Obj_Template, Obj_style, Obj_Template_with_style),
+
+    IN_DEFAULT = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',        
+        template: Obj_Template,
+        hasEvent: 'e_edit_notoolbar'        
+    },
+
+    Obj_kdetail_default = {  
+        type : 'kdetail',
+        hasChannel: CHANNEL_DEFAULTKDETAIL,
+        busId: BUSID_DEFAULTKDETAIL,
+        in : IN_DEFAULT
+    },
+
+    IN_BOX = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',        
+        template: Obj_Template_with_style,
+        hasEvent: 'e_edit_notoolbar'        
+    },
+
+    Obj_kdetail_box = {  
+        type : 'kdetail',
+        hasChannel: CHANNEL_BOXKDETAIL,
+        busId: BUSID_BOXKDETAIL,
+        in : IN_BOX
+    },
+
+    Obj_container = {
+        type: 'assembly',
+        id: 'parent_container',
+        classList: ["v-group"],
+        children: [
+            {
+                type: 'assembly',
+                id: 'default_container',
+                children: [
+                    {
+                        type: 'label',
+                        size: 'h3',
+                        d: 'Formulario con LAYOUT por defecto'
+                    },
+                    Obj_kdetail_default
+                ]
+            },
+            {
+                type: 'assembly',
+                id: 'box_container',
+                children: [
+                    {
+                        type: 'label',
+                        size: 'h3',
+                        d: 'Formulario con LAYOUT tipo BOX (hasStyle)'
+                    },
+                    Obj_kdetail_box
+                ]
+            }        
+        ]
+    },
+
+    Obj_class = {
+        in : {},
+        type : 'rprocess',
+        busId: BUS_RPROC,
+        hasChannel: CHANNEL_RPROC,
+        hasKw: ui_ux_kdetail_stylesvars,
+        hasDsca: 'Configuración de estilos para formularios (kdetail/kform)',
+        hasIcon: 'params',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_container,
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,Obj_out).
+
+'staber_uiux::form_stylevar__folder'(_, _, _, _):-    
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder_ui_ux_stylevar_form,
+            hasDsca: folder_ui_ux_stylevar_form_uiML,  
+            hasIcon: 'folder',
+            isRoot: false,
+            hasERCPart: [
+                ui_ux_stylevar_form_compare
+            ],
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },_,_).
+
+'staber_uiux::form__folders'(_, _, _, _):-    
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder_ui_ux_form,
+            hasDsca: folder_ui_ux_form_uiML,  
+            hasIcon: 'folder',
+            isRoot: false,
+            hasERCPart: [
+                ui_ux_form_automatic,
+                ui_ux_form_aggrupationapi,                
+                folder_ui_ux_customizationmodel,
+                ui_ux_form_help_dlg,
+                folder_ui_ux_autocols,
+                kmgt_test_forms_tylesVars,
+                text_stylesVars,
+                kdetail_show_icons_uiux,
+                controls_checkbox_with_multiple_states,
+                folder_ui_ux_stylevar_form
+            ],
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },_,_).
+
+

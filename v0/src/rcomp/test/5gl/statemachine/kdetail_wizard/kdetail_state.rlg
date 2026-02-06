@@ -1,0 +1,126 @@
+
+/* Estados de la máquina */
+
+
+'kdetail_state::state_init'(State_init):-
+    kdetail_navbar(O_navbar),
+    'kdetail_state_toolbar::state_init'(O_toolbar),
+    State_init ={    
+        type: 'state',
+        gui_out: {
+            type: 'assembly',
+            children: [
+                O_navbar,
+                O_toolbar,
+                {
+                    type: 'assembly',
+                    classList :['card'],
+                    scroll: 'main',
+                    children: [{
+                        busId: '$.hasArea.form.busId',
+                        type: 'kform',
+                        do_exec: true,
+                        in: {
+                            enabled: false,
+                            hasAgent: '$.hasArea.form.hasAgent',
+                            hasDataset: '$.hasArea.form.hasDataset',
+                            hasCKDIStatusFrom: '$.hasArea.form.ckdiStatusFrom',
+                            hasKw: '$.hasArea.form.hasKw'
+                        },
+                        proc: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', in: { options: { getSchema: true } }, name: 'get_formInfo', context: { delegatedTo: '$.hasArea.form.hasAgent' } },
+                                { type: 'method', name: 'import', module: 'Dataset' }
+                            ]
+                        },
+                        evtPublish: [{ topic: 'setNode', channel: '$.hasChannel.form' }],
+                        evtSubscribe: [{ topic: 'setNode', channel: '$.hasChannel.detail' }]
+                    }]
+
+                }
+            ]
+        }
+    }.
+
+'kdetail_state::state_edit'(State_edit):-
+    kdetail_navbar(O_navbar),
+    'kdetail_state_toolbar::state_edit'(O_toolbar),
+    State_edit = {
+        type: 'state',
+        gui_out: {
+            type: 'assembly',
+            children: [
+                O_navbar,
+                O_toolbar,
+                {
+                    type: 'assembly',
+                    classList :['card'],
+                    scroll: 'main',
+                    children: [{
+                        busId: '$.hasArea.form.busId',
+                        type: 'kform',
+                        do_exec: true,
+                        in: {
+                            enabled: true,
+                            hasAgent: '$.hasArea.form.hasAgent',
+                            hasDataset: '$.hasArea.form.hasDataset',
+                            hasCKDIStatusFrom: '$.hasArea.form.ckdiStatusFrom',
+                            hasKw: '$.hasArea.form.hasKw'
+                        },
+                        proc: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', in: { options: { getSchema: true } }, name: 'get_formInfo', context: { delegatedTo: '$.hasArea.form.hasAgent' } },
+                                { type: 'method', name: 'import', module: 'Dataset' }
+                            ]
+                        },
+                        evtPublish: [{ topic: 'setNode', channel: '$.hasChannel.form' }],
+                        evtSubscribe: [{ topic: 'setNode', channel: '$.hasChannel.detail' }]
+                    }]
+
+                }
+            ]
+        }
+    }.
+
+'kdetail_state::state_noedit'(State_noedit):-
+    kdetail_navbar(O_navbar),
+    'kdetail_state_toolbar::state_noedit'(O_toolbar),
+    State_noedit = {
+        type: 'state',
+        gui_out: {
+            type: 'assembly',
+            children: [
+                O_navbar,
+                O_toolbar,
+                {
+                    type: 'assembly',
+                    classList :['card'],
+                    scroll: 'main',
+                    children: [{
+                        busId: '$.hasArea.form.busId',
+                        type: 'kform',
+                        do_exec: true,
+                        in: {
+                            enabled: false,
+                            hasAgent: '$.hasArea.form.hasAgent',
+                            hasDataset: '$.hasArea.form.hasDataset',
+                            hasCKDIStatusFrom: '$.hasArea.form.ckdiStatusFrom',
+                            hasKw: '$.hasArea.form.hasKw'
+                        },
+                        proc: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', in: { options: { getSchema: true } }, name: 'get_formInfo', context: { delegatedTo: '$.hasArea.form.hasAgent' } },
+                                { type: 'method', name: 'import', module: 'Dataset' }
+                            ]
+                        },
+                        evtPublish: [{ topic: 'setNode', channel: '$.hasChannel.form' }],
+                        evtSubscribe: [{ topic: 'setNode', channel: '$.hasChannel.detail' }]
+                    }]
+
+                }
+            ]
+        }
+    }.

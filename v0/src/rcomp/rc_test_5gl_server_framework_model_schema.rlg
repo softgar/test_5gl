@@ -1,0 +1,165 @@
+﻿/**
+@descr	rc_test_5gl_server_framework_model_schema <br>
+		rc_test_5gl_server_framework_model_schema
+@author XXX
+@date	20XX_XX_XX
+**/
+
+rc_class('rc_test_5gl_server_framework_model_schema'):-
+	class +$ 'rc_test_5gl_server_framework_model_schema'  d ( 'es', 'rc_test_5gl_server_framework_model_schema' )
+		sc [ 'rComponent' ].
+
+rc_schema('rc_test_5gl_server_framework_model_schema'):-
+    'framework_model_schema::folders'(_,_,_,_),
+    'framework_model_schema::root_folder'(_,_,_,_).
+
+'framework_model_schema::root_folder'(_, _, _, _):-
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__framework,
+            hasDsca: framework_general__uiML,
+            hasIcon: 'staber',
+            isRoot: true,
+            security_edit: [],
+            security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+            hasERCPart: [
+                folder__framework_aplication,
+                folder__framework_maintenance,
+                folder__framework_component
+            ]
+    },_,_).
+
+'framework_model_schema::folders'(_,_,_,_):-
+    'framework_model_schema::folders_children',    
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__framework_component,
+            hasDsca: framework_final__uiML,
+            hasIcon: 'cog-line',
+            isRoot: false,
+            security_edit: [],
+            security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+            hasERCPart:[
+                folder__framework_tree,
+                folder__framework_dialog,
+                folder__framework_form,
+                folder__framework_search,
+                folder__framework_graphics2d
+            ]
+    },_,_),    
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__framework_aplication,
+            hasDsca: framework_aplication__uiML,
+            hasIcon: 'app',
+            isRoot: false,
+            security_edit: [],
+            security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+            hasERCPart:[
+                kbrowser_test_000,
+                rproc__scheduler_calendar,
+                rproc__4gl_gantt__001,
+                rproc__digital_signature
+            ]
+    },_,_),    
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__framework_maintenance,
+            hasDsca: framework_containers__uiML,
+            hasIcon: 'layout03',
+            isRoot: false,
+            security_edit: [],
+            security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+            hasERCPart:[
+                kmgt_test_stylesVars,
+                kmgt_test_navigation,
+                ktalogue_test_000
+            ]
+    },_,_).
+
+'framework_model_schema::folders_children':-
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__framework_tree,
+            hasDsca: framework_treetable__uiML,
+            hasIcon: 'flow-split',
+            isRoot: false,
+            security_edit: [],
+            security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+            hasERCPart: [
+                kresult_test_000,
+                kresult_contact__ontology_tree
+            ]
+    },_,_),
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__framework_navegacion,
+            hasDsca: framework_navegation__uiML,
+            hasIcon: 'navigate',
+            isRoot: false
+    },_,_),
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__framework_dialog,
+            hasDsca: framework_dialog__uiML,
+            hasIcon: 'answer',
+            isRoot: false,
+            security_edit: [],
+            security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+            hasERCPart:[
+                rdlg_test_002,
+                rdlg_test_000
+            ]
+    },_,_),
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__framework_form,
+            hasDsca: framework_form__uiML,
+            hasIcon: 'list-alt',
+            isRoot: false,
+            security_edit: [],
+            security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+            hasERCPart:[
+                kdetail_formulario_contactos_simple,
+                kdetail_formulario_contactos_agrupaciones_api,
+                kdetail_formulario_tabla_contactos,
+                staber_pdfviewer__0
+            ]
+    },_,_),
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__framework_search,
+            hasDsca: framework_search__uiML,
+            hasIcon: 'zoom-search',
+            isRoot: false,
+            security_edit: [],
+            security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+            hasERCPart:[
+                search_000_kmgt_searchResult
+            ]
+    },_,_),
+    create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__framework_graphics2d,
+            hasDsca: framework_graphics2d__uiML,
+            hasIcon: 'invoices-line',
+            isRoot: false,
+            security_edit: [],
+            security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+            hasERCPart:[
+                kchart__contact_age,
+                ui_ux_for_graphs
+                % test_kanvas__001,
+                % test_kanvas__004
+            ]
+    },_,_).

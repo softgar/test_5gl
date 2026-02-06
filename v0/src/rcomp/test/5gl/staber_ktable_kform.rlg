@@ -1,0 +1,483 @@
+﻿/**
+@descr	staber_ktable <br>
+		staber_ktable
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_ktable_kform') :-    
+	class +$ 'staber_ktable_kform' d ( es,'Patrón rproc para Tablas') sc function,
+    'staber_ktable::usecase__rql_krpsearch'(_, _, _, _),
+    'staber_ktable::usecase__sql_events'(_, _, _, _),
+    'staber_ktable::usecase__sql_local_events'(_, _, _, _),    
+    'staber_ktable::folders'(_, _, _, _).
+    
+
+'staber_ktable::usecase__rql_krpsearch___'(_, _OBJ_in, _, OBJ_out) :-
+    %% Busqueda y tabla
+    
+    I_agent_doc = 'builderweb',
+    I_dataset   = 'dataset__ssdocu',
+    IncludedProperties = [hasDsca,hasMMResource],
+    %% Canal para publicación/subscripción
+
+    newKw('canal__kpivotgrid__',CHANNEL_KPIVOTGRID),
+    newKw('canal__kbreadcrumb__',CHANNEL_KBREADCRUMB),
+    newKw('canal__kform__',CHANNEL_KFORM),
+
+    concatConstants([
+        '?hasDataset @ ( \n',
+        '?I type ?hasClass.\n',
+        'like_ci(?hasKw, ?I). \n',
+        'get_dsca(?I, ?D). \n',
+        'like_ci(?hasDsca, ?D). \n',
+        '?pointer = {includedProperties:?hasIncludedProperties,hasDataset:?hasDataset,hasKw:?I}. \n',
+        'rg_obj_get(_,?pointer,_,?OUT). \n'
+    ],DOC_S_CODE), 
+    Table_schema= [
+        {
+            label: {
+                d: 'Palabra Clave'
+            },
+            arc: 'hasKw',
+            sorted: true,
+            filter: true,
+            selectable: true
+            
+        },
+        {
+            label: {
+                d: 'Título'
+            },
+            arc: 'hasDsca',            
+            filter: true,
+            witdh: '100px'
+        },    
+         {
+            label: {
+                d: 'Fichero'
+            },
+            arc: 'hasMMResource',                        
+            width: '100px',
+            control: {
+                type: 'button',
+                label: {
+                    d: 'Abrir',
+                    icon: 'download-line'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        p_exec: {
+                                type: "sequence",
+                                hasProcess: [
+                                    { type: 'function', name: 'get_krp_resource', context: { delegatedTo: 'builderweb' } },
+                                    { type: 'method', name: 'openFile', module: 'FileManager' }
+
+                                ]
+                        }
+                    }
+                ]     
+            }
+        }        
+    ],
+    IN = {
+        hasAgent: I_agent_doc,
+        hasDataset: I_dataset,
+        hasClass: 'kItemT',
+        hasIncludedProperties : IncludedProperties,
+        hasKw: '*',
+        hasIDI: '*',
+        hasDsca: '*',
+        code: DOC_S_CODE,        
+        limit: 20,
+        getCount: false,
+        persistence:'remote',
+        schema: Table_schema
+    },
+    % En este ejemplo no es necesario gui_in, ni gui_out porque al meter type: krpsearch se sobrecarga por extension en JS
+	Obj_ktable = {
+            in : IN,            
+            proc: { type: 'function', name: 'rql', context: { delegatedTo: I_agent_doc } },
+            gui_out: { type: 'method', name: 'table_out', module: 'GenericUI'},
+            evtPublish: [{topic:'setNode',channel:CHANNEL_KPIVOTGRID}]    
+    },          
+    new_rprocess(_, Obj_ktable,_,Obj_rproc_ktable),
+    
+    %% Formulario      
+    IN1 = { 
+                hasAgent: I_agent_doc,                   
+                hasDataset: I_dataset, 
+                hasKw: 'kItem',
+                navigationFilter: 'lite',
+                enabled: true 
+        },
+    
+    Obj_kbreadcrumb =  {
+        type: 'kbreadcrumb',          
+        in: {data: [IN1]},
+        evtPublish : [{topic: 'setNode', channel: CHANNEL_KBREADCRUMB}],
+        evtSubscribe : [{topic: 'setNode', channel: CHANNEL_KFORM},{topic:'setNode',channel:CHANNEL_KPIVOTGRID}]
+    },        
+    new_rprocess(_, Obj_kbreadcrumb,_, Obj_rproc_kbreadcrumb),
+    Obj_kform =  {
+        type: 'kform',
+        in: IN1,
+        evtPublish: {topic:'setNode',channel:CHANNEL_KFORM},
+        evtSubscribe: [{topic:'setNode',channel:CHANNEL_KBREADCRUMB},{topic:'setNode',channel:CHANNEL_KPIVOTGRID}]
+    },    
+    
+    new_rprocess(_, Obj_kform,_,Obj_rproc_kform),
+
+    Obj_kconsole = {      
+        in: {},       
+        evtSubscribe: [{topic:'setNode',channel:CHANNEL_KFORM}, {topic:'setNode',channel:CHANNEL_KBREADCRUMB},{topic:'setNode',channel:CHANNEL_KPIVOTGRID}],
+        gui_out: { type: 'method', name: 'console_out', module: 'GenericUI'}
+    },
+
+    new_rprocess(_, Obj_kconsole,_,Obj_rproc_kconsole),
+    %% 4GL    
+    rproc *$ rproc__4glsearchdoc  d ('es', 'Búsqueda RQL + table_out')
+	p [ 
+        hasIconClass ¬> string $ 'group',
+		name ¬> string $ 'rprocess',
+		security_view ª 0 ¬> permissionProfile *$ permissionProfile__users,
+        security_view ª 1 ¬> permissionProfile *$ permissionProfile__repositorioTests_KRP
+
+	], 
+    
+    setStmtj('hasConfig',rproc__4glsearchdoc,
+            { 
+                gui_out:{   
+                    type: 'assembly',
+                    children : [                        
+                        {
+                            type:'assembly',
+                            format:obj,                           
+                            classList: [                                
+                                'z-1',
+                                'white-bg',                                            
+                                'r-separator',
+                                'b-group'
+                            ],                           
+                            children: [                                 
+                                {                            
+                                    type: 'assembly',
+                                    width: 30,
+                                    children:[Obj_rproc_ktable]
+                                },
+                                {                             
+                                    type: 'assembly',
+                                    scroll: 'main',
+                                    width: 70,
+                                    children:[{
+                                        type:'assembly',
+                                        children: [
+                                            {
+                                                type: 'assembly',
+                                                width: 70,
+                                                children:[Obj_rproc_kbreadcrumb, Obj_rproc_kform]
+                                            },
+                                            {
+                                                type: 'assembly',
+                                                width: 30,
+                                                children:[Obj_rproc_kconsole]
+                                            }
+                                        ]                
+                                    }]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+    ),
+
+    OBJ_out = {result:true}.
+
+
+
+'staber_ktable::usecase__rql_krpsearch'(_, _OBJ_in, _, OBJ_out) :-
+    
+    
+    I_agent_doc = 'builderweb',
+    I_dataset   = 'dataset__ssa_test',
+    
+    %% Canales para publicación/subscripción
+
+    newKw('canal__kpivotgrid__',CHANNEL_KPIVOTGRID),
+    newKw('canal__kbreadcrumb__',CHANNEL_KBREADCRUMB),
+    newKw('canal__kform__',CHANNEL_KFORM),
+
+
+    'staber_pivotgrid_rproc_pattern::usecase__rql_remote_pivotgrid'(_,{channel: CHANNEL_KPIVOTGRID},_,Obj_kpivotgrid1),
+    Obj_kPivotEvents = {
+        evtPublish : [
+            {topic: 'setNode', channel: CHANNEL_KPIVOTGRID}
+        ]        
+    },
+    
+    obj_merge(Obj_kPivotEvents, Obj_kpivotgrid1, Obj_kpivotgrid),
+
+    
+    %% Formulario      
+    IN1 = { 
+                hasAgent: I_agent_doc,                   
+                hasDataset: I_dataset, 
+                hasKw: 'ss:project',
+                navigationFilter: 'lite',
+                enabled: true 
+        },
+    
+    Obj_kbreadcrumb =  {
+        type: 'kbreadcrumb',          
+        in: {data: [IN1]},
+        evtPublish : [{topic: 'setNode', channel: CHANNEL_KBREADCRUMB}],
+        evtSubscribe : [{topic: 'setNode', channel: CHANNEL_KFORM},{topic:'setNode',channel:CHANNEL_KPIVOTGRID}]
+    },        
+    new_rprocess(_, Obj_kbreadcrumb,_, Obj_rproc_kbreadcrumb),
+    Obj_kform =  {
+        type: 'kform',
+        in: IN1,
+        evtPublish: [{topic:'setNode',channel:CHANNEL_KFORM}],
+        evtSubscribe: [{topic:'setNode',channel:CHANNEL_KBREADCRUMB},{topic:'setNode',channel:CHANNEL_KPIVOTGRID}]
+    },    
+    
+    new_rprocess(_, Obj_kform,_,Obj_rproc_kform),
+
+    Obj_kconsole = {      
+        in: {},       
+        evtSubscribe: [{topic:'setNode',channel:CHANNEL_KFORM}, {topic:'setNode',channel:CHANNEL_KBREADCRUMB},{topic:'setNode',channel:CHANNEL_KPIVOTGRID}],
+        gui_out: { type: 'method', name: 'console_out', module: 'GenericUI'}
+    },
+
+    new_rprocess(_, Obj_kconsole,_,Obj_rproc_kconsole),
+    %% 4GL    
+    rproc *$ rproc__4glsearchdoc  d ('es', 'Búsqueda RQL + table_out')
+	p [ 
+        hasIconClass ¬> string $ 'group',
+		name ¬> string $ 'rprocess',
+		security_view ª 0 ¬> permissionProfile *$ permissionProfile__users,
+        security_view ª 1 ¬> permissionProfile *$ permissionProfile__repositorioTests_KRP
+
+	], 
+    
+    setStmtj('hasConfig',rproc__4glsearchdoc,
+            { 
+                gui_out:{   
+                    type: 'assembly',
+                    children : [                        
+                        {
+                            type:'assembly',
+                            format:obj,                           
+                            classList: [                                
+                                'z-1',
+                                'white-bg',                                            
+                                'r-separator',
+                                'b-group'
+                            ],                           
+                            children: [                                 
+                                {                            
+                                    type: 'assembly',
+                                    width: 30,
+                                    children:[Obj_kpivotgrid]
+                                },
+                                {                             
+                                    type: 'assembly',
+                                    scroll: 'main',
+                                    width: 70,
+                                    children:[{
+                                        type:'assembly',
+                                        children: [
+                                            {
+                                                type: 'assembly',
+                                                width: 70,
+                                                children:[Obj_rproc_kbreadcrumb, Obj_rproc_kform]
+                                            },
+                                            {
+                                                type: 'assembly',
+                                                width: 30,
+                                                children:[Obj_rproc_kconsole]
+                                            }
+                                        ]                
+                                    }]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+    ),
+
+    OBJ_out = {result:true}.    
+
+'staber_ktable::usecase__sql_events'(_, _OBJ_in, _, OBJ_out) :-
+    %%I_agent_doc = 'builderweb',
+    Table_Schema = [
+                {
+                    label: {
+                        d: 'Fecha Evento'
+                    },
+                    range: 'date',
+                    arc: 'DATATIMESTAMP',
+                    sorted: true,
+                    filter: true
+                },
+                {
+                    'label': {
+                        'd': 'Grupo'
+                    },
+                    arc: 'GROUPID',
+                    sorted: true,
+                    filter: true
+                },
+                {
+                    'label': {
+                        'd': 'Indicador'
+                    },                    
+                    arc: 'INDICATORID',
+                    sorted: true                    
+                },
+                {
+                    'label': {
+                        'd': 'Valor'
+                    },
+                    range: 'float',
+                    mask: '###.###,###',
+                    arc: 'VALUE'                    
+                }                
+    ],	
+    CODE = "SELECT DATATIMESTAMP, GROUPID, INDICATORID, VALUE from indicators_events_500m ?WHERE ?ORDERBY",
+    IN = { 
+        limit: 30,
+        getCount: true,
+        persistence:'remote',  
+        schema : Table_Schema,
+        code: CODE
+
+    },
+    Obj_searchdoc = {
+            in : IN,     
+            gui_in : {},       
+            proc: {                 
+                type: 'sequence',
+                hasProcess: [
+                      {type: 'method', in:{dbType:'mysql', dbConn: 'events_dev'}, name: 'getConnection', module: 'SqlServices' },
+                      {type: 'method', name: 'execSQL', module: 'SqlServices' }
+                ]
+            },               
+            gui_out: { type: 'method', name: 'table_out', module: 'GenericUI'}      
+    },          
+    new_rprocess(_, Obj_searchdoc,_,Obj_out_rproc__searchdoc),    
+    %% 4GL
+    rproc *$ rproc__4glsearchEvents  d ('es', 'Búsqueda SQL + table_out (remote)')
+	p [ 
+        hasIconClass ¬> string $ 'group',
+		name ¬> string $ 'rprocess',
+		security_view ª 0 ¬> permissionProfile *$ permissionProfile__users,
+        security_view ª 1 ¬> permissionProfile *$  permissionProfile__repositorioTests_KRP
+	],    
+    setStmtj('hasConfig',rproc__4glsearchEvents,
+            { 
+                gui_out:{    
+                            type:'assembly',
+                            children:[Obj_out_rproc__searchdoc]
+                }
+    }),
+
+    OBJ_out = {result:true}.
+
+
+'staber_ktable::usecase__sql_local_events'(_, _OBJ_in, _, OBJ_out) :-
+    %%I_agent_doc = 'builderweb',
+    Table_Schema = [
+                {
+                    label: {
+                        d: 'Fecha Evento'
+                    },
+                    range: 'date',
+                    arc: 'DATATIMESTAMP',
+                    sorted: true,
+                    filter: true
+                },
+                {
+                    'label': {
+                        'd': 'Grupo'
+                    },
+                    arc: 'GROUPID',
+                    sorted: true,
+                    filter: true
+                },
+                {
+                    'label': {
+                        'd': 'Indicador'
+                    },                    
+                    arc: 'INDICATORID',
+                    sorted: true,
+                    filter: true
+                },
+                {
+                    'label': {
+                        'd': 'Valor'
+                    },
+                    range: 'float',
+                    mask: '###.###,###',
+                    arc: 'VALUE'                    
+                }                
+    ],	
+    CODE = "SELECT DATATIMESTAMP, GROUPID, INDICATORID, VALUE from indicators_events_500m limit 10000",
+    IN = { 
+        persistence:'local',       
+        limit: 30,                                 
+        schema : Table_Schema,
+        pagination: true,
+        code: CODE
+    },
+    Obj_searchdoc = {
+            in : IN,     
+            gui_in : {},       
+            proc: {                 
+                type: 'sequence',
+                hasProcess: [
+                      {type: 'method', in: {dbType:'mysql', dbConn: 'events_dev'}, name: 'getConnection', module: 'SqlServices' },
+                      {type: 'method', name: 'execSQL', module: 'SqlServices' }
+                ]
+            },               
+            gui_out: { type: 'method', name: 'table_out', module: 'GenericUI'}      
+    },          
+    new_rprocess(_, Obj_searchdoc,_,Obj_out_rproc__searchdoc),    
+    %% 4GL
+    rproc *$ rproc__4glsearchLocalEvents  d ('es', 'Búsqueda SQL + table_out (local)')
+	p [ 
+        hasIconClass ¬> string $ 'group',
+		name ¬> string $ 'rprocess',
+		security_view ª 0 ¬> permissionProfile *$ permissionProfile__users,
+        security_view ª 1 ¬> permissionProfile *$ permissionProfile__repositorioTests_KRP
+
+	],    
+    setStmtj('hasConfig',rproc__4glsearchLocalEvents,
+            { 
+                gui_out:{    
+                            type:'assembly',
+                            children:[Obj_out_rproc__searchdoc]
+                }
+    }),
+
+    OBJ_out = {result:true}.
+
+'staber_ktable::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_ktable,
+        isRoot: false,
+        hasIcon: 'dinamic',
+        hasDsca: 'ktable (Radcore)',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            rproc__4glsearchdoc,
+            rproc__4glsearchEvents,
+            rproc__4glsearchLocalEvents
+        ]
+	},	
+	create_rprocess(_, Conf_folder, _, _).

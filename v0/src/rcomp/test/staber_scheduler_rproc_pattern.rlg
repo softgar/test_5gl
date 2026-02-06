@@ -1,0 +1,454 @@
+﻿/**
+@descr	staber_scheduler_rproc_pattern <br>
+		staber_scheduler_rproc_pattern
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_scheduler_rproc_pattern') :-
+	class +$ 'staber_scheduler_rproc_pattern' d ( es,'Patrón rproc para scheduler') sc function,
+    'staber_scheduler_rproc_pattern::usecase__1'(_, _, _, _),
+    'staber_scheduler_rproc_pattern::usecase__2'(_, _, _, _),
+    'staber_scheduler_rproc_pattern::usecase__3'(_, _, _, _),
+    'staber_scheduler_rproc_pattern::calendar'(_, _, _, _),
+    'staber_scheduler_rproc_pattern::folders'(_, _, _, _).
+
+'staber_scheduler_rproc_pattern::calendar'(_, _OBJ_in, _, OBJ_out) :-
+
+    % LECTURA DE ARCHIVO DE DATOS
+    getPathHome(PH),
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/schedulerCase1.json',
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes), 
+    json_read(Codes, Collection),
+    obj_get(data, Collection, ArrayData),
+    newKw('rproc_scheduler__', BUSID),
+    OBJ_form =  {
+            type: 'scheduler',
+            date: 1646089200000,
+            startTime: '2022-03-15T06:00:00.000Z',
+            endTime: '2022-03-15T16:00:00.000Z',
+            views: [
+                day,
+                workWeek,
+                {
+                    type: 'month',
+                    selected: true,
+                    eventHeight: 'auto'
+                },
+                agenda
+            ],
+            data: ArrayData
+    },
+    OBJ= {
+        type: 'assembly',
+        children : [OBJ_form]
+    },
+    OBJ_PROC= {
+        type: 'rprocess',
+        busId: BUSID,
+        gui_out : OBJ,
+        hasIcon: 'calendar',
+        hasKw: rproc__scheduler_calendar,
+        hasDsca: 'Calendario',
+        isSession: true,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest]
+    },
+    create_rprocess(_, OBJ_PROC, _, OBJ_out).
+
+'staber_scheduler_rproc_pattern::usecase__1'(_, _OBJ_in, _, OBJ_out) :-
+    
+    newKw('bus__',BUS_CONSOLE),
+    Obj_console = {
+        in: {},
+        busId: BUS_CONSOLE,
+        gui_out: { type: 'method', name: 'console_out', module: 'GenericUI'}            
+    },          
+    new_rprocess(_, Obj_console,_,Obj_console_proc),
+
+% LECTURA DE ARCHIVO DE DATOS
+    getPathHome(PH),
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/schedulerCase1.json',
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes), 
+    json_read(Codes, Collection),	
+    obj_get(data, Collection, ArrayData),
+
+    OBJ_form =  {
+            type: 'scheduler',
+            date: 1646089200000,
+            startTime: '2022-03-15T06:00:00.000Z',
+            endTime: '2022-03-15T16:00:00.000Z',
+            views: [
+                day,
+                workWeek,
+                {
+                    type: 'month',
+                    selected: true,
+                    eventHeight: 'auto'
+                },
+                agenda
+            ],
+            data: ArrayData,
+            events: [
+                {
+                    type: 'edit',
+                    method: 'setNode',
+                    targetBusId: BUS_CONSOLE
+                },
+                {
+                    type: 'drop',
+                    method: 'setNode',
+                    targetBusId: BUS_CONSOLE
+                },
+                {
+                    type: 'resize',
+                    method: 'setNode',
+                    targetBusId: BUS_CONSOLE
+                }
+            ]
+    },
+    OBJ= {
+        type: 'assembly',
+        children : [OBJ_form, Obj_console_proc]
+    },
+    Rproc = {
+        type: 'rprocess',
+        hasIcon: 'calendar',
+        hasKw: rproc__4gl_scheduler__001,
+        hasDsca: 'Scheduler Events',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: OBJ
+    },
+    create_rprocess(_, Rproc, _, OBJ_out).
+
+'staber_scheduler_rproc_pattern::usecase__2'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('scheduler__filters_example_toolbar', BusId),
+    Rproc = {
+        type: 'rprocess',
+        hasIcon: 'list-alt',
+        busId: BusId,
+        hasKw: rproc__4gl_scheduler__002,
+        hasDsca: 'Scheduler Filters',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: [{
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_scheduler_rproc_basic_filters_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }]
+    },
+    create_rprocess(_, Rproc, _, OBJ_out).
+
+'staber_scheduler_rproc_pattern::usecase__3'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('scheduler__filters_complex_example_toolbar', BusId),
+    Rproc = {
+        type: 'rprocess',
+        hasIcon: 'list',
+        busId: BusId,
+        hasKw: rproc__4gl_scheduler__003,
+        hasDsca: 'Scheduler Complex Filters',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: [{
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_scheduler_rproc_complex_filters_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }]
+    },
+    create_rprocess(_, Rproc, _, OBJ_out).
+
+'staber_scheduler_rproc_basic_filters_gui_out'(_, ObjIn, _, ObjOut) :-
+
+    DefaultFilters = [{
+        resource: 'event',
+        selected: ['event__0', 'event__1']
+    }],
+    obj_get(in:filterResources, ObjIn, Filters, DefaultFilters),
+    obj_get(busId, ObjIn, BusId),
+% LECTURA DE ARCHIVO DE DATOS
+    getPathHome(PH),
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/schedulerCase1.json',
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes), 
+    json_read(Codes, Collection),	
+    obj_get(data, Collection, ArrayData),
+    obj_get(resources, Collection, Resources),
+    Scheduler =  {
+            type: 'scheduler',
+            date: 1646089200000,
+            startTime: '2022-03-15T06:00:00.000Z',
+            endTime: '2022-03-15T16:00:00.000Z',
+            views: [
+                day,
+                workWeek,
+                {
+                    type: 'month',
+                    selected: true,
+                    eventHeight: 'auto'
+                },
+                agenda
+            ],
+            data: ArrayData,
+            resources: Resources,
+            filterResources: Filters,
+            events:[
+                {
+                    type: "filter",
+                    targetBusId: BusId,
+                    method: "set_pv",
+                    p_exec:{
+                        type: "sequence",
+                        hasProcess:[
+                            {type: "method", name: "map", module:"Mapper", in:{
+                                    pattern:{
+                                        property: 'filterResources',
+                                        value: [{
+                                            resource: '_.hasKw',
+                                            selected: '_.value'
+                                        }]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+    },
+    Button1 = {
+        type: 'button',
+        appearance: 'floating',
+        label: {
+            d: 'Ver Histórico'
+        },
+        events: [{
+            type: 'click',
+            method: 'set_pv_exec',
+            targetBusId: BusId,
+            payload: {
+                property: 'filterResources',
+                value: [{
+                    resource: 'event',
+                    selected: ['event__0']
+                }]
+            }
+        }]
+    },
+    Button2 = {
+        type: 'button',
+        appearance: 'floating',
+        label: {
+            d: 'Ver Producción'
+        },
+        events: [{
+            type: 'click',
+            method: 'set_pv_exec',
+            targetBusId: BusId,
+            payload: {
+                property: 'filterResources',
+                value: [{
+                    resource: 'event',
+                    selected: ['event__1']
+                }]
+            }
+        }]
+    },
+    Reset = {
+        type: 'button',
+        appearance: 'floating',
+        label: {
+            d: 'Resetear Filtros'
+        },
+        events: [{
+            type: 'click',
+            method: 'set_pv_exec',
+            targetBusId: BusId,
+            payload: {
+                property: 'filterResources',
+                value: [{
+                    resource: 'event',
+                    selected: ['event__0', 'event__1']
+                }]
+            }
+        }]
+    },
+    Toolbar  = {
+        type: 'assembly',
+        children: [Button1, Button2, Reset]
+    },
+    ObjOut= {
+        type: 'assembly',
+        children : [Toolbar, Scheduler]
+    }.
+
+'staber_scheduler_rproc_complex_filters_gui_out'(_, ObjIn, _, ObjOut) :-
+
+    DefaultFilters = [{
+        resource: 'event',
+        selected: ['event__0', 'event__1', 'event__2']
+    },
+    {
+        resource: 'member',
+        selected: ['member__0', 'member__1', 'member__2', 'member__3']
+    }],
+    obj_get(in:filterResources, ObjIn, Filters, DefaultFilters),
+    obj_get(busId, ObjIn, BusId),
+% LECTURA DE ARCHIVO DE DATOS
+    getPathHome(PH),
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/schedulerCase2.json',
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes), 
+    json_read(Codes, Collection),	
+    obj_get(data, Collection, ArrayData),
+    obj_get(resources, Collection, Resources),
+    Scheduler =  {
+        type: 'scheduler',
+        date: 1646089200000,
+        startTime: '2022-03-15T06:00:00.000Z',
+        endTime: '2022-03-15T16:00:00.000Z',
+        views: [
+            day,
+            workWeek,
+            {
+                type: 'month',
+                selected: true,
+                eventHeight: 'auto'
+            },
+            agenda
+        ],
+        data: ArrayData,
+        resources: Resources,
+        filterResources: Filters,
+        events:[
+            {
+                type: 'filter',
+                targetBusId: BusId,
+                method: 'set_pv',
+                p_exec:{
+                    type: 'sequence',
+                    hasProcess:[
+                        {type: 'function', in:{ filterResources: Filters}, name: 'map_scheduler_filters', context: {delegatedTo: 'builderweb'}}
+                    ]
+                }
+            }
+        ]
+    },
+    Button1 = {
+        type: 'button',
+        appearance: 'floating',
+        label: {
+            d: 'Filtrar por Eventos'
+        },
+        events: [{
+            type: 'click',
+            method: 'set_pv_exec',
+            targetBusId: BusId,
+            payload: {
+                property: 'filterResources',
+                value: [{
+                    resource: 'event',
+                    selected: ['event__0', 'event__1', 'event__2']
+                }]
+            }
+        }]
+    },
+    Button2 = {
+        type: 'button',
+        appearance: 'floating',
+        label: {
+            d: 'Filtrar por Responsables'
+        },
+        events: [{
+            type: 'click',
+            method: 'set_pv_exec',
+            targetBusId: BusId,
+            payload: {
+                property: 'filterResources',
+                value: [
+                    {
+                        resource: 'member',
+                        selected: ['member__0', 'member__1', 'member__2', 'member__3']
+                    }]
+            }
+        }]
+    },
+    Reset = {
+        type: 'button',
+        appearance: 'floating',
+        label: {
+            d: 'Resetear Filtros'
+        },
+        events: [{
+            type: 'click',
+            method: 'set_pv_exec',
+            targetBusId: BusId,
+            payload: {
+                property: 'filterResources',
+                value: [{
+                    resource: 'event',
+                    selected: ['event__0', 'event__1', 'event__2']
+                },
+                {
+                    resource: 'member',
+                    selected: ['member__0', 'member__1', 'member__2', 'member__3']
+                }]
+            }
+        }]
+    },
+    Toolbar  = {
+        type: 'assembly',
+        children: [Button1, Button2, Reset]
+    },
+    ObjOut= {
+        type: 'assembly',
+        children : [Toolbar, Scheduler]
+    }.
+
+map_scheduler_filters(_, ObjIn, _, ObjOut):-
+    obj_get(hasKw, ObjIn, Resource),
+    obj_get(value, ObjIn, KwList),
+    obj_get(filterResources, ObjIn, ResourceFilters),
+    findall( FilterObj,
+        (   member(ResourceFilter, ResourceFilters),
+            obj_get(resource, ResourceFilter, FilterKw),
+            ( FilterKw = Resource ->
+                FilterObj = {
+                    resource: Resource,
+                    selected: KwList
+                }
+            ; FilterObj = ResourceFilter
+            )
+        ), NewResourceFilters
+    ),
+    ObjOut = {
+        property: 'filterResources',
+        value: NewResourceFilters
+    }.
+
+
+
+'staber_scheduler_rproc_pattern::folders'(_, _, _, _):-
+	Conf_folder = {
+		type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_scheduler,
+        hasDsca: 'scheduler(Radcore)',
+        hasIcon: 'calendar-empty',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__4gl_scheduler__001,
+            rproc__4gl_scheduler__002,
+            rproc__4gl_scheduler__003
+        ]
+	},
+    create_rprocess(_, Conf_folder, _, _).

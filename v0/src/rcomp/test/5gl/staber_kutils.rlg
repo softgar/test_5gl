@@ -1,0 +1,39 @@
+/**
+@descr	staber_kutils <br>
+		staber_kutils
+@author ccp
+@date	2023_02_01
+**/
+
+configureSampleOutput(Rproc, Channel, Children):-
+    newKw('bus__detail__', BUS_CONSOLE),
+    Obj_console = {      
+        in: {},
+        type: 'rprocess',  
+        busId: BUS_CONSOLE,    
+        evtSubscribe: [{topic:'setNode',channel: Channel}],
+        gui_out: { type: 'method', name: 'console_out', module: 'GenericUI'}
+    },
+    setStmtj('hasConfig',Rproc,
+    {
+        gui_out:{
+            type: 'assembly',
+            children : [
+                {
+                    type:'assembly',
+                    children: [
+                        {
+                            type: 'assembly',
+                            width: 70,
+                            children:[Children]
+                        },
+                        {
+                            type: 'assembly',
+                            width: 30,
+                            children:[Obj_console]
+                        }
+                    ]
+                }                
+            ]
+        }                    
+    }).   

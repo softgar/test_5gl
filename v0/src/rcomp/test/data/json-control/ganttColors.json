@@ -1,0 +1,19 @@
+{
+    "data":[
+        {
+            "id": 1,
+            "color": "red",
+            "completeColor": "green"
+        },
+        {
+            "id": 2,
+            "color": "rgba(234,23,45,0.5)",
+            "completeColor": "rgb(234,23,45)"
+        },
+        {
+            "id": 3,
+            "color": "black",
+            "completeColor": "grey"
+        }
+    ]
+}

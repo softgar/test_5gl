@@ -1,0 +1,620 @@
+﻿/**
+@descr	staber_kmgt_ktalogue_comparison <br>
+		staber_kmgt_ktalogue_comparison
+@author ccp
+@date	2023_10_27
+**/
+rc_class('staber_kmgt_ktalogue_comparison') :-
+	class +$ 'staber_kmgt_ktalogue_comparison' d ( es,'Búsquedas en kContainers (kmgt/ktalogue)') sc function,
+    'staber_kmgt::absolutequery'(_, _, _, _),
+    'staber_kmgt::procsearch'(_, _, _, _),
+    'staber_kmgt::overrideSearch'(_, _, _, _),
+    'staber_kmgt::overrideSearchWithDialog'(_, _, _, _),
+    'staber_ktalogue::absolutequery'(_, _, _, _),
+    'staber_ktalogue::procsearch'(_, _, _, _),
+    'staber_ktalogue::overrideSearch'(_, _, _, _),
+    'staber_kmgt_ktalogue_comparison::folders'(_, _, _, _).
+
+/*KMGT*/
+'staber_kmgt::absolutequery'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb', 
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp_contacto_001',        
+        hasLayout: 'resultDetail',
+        schema: {
+            data: [
+                {
+                    label: {
+                        d: 'Kw'
+                    },
+                    arc: 'hasKw',
+                    enabled: false,
+                    sorted: true,
+                    filter: true
+                }
+            ]
+        },
+        hasArea: {
+            result: {
+                query: 'stmt(type, HASKW, C), stmt(hasDsca, HASKW, HASDSCA), member(C, [\'testapp:contact\']), stmt(\'contact:hasName\', HASKW, T_N), like_ci(\'*ar*\', T_N)'
+            }
+        }
+    },   
+    Title =  'kmgt testing absoluteQuery',  
+    Obj_rproc = {
+        type: 'kmgt',            
+        in: IN,
+        hasKw: kmgt_absolutequery,            
+        hasDsca: Title,            
+        hasIcon: 'document',
+        isRoot: false,            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]      
+    },
+    create_rprocess(_, Obj_rproc, _, OBJ_out).
+
+
+'staber_kmgt::procsearch'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+
+    IN = {
+        hasTitle: 'BuilderMgt',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact'
+    },
+
+    Title = 'kmgt testing `proc` search',
+
+    OBJ_out = {
+        type: 'kmgt',
+        in: IN,
+        hasKw: kmgt_procsearch,
+        hasDsca: Title,
+        hasIcon: 'project',
+        isRoot: false,
+        do_exec: true,
+        forceSearchProc: true,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                { type: 'function', name: 'staber_kmgt::search::rc_proc', context: { delegatedTo: 'builderweb' } }
+            ]
+        },
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+
+    create_rprocess(_, OBJ_out, _, _).
+
+
+'staber_kmgt::overrideSearch'(_, OBJ_in, _, OBJ_out):-
+    I_dataset = 'dataset__erc_test',
+    I_agent = 'builderweb',
+    'result::schema::overrideSearch'(CTX, OBJ_in, CTX, OBJ_schema),
+
+    SEARCH_OVERRIDES = [
+        {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::search::rc_gui_out::overrideSearch', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+
+    IncludedProperties = ['hasKw','hasDsca'],
+    NavigableProperties =[],
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'eRComponent',
+        hasTag: 'instance',
+        searchLayout: 'basic',
+        hasArea: {
+            detail: {
+                excludedProperties: ['type'],
+                showAllProperties: true
+            },
+            result: {
+                selectable: true,
+                schema: OBJ_schema,
+                persistence : 'remote',
+                includedProperties: IncludedProperties,
+                navigableProperties: NavigableProperties
+            }
+        }
+    },
+
+    Title = 'kmgt testing `override` search',
+
+    OBJ_out = {
+            type: 'kmgt',
+            in: IN,
+            hasKw: kmgt_overridesearch,
+            hasDsca: Title,
+            hasIcon: 'file-cabinet',
+            isRoot: false,
+            hasAppOverride: {
+                search: SEARCH_OVERRIDES
+            },
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },
+
+    create_rprocess(_, OBJ_out, _, _).
+
+'staber_kmgt::overrideSearchWithDialog'(_, OBJ_in, _, OBJ_out):-
+    I_dataset = 'dataset__erc_test',
+    I_agent = 'builderweb',
+    'result::schema::overrideSearch'(CTX, OBJ_in, CTX, OBJ_schema),
+
+    SEARCH_OVERRIDES = [
+        {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::search::rc_gui_out::overrideSearchWithDialog', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+
+    IncludedProperties = ['hasKw','hasDsca'],
+    NavigableProperties =[],
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'eRComponent',
+        hasTag: 'instance',
+        searchLayout: 'basic',
+        hasArea: {
+            search: {
+                hasDlg: true
+            },
+            detail: {
+                excludedProperties: ['type'],
+                showAllProperties: true
+            },
+            result: {
+                selectable: true,
+                schema: OBJ_schema,
+                persistence : 'remote',
+                includedProperties: IncludedProperties,
+                navigableProperties: NavigableProperties
+            }
+        }
+    },
+
+    Title = 'kmgt testing `override` search with dialog in actions',
+
+    OBJ_out = {
+            type: 'kmgt',
+            in: IN,
+            hasKw: kmgt_overridesearchWithDialog,
+            hasDsca: Title,
+            hasIcon: 'file-cabinet',
+            isRoot: false,
+            hasAppOverride: {
+                search: SEARCH_OVERRIDES
+            },
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },
+
+    create_rprocess(_, OBJ_out, _, _).
+
+/*KTALOGUE*/
+'staber_ktalogue::overrideSearch'(_, OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__erc_test',
+    I_agent = 'builderweb',
+    'result::schema::overrideSearch'(CTX, OBJ_in, CTX, OBJ_schema),
+
+    SEARCH_OVERRIDES = [
+        {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_ktalogue::search::rc_gui_out::overrideSearch', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+
+    IncludedProperties = ['hasKw','hasDsca'],
+    NavigableProperties = [],
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'eRComponent',
+        hasTag: 'instance',
+        searchLayout: 'basic',
+        hasArea: {
+            detail: {
+                excludedProperties: ['type'],
+                showAllProperties: true
+            },
+            result: {
+                selectable: true,
+                schema: OBJ_schema,
+                persistence: 'remote',
+                includedProperties: IncludedProperties,
+                navigableProperties: NavigableProperties
+            },
+            catalogue: {
+                backButton: false,
+                layoutType:'kgallery',
+                hasTemplate :{
+                    default:{
+                        hasKw : '_.hasKw',
+                        hasDsca:  '_.hasDsca',                                            
+                        hasIconClass: 'document'
+                    }
+                }
+            }
+        }
+    },
+
+    Title = 'ktalogue testing `override` search',
+
+    OBJ_out = {
+            type: 'ktalogue',
+            in: IN,
+            hasKw: ktalogue_overridesearch,
+            hasDsca: Title,
+            hasIcon: 'file-cabinet',
+            isRoot: false,
+            hasAppOverride: {
+                search: SEARCH_OVERRIDES
+            },
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },
+
+    create_rprocess(_, OBJ_out, _, _).
+
+
+'staber_ktalogue::procsearch'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        hasLayout: 'resultCatalogue',
+        hasArea: {
+            result: {
+                selectable: true
+            },
+            catalogue: {
+                backButton: false,
+                layoutType:'kgallery',
+                hasTemplate :{
+                    default:{
+                        hasKw : '_.hasKw',
+                        hasDsca:  '_.hasDsca',                                            
+                        hasIconClass: 'document'
+                    }
+                }
+            }
+        }
+    },
+
+    Title =  'ktalogue testing `proc` search',
+
+    OBJ_out = {
+        type: 'ktalogue',
+        do_exec: true,
+        in: IN,
+        hasKw: ktalogue_procsearch,
+        hasDsca: Title,
+        hasIcon: 'project',
+        isRoot: false,
+        forceSearchProc: true,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                { type: 'function', name: 'staber_ktalogue::search::rc_proc', context: { delegatedTo: 'builderweb' } }
+            ]
+        },
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_, OBJ_out, _, _).
+
+'staber_ktalogue::absolutequery'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'Default', 
+    IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasLayout: 'resultCatalogue',
+        hasArea:{
+            catalogue: {
+                backButton: false,
+                layoutType:'kgallery',
+                hasTemplate :{
+                    default:{
+                        hasKw : '_.hasKw',
+                        hasDsca:  '_.hasDsca',                                            
+                        hasIconClass: 'document'
+                    }
+                }
+            },
+            result: {
+                query: 'stmt( hasDsca, HASKW, _), member( HASKW,[\'testapp:contact\'])'
+            }
+        }        
+    },   
+    Title =  'ktalogue testing absoluteQuery',
+    OBJ_in = {
+        type: 'ktalogue',
+        in: IN,
+        hasKw: ktalogue_absolutequery,
+        hasDsca: Title,
+        hasIcon: 'document',
+        isRoot: false
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+
+/*KMGT OVERRIDES*/
+'staber_kmgt::search::rc_gui_out::overrideSearch'(Ctx, OBJ_in, Ctx, OBJ_out):-
+    obj_get(in:elementInERC, OBJ_in, Element, ''),
+    obj_get(in:parentBusId, OBJ_in, PB),
+
+    OBJ_out = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'text',
+                label: { d: 'Elemento de Modelo' },
+                value: Element,
+                events: [
+                    {
+                        type: 'change',
+                        method: 'set_propertyValue',
+                        targetBusId: PB,
+                        payload: { property: 'elementInERC' }
+                    }
+                ]
+            },
+            {
+                type: 'button',
+                label: { d: 'Localizar', icon: 'search' },
+                events: [
+                    {
+                        type: 'click',
+                        targetBusId: PB,
+                        method: 'setSearchQuery',
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', name: 'search::setElementSearchQuery', context: { delegatedTo: 'builderweb' } }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }.
+
+'staber_kmgt::search::rc_gui_out::overrideSearchWithDialog'(Ctx, OBJ_in, Ctx, OBJ_out):-
+    obj_get(in:elementInERC, OBJ_in, Element, ''),
+    obj_get(in:parentBusId, OBJ_in, PB),
+
+    'staber_rdlg::dlg'(DLG_CUSTOMER, _),
+
+    SCHEMA_DLG_CUSTOMER = {
+        data: [           
+            {
+                label: {
+                    d: 'Contacto'
+                },
+                arc: 'hasDsca'
+            }
+        ]
+    },
+
+    DATA_CUSTOMER = {
+        type: 'kresult',
+        busId: SearchDlgBusId1,
+        hasChannel: '_.dlg.hasChannel',
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'Default',
+            hasKw: 'testapp:contact',
+            includedProperties:['hasDsca'],
+            hasLayout: 'result',
+            searchType: 'rem',
+            schema: SCHEMA_DLG_CUSTOMER,          
+            selectable: true
+        }
+    },
+
+    concatConstants([PB, '_dlg1'], SearchDlgBusId1),
+
+    OBJ_out = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'text',
+                label: { d: 'Elemento de Modelo' },
+                value: Element,
+                events: [
+                    {
+                        type: 'change',
+                        method: 'set_propertyValue',
+                        targetBusId: PB,
+                        payload: { property: 'elementInERC' }
+                    }
+                ],
+                actions: [{
+                    label: {
+                        icon: 'zoom'
+                    },
+                    collapse: false,
+                    events: [{
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: PB,
+                        payload:{
+                            '?CLIENTFILTER':'Prueba'
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'method', in: { dlg_data: DATA_CUSTOMER, dlg: DLG_CUSTOMER}, name: 'dialog_exec', busId: PB},
+                                { type: 'method', in: {hasClientFilter: '?CLIENTFILTER', pattern: {'hasClientFilter': '_.data.hasDsca'}}, name: 'map',  module: 'Mapper' },
+                                { type: 'method', name: 'change_config', busId: PB }
+                            ]
+                        }
+                    }]
+                }]
+            },
+            {
+                type: 'button',
+                label: { d: 'Localizar', icon: 'search' },
+                events: [
+                    {
+                        type: 'click',
+                        targetBusId: PB,
+                        method: 'setSearchQuery',
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', name: 'search::setElementSearchQuery', context: { delegatedTo: 'builderweb' } }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }.
+
+
+'staber_kmgt::search::rc_proc'(CTX, OBJ_in, CTX, OBJ_out):-
+    FILTER = 'stmt(type, HASKW, \'testapp:contact\'), stmt(hasDsca, HASKW, HASDSCA), stmt(\'contact:hasName\', HASKW, T_N), like_ci(\'*Juan*\', T_N)',
+    obj_set(queryFilter, OBJ_in, FILTER, OBJ_out).
+
+
+/*KTALOGUE OVERRIDES*/
+'staber_ktalogue::search::rc_gui_out::overrideSearch'(Ctx, OBJ_in, Ctx, OBJ_out):-
+    obj_get(in:elementInERC, OBJ_in, Element, ''),
+    obj_get(in:parentBusId, OBJ_in, PB),
+
+    OBJ_out = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'text',
+                label: { d: 'Elemento de Modelo' },
+                value: Element,
+                events: [
+                    {
+                        type: 'change',
+                        method: 'set_propertyValue',
+                        targetBusId: PB,
+                        payload: { property: 'elementInERC' }
+                    }
+                ]
+            },
+            {
+                type: 'button',
+                label: { d: 'Localizar', icon: 'search' },
+                events: [
+                    {
+                        type: 'click',
+                        targetBusId: PB,
+                        method: 'setSearchQuery',
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', name: 'search::setElementSearchQuery', context: { delegatedTo: 'builderweb' } }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }.
+
+
+'staber_ktalogue::search::rc_proc'(CTX, OBJ_in, CTX, OBJ_out):-
+    FILTER = 'stmt(type, HASKW, \'testapp:contact\'), stmt(hasDsca, HASKW, HASDSCA), stmt(\'contact:hasName\', HASKW, T_N), like_ci(\'*Juan*\', T_N)',
+    obj_set(queryFilter, OBJ_in, FILTER, OBJ_out).
+
+/*OVERRIDE SEARCH PROC*/
+'result::schema::overrideSearch'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    Table_Schema = [
+        {
+                label: {
+                    d: 'KW'
+                },
+                arc: 'hasKw',
+                filter: true,
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Descripción'
+                },
+                arc: 'hasDsca'
+            }            
+                                                
+	],
+    OBJ_out = {data: Table_Schema }.
+
+
+'search::setElementSearchQuery'(_CTX, OBJ_in, _CTX, OBJ_out) :-
+    obj_get(elementInERC, OBJ_in, Elm, ''),
+
+    ( Elm \== '' ->
+        codes_append(["stmt(type, HASKW, 'eRComponent'), like_ci('*", Elm,"*', HASKW)"], Filter)
+    ;
+        Filter = ''
+    ),
+
+    OBJ_out = {
+        queryFilter: Filter
+    },
+
+    obj_ppd(OBJ_out).
+
+
+'staber_kmgt_ktalogue_comparison::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kmgt_ktalogue_compare,
+        isRoot: false,
+        hasIcon: 'folder-line',
+        hasDsca: 'Búsquedas en kContainers (kmgt/ktalogue)',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[          
+            kmgt_overridesearch,
+            % TODO, Revisar comportamiento de estos dos
+            % kmgt_overridesearchWithDialog,
+            % ktalogue_overridesearch, 
+            kmgt_absolutequery,
+            ktalogue_absolutequery,
+            kmgt_procsearch,
+            ktalogue_procsearch
+        ]
+	},	
+	create_rprocess(_, Conf_folder, _, _).

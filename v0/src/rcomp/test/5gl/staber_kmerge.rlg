@@ -1,0 +1,58 @@
+﻿/**staber_k
+@descr	staber_kmerge <br>
+		staber_kmerge
+@author ccp
+@date	2025_03_13
+**/
+rc_class('staber_kmerge') :-
+	class +$ 'staber_kmerge' d ( es,'Visualización de componentes de mergeado') sc function,
+    'staber_kmerge::simple_merge_test'(_, _, _, _),
+    'staber_kmerge::folders'(_, _, _, _).
+
+'staber_kmerge::simple_merge_test'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__merge', CHANNEL_MERGE),
+    newKw('bus__merge', BUSID_MERGE),
+    Title = 'Ejemplo simple de componente de mergeo',
+	Obj_merge = {  
+        type: 'merge',
+        leftContent: 'First test left content',
+        rightContent: 'First test right content'
+    },
+    Obj_merge_container = {  
+        type: 'assembly',
+        id: 'assembly_merge_container',
+        children: [
+           Obj_merge                                 
+        ]
+    },
+    Obj_class = {
+        type: 'rprocess',
+        hasKw: staber_kmerge__0,     
+        hasChannel: CHANNEL_MERGE,
+        busId : BUSID_MERGE,      
+        hasDsca: Title,
+        hasIcon: 'paste',
+        isRoot: false,
+        isSession: true,
+        hasNavbar: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_merge_container
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kmerge::folders'(_, _, _, _):-
+    Title = 'kmerge',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kmerge,
+        hasDsca: Title,
+        hasIcon: 'paste',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            staber_kmerge__0
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

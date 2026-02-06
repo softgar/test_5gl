@@ -1,0 +1,177 @@
+﻿/**
+@descr	Componente kresult con dos columnas <br>
+		Ejemplo de componente kresult con schemas y dos columnas
+@author XXX
+@date	2026_01_28
+**/
+
+rc_schema('kresult_example_schema'):-
+    'test_5gl_server::kresult_example_component'(_,_,_,_).
+
+'test_5gl_server::kresult_example_component'(_, _, _, _):-
+    Title = 'KResult con Dos Columnas',
+    create_rprocess(_, 
+        {
+            type: 'krp:rprocess',
+            hasKw: rprocess__kresult_example,
+            hasDsca: Title,
+            hasIcon: 'dinamic',
+            hasChannel: [
+                {
+                    type: 'krp:channel',
+                    hasKw: channel__kresult_example_main,
+                    hasDsca: 'Principal',
+                    isMain: true,
+                    hasPanel: [
+                        {
+                            type: 'krp:panel',
+                            hasKw: panel__kresult_example_main,
+                            hasDsca: 'Panel Principal',
+                            hasComponent: [
+                                {
+                                    type: 'krp:kresult',
+                                    hasKw: kresult__example_main,
+                                    hasDsca: 'Resultado con Dos Columnas',
+                                    busId: 'kresult__example_main',
+                                    hasAgent: agent__deltaserver_test,
+                                    hasDataset: dataset__test_5gl_server,
+                                    
+                                    %% Entrada - Parametros del componente
+                                    IN: {
+                                        hasAgent: agent__deltaserver_test,
+                                        hasDataset: dataset__test_5gl_server,
+                                        hasKw: kresult__example_main,
+                                        includedProperties: [column1, column2],
+                                        navigableProperties: [column1]
+                                    },
+                                    
+                                    %% Esquema - Definición de columnas
+                                    hasSchema: {
+                                        fields: [
+                                            {
+                                                hasKw: column1,
+                                                arc: 'string',
+                                                label: 'Descripción',
+                                                control: 'text',
+                                                filter: 'likewildcard',
+                                                sorted: true,
+                                                width: 50,
+                                                enabled: true
+                                            },
+                                            {
+                                                hasKw: column2,
+                                                arc: 'string',
+                                                label: 'Valor',
+                                                control: 'text',
+                                                filter: 'equal',
+                                                sorted: false,
+                                                width: 50,
+                                                enabled: true
+                                            }
+                                        ]
+                                    },
+                                    
+                                    %% Toolbar - Acciones generales
+                                    hasToolbar: [
+                                        {
+                                            type: 'krp:toolbar',
+                                            hasButton: [
+                                                {
+                                                    type: 'krp:button',
+                                                    hasKw: btn__create,
+                                                    label: 'Crear',
+                                                    icon: 'new',
+                                                    evtPublish: [{
+                                                        hasKw: evt__create_new,
+                                                        method: 'openInBrowser',
+                                                        targetUI: 'kdetail__example_create'
+                                                    }]
+                                                },
+                                                {
+                                                    type: 'krp:button',
+                                                    hasKw: btn__refresh,
+                                                    label: 'Actualizar',
+                                                    icon: 'refresh',
+                                                    evtPublish: [{
+                                                        hasKw: evt__refresh,
+                                                        method: 'refresh'
+                                                    }]
+                                                },
+                                                {
+                                                    type: 'krp:button',
+                                                    hasKw: btn__export,
+                                                    label: 'Exportar',
+                                                    icon: 'export',
+                                                    evtPublish: [{
+                                                        hasKw: evt__export,
+                                                        method: 'export',
+                                                        params: {format: 'excel'}
+                                                    }]
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    
+                                    %% Acciones por fila (Row Actions)
+                                    hasRowActions: [
+                                        {
+                                            type: 'krp:rowaction',
+                                            hasKw: action__edit,
+                                            label: 'Editar',
+                                            icon: 'edit',
+                                            evtPublish: [{
+                                                hasKw: evt__edit_row,
+                                                method: 'openInBrowser',
+                                                targetUI: 'kdetail__example_edit',
+                                                params: {
+                                                    busId: 'kresult__example_main',
+                                                    passValues: [column1, column2]
+                                                }
+                                            }]
+                                        },
+                                        {
+                                            type: 'krp:rowaction',
+                                            hasKw: action__copy,
+                                            label: 'Copiar',
+                                            icon: 'copy',
+                                            evtPublish: [{
+                                                hasKw: evt__copy_row,
+                                                method: 'copyRow',
+                                                params: {
+                                                    busId: 'kresult__example_main'
+                                                }
+                                            }]
+                                        },
+                                        {
+                                            type: 'krp:rowaction',
+                                            hasKw: action__delete,
+                                            label: 'Eliminar',
+                                            icon: 'delete',
+                                            evtPublish: [{
+                                                hasKw: evt__delete_row,
+                                                method: 'delete',
+                                                params: {
+                                                    busId: 'kresult__example_main',
+                                                    confirmMessage: '¿Desea eliminar este elemento?'
+                                                }
+                                            }]
+                                        }
+                                    ],
+                                    
+                                    %% Configuración
+                                    security_edit: [],
+                                    security_view: [permissionProfile__repositorioTests_KRP],
+                                    isSession: false,
+                                    
+                                    %% Eventos
+                                    evtPublish: [],
+                                    evtSubscribe: []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            security_edit: [],
+            security_view: [permissionProfile__repositorioTests_KRP]
+        },_,_).

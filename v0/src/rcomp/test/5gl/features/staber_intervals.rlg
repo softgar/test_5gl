@@ -1,0 +1,76 @@
+﻿/**staber_k
+@descr	staber_intervals <br>
+		staber_intervals
+@author opr
+@date	2024_04_04
+**/
+rc_class('staber_intervals') :-
+	class +$ 'staber_intervals' d ( es,'Refresco a intervalos') sc function,
+    'staber_intervals::update_timer_with_result'(_, _, _, _),
+    'staber_intervals::folders'(_, _, _, _).
+
+'staber_intervals::update_timer_with_result'(_, _OBJ_in, _, OBJ_out) :-
+ I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),
+    newKw('bus__kresult', BUSID_RESULT),
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: 'Default',
+        hasKw: 'testapp:contact'
+    },
+    Title =  'Test de refresco automático para compoonente de resultados kResut',
+	Obj_result = {  
+        type : 'kresult',
+        hasDsca: Title,
+        in : IN,                
+        hasChannel: CHANNEL_RESULT,
+        busId : BUSID_RESULT,
+        do_execute: true
+       
+    },
+    Obj_timer_and_result = {  
+        type: 'assembly',       
+        children: [            
+            {
+                type:'countdown',
+                label: {
+                    % d: 'Los datos se actualizarán en {{initTime}} minutos'
+                    d: 'countdown.table',
+                    i18n: 'd'
+                },
+                initTime: 65,
+                background: 'red'
+            },
+            Obj_result            
+        ]
+    },
+    Obj_class = {
+        type: 'rprocess',
+        hasKw: staber_interval__0,           
+        hasDsca: Title,
+        hasIcon: 'clock',
+        isRoot: false,
+        execInterval: 65,  
+        isSession: true,
+        hasNavbar: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_timer_and_result
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_intervals::folders'(_, _, _, _):-
+    Title = 'Test de refresco automático (INTERVALS)',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_interval,
+        hasDsca: Title,
+        hasIcon: 'clock',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            staber_interval__0
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

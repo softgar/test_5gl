@@ -1,0 +1,335 @@
+﻿/**
+@descr	staber_manager_error_server <br>
+		staber_manager_error_server
+@author CCP
+@date	2025_06_17
+**/
+rc_class('staber_manager_error_server') :-
+
+	class +$ 'staber_manager_error_server' d ( es,'Ejemplos de ejecuciones de procesos') sc function,
+    'staber_manager_error_server::rprocess_proc_uncaught'(_, _, _, _),
+    'staber_manager_error_server::rprocess_proc_apperror'(_, _, _, _),
+    'staber_manager_error_server::rprocess_rproc_errortype'(_, _, _, _),
+    'staber_manager_error_server::kresult_errortype'(_, _, _, _),
+    'staber_manager_error_server::rprocess_rproc_type_appError'(_, _, _, _),
+    'staber_manager_error_server::folders'(_, _, _, _).
+
+'staber_manager_error_server::rprocess_proc_uncaught'(_, _OBJ_in, _, OBJ_out) :-	
+    newKw('bus__errorsprocess__', ERROR_BUS),
+    newKw('channels__errorsprocess__', ERROR_CHANNEL),
+    PROC = {
+        type: 'sequence',
+        context: {
+            delegatedTo: 'builderweb'
+        },                       
+        hasProcess: [
+            { 
+                type: 'function',                 
+                name: 'testapp::forced_fetch_failure',
+                context: { delegatedTo: 'builderweb' }
+            }               
+        ]                                
+    },
+    GUI_OUT = {        
+        type: 'assembly',
+        classList: [
+            'z-1',
+            'white-bg'
+        ],
+        label: {
+            d: 'ui_ux_feature_error_server_fetch_error_label',
+            i18n: 'd'
+        }        
+    },
+    Title = 'ui_ux_feature_error_server_fetch_error',   
+    IN = {        
+    },
+    Obj_proc = {        
+        type: 'rprocess',                
+        busId: ERROR_BUS,
+        hasChannel: ERROR_CHANNEL,
+        hasDsca: Title,
+        in: IN,        
+        proc: PROC,
+        gui_out: GUI_OUT,
+        hasKw: rproc__rprocess_proc_uncaught,     
+        hasIcon: 'unlink',
+        do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],       
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_manager_error_server::rprocess_proc_apperror'(_, _OBJ_in, _, OBJ_out) :-	
+    newKw('bus__errorsprocess__', ERROR_BUS),
+    newKw('channels__errorsprocess__', ERROR_CHANNEL),
+    PROC = {
+        type: 'sequence',
+        context: {
+            delegatedTo: 'builderweb'
+        },                       
+        hasProcess: [
+            { 
+                type: 'function',                 
+                name: 'testapp::forced_errortype_failure',
+                context: { delegatedTo: 'builderweb' }
+            }               
+        ]                                
+    },
+    GUI_OUT = {        
+        type: 'assembly',
+        classList: [
+            'z-1',
+            'white-bg'
+        ],
+        label: {
+            d: 'ui_ux_feature_error_server_apperror_label',
+            i18n: 'd'
+        }        
+    },
+    Title = 'ui_ux_feature_error_server_apperror',   
+    IN = {        
+    },
+    Obj_proc = {        
+        type: 'rprocess',                
+        busId: ERROR_BUS,
+        hasChannel: ERROR_CHANNEL,
+        hasDsca: Title,
+        in: IN,        
+        proc: PROC,
+        gui_out: GUI_OUT,
+        hasKw: rproc__rprocess_proc_apperror,     
+        hasIcon: 'unlink',
+        do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],       
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_manager_error_server::rprocess_rproc_errortype'(_, _OBJ_in, _, OBJ_out) :-	
+    newKw('bus__errorsprocess__', ERROR_BUS),
+    newKw('channels__errorsprocess__', ERROR_CHANNEL),
+    GUI_OUT = {        
+        type: 'assembly',
+        classList: [
+            'z-1',
+            'white-bg'
+        ],
+        label: {
+            d: 'ui_ux_feature_error_server_uncaught',
+            i18n: 'd'
+        },
+        children: [
+            {
+                type: 'combobox',
+                autocomplete: true,
+                enabled:true,
+                label: {
+                    d: 'ui_ux_feature_error_server_uncaught_combo',
+                    i18n: 'd'
+                },
+                elements: [
+                    { label: { d: 'ui_ux_feature_error_server_uncaught_combo_unchecked_property', i18n: 'd' }, datavalue: 'uncaught' },
+                    { label: { d: 'ui_ux_feature_error_server_uncaught_combo_errortype', i18n: 'd' }, datavalue: 'apperror' }
+                ],
+                events:[
+                    {
+                        type: 'change',
+                        method: 'log',
+                        targetBusId: ERROR_BUS,
+                        payload: {},
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                { 
+                                    type: 'function', 
+                                    name: 'testapp::forced_error_failure', 
+                                    context:{ delegatedTo: 'builderweb' }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    Title = 'Testeando errores en proceso (ERRORTYPE)',   
+    IN = {        
+    },
+    Obj_proc = {        
+        type: 'rprocess',                
+        busId: ERROR_BUS,
+        hasChannel: ERROR_CHANNEL,
+        hasDsca: Title,
+        in: IN,        
+        gui_out: GUI_OUT,
+        hasKw: rproc__rprocess_rproc_errortype,     
+        hasIcon: 'unlink',
+        do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],       
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_manager_error_server::rprocess_rproc_type_appError'(_, _OBJ_in, _, OBJ_out) :-	
+    newKw('bus__errorsprocess__', ERROR_BUS),
+    newKw('channels__errorsprocess__', ERROR_CHANNEL),
+    PROC = {
+        type: 'sequence',
+        context: {
+            delegatedTo: 'builderweb'
+        },                       
+        hasProcess: [
+            { 
+                type: 'function',                 
+                name: 'testapp::forced_typeError_sql',
+                context: { delegatedTo: 'builderweb' }
+            }               
+        ]                                
+    },
+    GUI_OUT = {        
+        type: 'assembly',
+        classList: [
+            'z-1',
+            'white-bg'
+        ],
+        label: {
+            d: 'ui_ux_feature_error_server_sql_error_label',
+            i18n: 'd'
+        }        
+    },
+    Title = 'ui_ux_feature_error_server_sql_error',   
+    IN = {        
+    },
+    Obj_proc = {        
+        type: 'rprocess',                
+        busId: ERROR_BUS,
+        hasChannel: ERROR_CHANNEL,
+        hasDsca: Title,
+        in: IN,        
+        proc: PROC,
+        gui_out: GUI_OUT,
+        hasKw: rproc__rprocess_proc_typeerrorsql,     
+        hasIcon: 'unlink',
+        do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],       
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_manager_error_server::kresult_errortype'(_, _OBJ_in, _, OBJ_out) :-	
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('bus__errorsprocess__', ERROR_BUS),
+    newKw('channels__errorsprocess__', ERROR_CHANNEL),    
+    
+    SCHEMA = {
+        data: [  
+            {
+                label: {
+                    d: 'Kw'
+                },
+                arc: 'hasKw'
+            }
+        ]
+    },
+    Title = 'ui_ux_feature_error_server_kresult',       
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        searchType: 'rql',
+        predicate: 'testapp::forced_errortype_failure',
+        schema: SCHEMA
+    },
+	Obj_proc = {
+        type : 'kresult',
+        in : IN,
+        busId: ERROR_BUS,
+        hasChannel: ERROR_CHANNEL,
+        hasKw: rproc__rprocess_kresult_error,
+        hasDsca: Title,
+        hasIcon: 'unlink',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+
+
+
+% AUX Predicates 
+'testapp::forced_fetch_failure'(_,OBJ_IN,_,OBJ_OUT):-
+    obj_fetch(notexist, OBJ_IN, _ERRORTYPE),
+    OBJ_OUT = OBJ_IN.
+
+'testapp::forced_errortype_failure'(_,_OBJ_IN,_,OBJ_OUT):-
+    OBJ_OUT = {
+        apperror:
+            {
+                code:'TEST_ERROR', 
+                txt:'Testing return errors -apperror-'
+            }
+    }.
+
+'testapp::forced_typeError_sql'(_,_OBJ_IN,_,OBJ_OUT):-
+    OBJ_OUT = {
+        type: appError,
+        error: {
+            code: 'INTERNAL_ERROR',
+            message: 'SQLException: [SQLITE_ERROR] SQL error or missing database (no such table: NotExistTable)'
+        }
+    }.
+
+
+'testapp::forced_error_failure'(_,OBJ_IN,_,OBJ_OUT):-
+    obj_fetch(value, OBJ_IN, Error),
+    Error = uncaught,
+    !,
+    writeln(Error),
+    obj_fetch(paco, OBJ_IN, _NoVaAHaberNada),
+    OBJ_OUT = OBJ_IN.
+
+'testapp::forced_error_failure'(_,OBJ_IN,_,OBJ_OUT):-
+    obj_fetch(value, OBJ_IN, Error),
+    Error = apperror,
+    !,
+    writeln(Error),
+    OBJ_OUT = {
+        type: 'errorType',
+        error: {
+            code: '666',            
+            message: 'Testeando errorType'   
+        }
+    }.
+
+
+
+'staber_manager_error_server::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_error_server,
+        hasDsca: 'Testeando respuestas de errores de servidor',
+        hasIcon: 'unlink',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__rprocess_proc_uncaught,
+            rproc__rprocess_proc_apperror,
+            rproc__rprocess_rproc_errortype,
+            rproc__rprocess_kresult_error,
+            rproc__rprocess_proc_typeerrorsql
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

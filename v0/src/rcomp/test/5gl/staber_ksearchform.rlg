@@ -1,0 +1,154 @@
+﻿/**
+@descr	staber_ksearchform <br>
+		staber_ksearchform
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_ksearchform') :-    
+	class +$ 'staber_ksearchform' d ( es,'Patrón rproc para ksearchform') sc function,
+    'staber_ksearchform::usecase__1'(_, _, _, _),
+    'staber_ksearchform::usecase__2'(_, _, _, _),
+    'staber_ksearchform::folders'(_, _, _, _).
+    
+
+'staber_ksearchform::usecase__1'(_, _OBJ_in, _, OBJ_out) :-   
+    I_agent   = 'builderweb',
+    I_dataset =  'Default',
+    newKw('search',KW),
+    IN = {                      
+            hasDataset: I_dataset,
+            hasAgent : I_agent,
+            hasKw: KW,
+            enabled: true,
+            hasKwc: 'testapp:advSearch'
+    }, 
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_searchFormInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    Obj_class =  {        
+        type: 'ksearchform',  
+        hasKw: rproc__4gl_ksearchdoc__001,
+        proc: PROC,
+        in: IN,
+        hasDsca: [('es', 'ksearch__001  Formulario de búsqueda')],
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_ksearchform::usecase__2'(_, _OBJ_in, _, OBJ_out) :-   
+    I_agent   = 'builderweb',
+    I_dataset =  'Default',
+    newKw('busId__',BUSID),
+    newKw('search',KW),
+    IN = {                      
+            hasDataset: I_dataset,
+            hasAgent : I_agent,
+            hasKw: KW,
+            enabled: true,
+            hasKwc: 'testapp:advSearch'
+    }, 
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_searchFormInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    Obj_OUT =  {
+        type: 'assembly',
+        children:[
+            {
+                type: 'ksearchform',  
+                busId: BUSID,
+                proc: PROC,
+                in: IN
+            },
+            {
+                type: 'button',                
+                label: { icon: 'chart-line', d: 'Ejecutar' },
+                events: [{
+                    type: 'click',
+                    method: 'search',
+                    targetBusId: BUSID,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            {  
+                                type: 'function',
+                                name :'adv_search_fake_func',
+                                context: {delegatedTo: 'builderweb'}
+                            }
+                        ]
+                    }
+                }]
+            }
+        ]
+    },
+    Obj_class = {
+        type: 'rprocess',  
+        hasKw: rproc__4gl_ksearchdoc__002,
+        hasDsca: [('es', 'ksearch__001  Formulario de búsqueda con botón')],
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_OUT,
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+adv_search_fake_func(_, OBJIN, _, OBJOUT):-
+    OBJOUT = OBJIN.
+
+'staber_ksearchform:search'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_ppd(Obj_in),
+    Obj_out ={}.
+
+'staber_ksearchform::folders'(_, _, _, _):-
+    Title1 = 'ksearchform',
+	Conf_folder1 = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_ksearchform,
+        hasDsca: Title1,
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'dinamic',
+        hasERCPart: [
+            rproc__4gl_ksearchdoc__001,
+            rproc__4gl_ksearchdoc__002
+        ]
+	},	
+    create_rprocess(_, Conf_folder1, _, _).
+
+%% Pruebas 
+
+'incident_search::getListPropsIncludedAdvancedSearch_solution'([
+    ( createdOn, date, 10),    
+    ( hasTypeInc, typeIncident, 17),        
+    ( hasStateIncident, statusIncident, 20),    
+    ( hasSupportGroup, supportGroup, 30),      
+    ( int_hasCustomer, company, 40),
+    ( hasTechnician, employee, 45),
+    ( hasIntervention, incident, 50)    
+]).
+
+'intervention_search::getListPropsIncludedAdvancedSearch_solution'([
+    ( createdOn, date, 10),    
+    ( isBillable, boolean, 20),                
+    ( hasDedicationTimeHour, float, 25),                
+    ( hasSupportTeam, supportTeam, 30),          
+    ( hasTechnician, employee, 45),
+    ( hasExternalTechnician, person, 50),
+    ( 'krp:hasERCTask', 'krp:task', 60)
+]).
+
+

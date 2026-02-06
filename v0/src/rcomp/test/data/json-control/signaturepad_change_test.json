@@ -1,0 +1,29 @@
+{
+  "data": {
+    "type": "assembly",
+    "width": 50,
+    "label": {
+      "d": "Caso con el componente firma digital deshabilitado"
+    },
+    "children": [
+      {
+        "type": "signaturePad",
+        "height": 150,
+        "enabled": true,        
+        "actions": [
+          {
+            "label": {"text" : "Salvar"},
+            "method": "save",
+            "events": [
+              {
+                "type": "change",
+                "targetBusId": "bus__console_0",
+                "method": "setNode"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

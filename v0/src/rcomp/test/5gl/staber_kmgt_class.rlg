@@ -1,0 +1,77 @@
+﻿/**
+@descr	staber_kmgt_class <br>
+		staber_kmgt_class
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kmgt_class') :-
+	class +$ 'staber_kmgt_class' d ( es,'Patrón rproc para kmgt Class') sc function,
+    % configuración básica
+    'staber_kmgt_class::usecase__001'(_, _, _, _),            
+    % configuración + OVERRIDES   
+    'staber_kmgt_class::folders'(_, _, _, _).
+
+
+/* Ejemplo de 5GL base  con configuración*/
+'staber_kmgt_class::usecase__001'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',    
+    RESULT_OVERRIDES = [        
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::ontology::result::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+	IN = {
+        hasTitle: 'Mantenimiento Clases',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'resourceRepcon',
+        hasMDI: true,
+        hasArea:{
+            detail: {
+                hasTag: "class"
+            }
+        }
+    },    	 
+    Title =  'kmgt_class__001',         
+    OBJ_in = {
+        type: 'kmgt',            
+        in: IN,
+        hasKw: 	kmgt_class_test_001,            
+        hasDsca: Title,            
+        hasIcon: 'clase',
+        isRoot: false,
+        hasAppOverride:{
+            result : RESULT_OVERRIDES
+        },              
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+    
+
+
+'staber_kmgt_class::folders'(_, _, _, _):-    
+    Title =  'kmgt  [Clases]',              
+    create_rprocess(_, 
+        {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kmgt_class,            
+        hasDsca: Title,            
+        hasIcon: 'clase-line',
+        isRoot: false,            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            kmgt_class_test_001                
+        ]
+    },_,_).
+
+

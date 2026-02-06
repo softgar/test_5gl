@@ -1,0 +1,106 @@
+﻿/**
+@descr	staber_rdlg_rproc_pattern <br>
+		staber_rdlg_rproc_pattern
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_rdlg_rproc_pattern') :-
+
+	class +$ 'staber_rdlg_rproc_pattern' d ( es,'Ejemplos RDlg') sc function,
+    'staber_rdlg_rproc_pattern::msg_dialog_tests'(_, _, _, _),
+    'staber_rdlg_rproc_pattern::rdlg_tests'(_, _, _, _),
+    'staber_rdlg_rproc_pattern::folders'(_, _, _, _).
+
+'staber_rdlg_rproc_pattern::msg_dialog_tests'(_, _OBJ_in, _, OBJ_out) :-
+    getPathHome(PH),
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/msg_dialog_test.json',
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes),
+    json_read(Codes, Collection),
+    obj_get(data, Collection, ObjChildren),
+    OBJ = {
+        type: 'testmsgdialog',
+        busId: 'testmsgdialog_busId',
+        children: [ObjChildren]
+    },
+    Conf_obj ={
+        type: 'assembly',
+        classList:['test-rcomponent-content'],
+        children : [OBJ]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: Conf_obj,
+        hasKw: rproc__4gl_rdlg__001,
+        hasDsca: 'msg_dialog test',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'group'
+    },
+    create_rprocess(_, Rproc, _, OBJ_out).
+
+'staber_rdlg_rproc_pattern::rdlg_tests'(_, _OBJ_in, _, OBJ_out) :-
+    getPathHome(PH),
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/rdlg_test.json',
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes),
+    json_read(Codes, Collection),
+    obj_get(data, Collection, ObjChildren),
+    OBJ = {
+        type: 'assembly',
+        classList:['test-rcomponent-content'],
+        children : [ObjChildren]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ,
+        hasKw: rproc__4gl_rdlg__002,
+        hasDsca: 'rdlg test',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'group'
+    },
+    create_rprocess(_, Rproc, _, OBJ_out).
+
+'staber_rdlg_rproc_pattern::folders'(_, _, _, _):-
+	Conf_folder = {
+		type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_rdlg,
+        hasDsca: 'Test rdlg(Radcore)',
+        hasIcon: 'dinamic',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__4gl_rdlg__001,
+            rproc__4gl_rdlg__002
+        ]
+	},
+	create_rprocess(_, Conf_folder, _, _).
+
+'tdsapp::forced_failure'(_,OBJ_IN,_,OBJ_OUT):-
+    obj_fetch(type, OBJ_IN, ERRORTYPE, 'errorMsg'),
+    obj_fetch(message, OBJ_IN, ERRORMSG, 'Mensaje por defecto'),
+    Obj0 = {
+        code: 23212,
+        type: ERRORTYPE,
+        txt: ERRORMSG
+    },
+    ( obj_fetch(label, OBJ_IN, LABEL) ->
+        OBJ_LABEL = {
+            label: LABEL
+        },
+        obj_merge(Obj0, OBJ_LABEL, Obj1)
+    ;
+        Obj1 = Obj0
+    ),
+    ( obj_fetch(async, OBJ_IN, ASYNC) ->
+        OBJ_ASYNC = {
+            async: ASYNC
+        },
+        obj_merge(Obj1, OBJ_ASYNC, Obj)
+    ;
+        Obj = Obj1
+    ),
+    OBJ_OUT ={
+        apperror: Obj
+    }.

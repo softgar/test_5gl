@@ -1,0 +1,40 @@
+{
+  "data": {
+    "type": "assembly",
+    "width": 50,
+    "label": {
+      "d": "Firme aquí"
+    },
+    "children": [
+      {
+        "type": "signaturePad",
+        "height": 100,
+        "enabled": true,        
+        "actions": [
+          {
+            "label": {"text" : "Salvar"},
+            "method": "save",
+            "events": [
+              {
+                "type": "click",
+                "targetBusId": "bus__console_0",
+                "method": "setNode"
+              }
+            ]
+          },
+          {
+            "label": {"icon" : "eraser"},
+            "method": "clean",
+            "events": [
+              {
+                "type": "click",
+                "targetBusId": "bus__console_0",
+                "method": "setNode"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

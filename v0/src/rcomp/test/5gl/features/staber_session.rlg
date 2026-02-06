@@ -1,0 +1,194 @@
+﻿/**staber_k
+@descr	staber_session <br>
+		staber_session
+@author ccp
+@date	2024_03_07
+**/
+rc_class('staber_session') :-
+	class +$ 'staber_session' d ( es,'Refresco a intervalos') sc function,
+    'staber_session::close_session_from_same_session'(_, _, _, _),
+    'staber_session::close_session_from_statusview'(_, _, _, _),
+    'staber_session::folders'(_, _, _, _).
+
+'staber_session::close_session_from_same_session'(_, _OBJ_in, _, OBJ_out) :-
+    % I_agent = 'builderweb',
+    % newKw('channel__session', CHANNEL_SESSION),
+    newKw('bus__session_buttons', BUSID_SESSION),
+    Title =  'Cierre sesión desde un botón en la misma sesión',
+    Obj_close_session_button = {  
+        type: 'assembly',       
+        children: [                 
+            {
+                type: 'button',
+                id: 'button-close',
+                label: {
+                    d: 'Cerrar esta misma sesión'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',                            
+                        targetBusId: BUSID_SESSION,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [            
+                                { 
+                                    type: 'method', name: 'publish', module: 'PubSub',
+                                    in: { 
+                                        publish:[
+                                            { 
+                                                topic: 'close', 
+                                                channel: 'channel__broadcast',     
+                                                busId: BUSID_SESSION,
+                                                hasKw: staber_close_session_button
+                                            }
+                                        ]
+                                    }                        
+                                }                  
+                            ]
+                        }                            
+                    }
+                ]
+            },
+            {
+                type: 'button',
+                id: 'button-explorer',
+                label: {
+                    d: 'Cierre de Sesión Mi Perfil (myprofile)'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',                            
+                        targetBusId: BUSID_SESSION,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [            
+                                { 
+                                    type: 'method', name: 'publish', module: 'PubSub',
+                                    in: { 
+                                        publish:[
+                                            { 
+                                                topic: 'close', 
+                                                channel: 'channel__broadcast',                                                 
+                                                hasTag: 'myProfile'                                                
+                                            }
+                                        ]
+                                    }                        
+                                }                  
+                            ]
+                        }                            
+                    }
+                ]
+            }                   
+        ]
+    },
+    Obj_class = {
+        type: 'rprocess',
+        hasKw: staber_close_session_button,
+        hasDsca: Title,
+        busId: BUSID_SESSION,
+        hasIcon: 'columns',
+        isRoot: false,
+        isSession: true,
+        hasNavbar: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_close_session_button
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_session::close_session_from_statusview'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__session_statusview', BUSID_SESSION),
+    Title =  'Cierre sesión desde un botón del área de estado',
+    Obj_close_session_button = {  
+        type: 'assembly',       
+        children: [                 
+            {
+                type : 'kstatusview',
+                busId: 'bus__session_kstatusview',
+                hasChannel: 'channel__session_kstatusview',
+                hasNotification: false,
+                hasUser: false,
+                statusActions: [
+                    {
+                        type: 'r-label',
+                        i18n: 'tip',
+                        tip: 'kStatusView.tagNavigation.tip',
+                        icon: 'send',
+                        position: 'left',
+                        events: [
+                            {
+                                type: 'click',
+                                method: 'log',                            
+                                targetBusId: BUSID_SESSION,
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [            
+                                        { 
+                                            type: 'method', name: 'publish', module: 'PubSub',
+                                            in: { 
+                                                publish:[
+                                                    { 
+                                                        topic: 'close', 
+                                                        channel: 'channel__broadcast', 
+                                                        busId: BUSID_SESSION, 
+                                                        hasTag: 'staber_close_statusview', 
+                                                        hasKw: 'staber_close_statusview' 
+                                                    }
+                                                ]
+                                            }                        
+                                        }                  
+                                    ]
+                                }                                                                                  
+                            }
+                        ]
+                    }                    
+                ]
+            }
+        ]
+    },
+    Obj_class = {
+        type: 'rprocess',
+        hasKw: staber_close_statusview,
+        hasDsca: Title,
+        busId: BUSID_SESSION,
+        hasIcon: 'columns',
+        isRoot: false,
+        isSession: true,
+        hasNavbar: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_close_session_button
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_session::folders'(_, _, _, _):-
+    Title = 'Test sobre sesiones/tag & Links',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_sessions,
+        hasDsca: Title,
+        hasIcon: 'columns',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            staber_close_session_button,
+            staber_close_statusview,
+            folder__repositorioTests_links
+
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).
+
+
+
+
+
+
+
+
+
+
+                

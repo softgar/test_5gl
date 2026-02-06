@@ -1,0 +1,482 @@
+﻿/**staber_k
+@descr	staber_kheader <br>
+		staber_kheader
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kheader') :-
+	class +$ 'staber_kheader' d ( es,'Patrón rproc para kheader') sc function,
+    % configuración básica
+    'staber_kheader::usecase__001'(_, _, _, _),
+    'staber_kheader::usecase__002'(_, _, _, _),
+    'staber_kheader::usecase__003'(_, _, _, _),
+    'staber_kheader::usecase__004'(_, _, _, _),
+    'staber_kheader::usecase__005'(_, _, _, _),
+    'staber_kheader::usecase__006'(_, _, _, _),
+    'staber_kheader::folders'(_, _, _, _).
+
+'staber_kheader::usecase__001'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__kheader__', CHANNEL_HEADER),
+    newKw('bus__header__', BUS_HEADER), 
+	Obj_class = {
+        type : 'kheader',
+        busId: BUS_HEADER,
+        hasChannel: CHANNEL_HEADER,
+        hasKw: kheader_test_001,
+        hasDsca: [('es', 'Cabecera simple')],
+        hasIcon: 'rocket-line',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kheader::usecase__002'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__kheader__', CHANNEL_HEADER), 
+    newKw('bus__header__', BUS_HEADER),
+
+	IN = {
+        imgLogo: './img/semantic-systems.png',
+        hasUser: 'Test User',
+        isoLang: 'en'
+    },
+	Obj_class = {
+        in : IN,
+        type : 'kheader',
+        busId: BUS_HEADER,
+        hasChannel: CHANNEL_HEADER,
+        hasKw: kheader_test_002,
+        hasDsca: [('es', 'Cabecera con sobrecarga por configuración')],
+        hasIcon: 'rocket-line',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kheader::usecase__003'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__kheader__', CHANNEL_HEADER),     
+    newKw('bus__header__', BUS_HEADER),
+
+    HEADER_OVERRIDES = [          
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kheader::rc_gui_out::withrcombobox', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }         
+    ], 
+
+	Obj_class = {
+        type : 'kheader',
+        hasChannel: CHANNEL_HEADER,
+        busId: BUS_HEADER,
+        overrides: HEADER_OVERRIDES,
+        hasKw: kheader_test_003,
+        hasDsca: [('es', 'Cabecera personalizada con override')],
+        hasIcon: 'rocket-line',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kheader::usecase__004'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__kheader__', CHANNEL_HEADER),     
+    newKw('bus__header__', BUS_HEADER),
+
+    IN = {
+        hasMenu: {
+            type: 'kmenu',
+            in: {
+                type: 'menunav',
+                menuBtn: {},
+                state: { visible: false },
+                children: [
+                    {
+                        label: {
+                            text: 'SEMANTIC SYSTEMS',
+                            icon: 'group'
+                        },
+                        actions: [
+                            {
+                                label: {
+                                    d: 'Acción 1'
+                                },
+                                collapse: true,
+                                onclick: 'alert( \"Acción 1 pulsada\")'
+                            }
+                        ],
+                        children: [
+                            {
+                                type: 'menuchild',
+                                children: [
+                                    {
+                                        label: {
+                                            text: 'EMPRESA'
+                                        }
+                                    }                                    
+                                ]  
+                            }
+                        ]
+                    },
+                    {
+                        label: {
+                            text: 'PRODUCTOS'
+                        }
+                    },
+                    {
+                        label: {
+                            i18n: 'tip',
+                            tip: 'kheader.close.tip',
+                            icon: 'on',
+                            classList: [
+                                'logout',
+                                'text-button'
+                            ],
+                            events: [{
+                                type: 'click',
+                                method: 'sessionClose',
+                                targetBusId: '$.busId'
+                            }]
+                        }
+                    }                           
+                ]
+            }
+         }        
+    },
+
+	Obj_class = {
+        in: IN,
+        type : 'kheader',
+        hasChannel: CHANNEL_HEADER,
+        busId: BUS_HEADER,
+        hasKw: kheader_test_004,
+        hasDsca: [('es', 'Cabecera con menú por configuración')],
+        hasIcon: 'rocket-line',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kheader::usecase__005'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__kheader__', CHANNEL_HEADER),     
+    newKw('bus__header__', BUS_HEADER),
+
+    MENU_OVERRIDES = [          
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmenu::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }         
+    ], 
+
+    IN = {
+        hasMenu: {
+            type: 'kmenu',
+            in: {
+                state: { visible: false }
+            },
+            overrides: MENU_OVERRIDES
+        }
+    },
+
+	Obj_class = {
+        in: IN,
+        type : 'kheader',
+        hasChannel: CHANNEL_HEADER,
+        busId: BUS_HEADER,
+        hasKw: kheader_test_005,
+        hasDsca: [('es', 'Cabecera con menú generado por override')],
+        hasIcon: 'rocket-line',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kheader::usecase__006'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__kheader006__', CHANNEL_HEADER),     
+    newKw('bus__header006__', BUS_HEADER),
+
+    Obj_form = {
+        type: 'assembly',
+        children: [
+            {
+                in: {
+                    headButtons: [
+                        {
+                            type: 'r-label',
+                            text: '$.in.hasSessionOtherData.hasOperator',
+                            icon: 'worker',
+                            classList: [
+                                'round-icon',
+                                'user'
+                            ],
+                            events: [{
+                                type: 'click',
+                                method: 'refreshHeader',
+                                targetBusId: BUS_HEADER,
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'generateOperatorDialog', context: {delegatedTo: 'builderweb'} },
+                                        { type: 'method', name: 'dialog_exec', busId: '$.in.busId' }, 
+                                        { type: 'method', name: 'setSessionOtherData', module: 'SessionContext' },
+                                        { type: 'function', name: 'staber_kheader::usecase__006::createRProcess_gui_out', context: {delegatedTo: 'builderweb'} },
+                                        { type: 'method', name: 'set_gui_out', busId: 'busId_rprocess_006' }
+                                    ]
+                                }
+                            }]
+                        }
+                    ]
+                },
+                type : 'kheader',
+                do_exec: true,
+                hasDlg: true,
+                hasChannel: CHANNEL_HEADER,
+                busId: BUS_HEADER
+            },
+            {
+                type: 'rprocess',
+                do_exec: true,
+                hasChannel: 'channel_rprocess_006',
+                busId: 'busId_rprocess_006',
+                gui_out: {
+                    type: 'assembly',
+                    children: [
+                        {
+                            type: 'text',
+                            value: '',
+                            enabled: false
+                        }
+                    ]
+                }
+            }            
+        ]
+    },
+    Obj_class = {
+        type: 'rprocess',
+        hasKw: kheader_test_006,
+        hasDsca: [(es, 'Cabecera con personalización para afectar al context y tener diálogo y botones extra')],
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_form
+	},
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'generateOperatorDialog'(_CTX, _Obj_in, _CTX, Obj_out):-
+    DLG = {
+        type: 'rdlg',
+        busId: '_.dlg.busId',
+        busChannel: '_.dlg.hasChannel',
+        in: {
+            close: true,
+            options: {
+                label: {
+                    d: 'Selección de operador'
+                }
+            }
+        }
+    },
+    DLG_DATA = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'button',
+                appearance: 'line',
+                label:{
+                    d: 'Operario 1'
+                },
+                enabled: true,
+                events: [{
+                    type: 'click',
+                    payload: {
+                        hasOperator: 'Operario 1'
+                    },
+                    method: 'accept',
+                    targetBusId: '_.dlg.busId'
+                }]
+            },
+            {
+                type: 'button',
+                appearance: 'line',
+                label:{
+                    d: 'Operario 2'
+                },
+                enabled: true,
+                events: [{
+                    type: 'click',
+                    payload: {
+                        hasOperator: 'Operario 2'
+                    },
+                    method: 'accept',
+                    targetBusId: '_.dlg.busId'
+                }]
+            },
+            {
+                type: 'button',
+                appearance: 'line',
+                label:{
+                    d: 'Operario 3'
+                },
+                enabled: true,
+                events: [{
+                    type: 'click',
+                    payload: {
+                        hasOperator: 'Operario 3'
+                    },
+                    method: 'accept',
+                    targetBusId: '_.dlg.busId'
+                }]
+            }
+        ]
+    },
+    Obj_out = {
+        dlg: DLG,
+        dlg_data: DLG_DATA
+    }.
+
+'staber_kheader::usecase__006::createRProcess_gui_out'(_CTX, OBJ_in, _CTX, OBJ_out) :-
+    obj_fetch(hasOperator, OBJ_in, HasOperator),
+    OBJ_out = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'text',
+                value: HasOperator,
+                enabled: false
+            }
+        ]
+    }.
+
+'staber_kheader::rc_gui_out::withrcombobox'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    OBJ_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'r-header',
+                children: [
+                    {
+                        type: 'r-image',
+                        layout: 'logo',
+                        source: './img/staber.png'
+                    },
+                    {
+                        type: 'r-combobox',
+                        elements: [
+                            {
+                                label: {
+                                    text: 'Opción Personalizada 1'
+                                }
+                            },
+                            {
+                                label: {
+                                    text: 'Opción Personalizada 2'
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        type: 'r-label',
+                        text: 'Usuario personalizado'
+                    },                                    
+                    {
+                        type: 'r-button',
+                        classList: [
+                            'floating-button'
+                        ],
+                        text: 'es/ES'
+                    },
+                    {
+                        type: 'r-button',
+                        icon: 'on'                     
+                    }
+                ]
+            }
+        ]
+    }.
+
+'staber_kmenu::rc_gui_out'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    OBJ_out =  
+    {
+        type: 'menunav',
+        menuBtn: {},
+        state: '$.in.state',
+        floating: '$.in.floating',
+        align: '$.in.align',
+        children: [
+            {
+                label: {
+                    text: 'SEMANTIC SYSTEMS',
+                    icon: 'group'
+                },
+                actions: [
+                    {
+                        label: {
+                            d: 'Acción 1'
+                        },
+                        collapse: true
+                    }
+                ],
+                children: [
+                    {
+                        type: 'menuchild',
+                        children: [
+                            {
+                                label: {
+                                    text: 'EMPRESA'
+                                }
+                            }                                    
+                        ]  
+                    }                                                      
+                ]
+            },
+            {
+                label: {
+                    text: 'PRODUCTOS'
+                }
+            },
+            {
+                label: {
+                    icon: 'on'
+                }
+            }                           
+        ]
+    }.
+
+'staber_kheader::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kheader,
+        hasDsca: 'kheader: Componente Cabecera',
+        hasIcon: 'search',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            kheader_test_001,
+            kheader_test_002,
+            kheader_test_003,
+            kheader_test_004,
+            kheader_test_005,
+            kheader_test_006
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).

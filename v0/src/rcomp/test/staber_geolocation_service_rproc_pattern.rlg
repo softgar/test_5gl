@@ -1,0 +1,50 @@
+﻿/**
+@descr	staber_geolocation_service_rproc_pattern <br>
+		staber_geolocation_service_rproc_pattern
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_geolocation_service_rproc_pattern') :-
+
+	class +$ 'staber_geolocation_service_rproc_pattern' d ( es,'Ejemplos Geolocalización') sc function,
+    'staber_geolocation_service_rproc_pattern::geolocation_service_test'(_, _, _, _),
+    'staber_geolocation_service_rproc_pattern::folders'(_, _, _, _).
+
+'staber_geolocation_service_rproc_pattern::geolocation_service_test'(_, _OBJ_in, _, OBJ_out) :-
+    getPathHome(PH),
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/geolocation_service.json',
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes),
+    json_read(Codes, Collection),
+    obj_get(data, Collection, ObjChildren),
+    OBJ = {
+        type: 'assembly',
+        children: [ObjChildren]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ,
+        hasKw: rproc__4gl_geolocation_service__001,
+        hasDsca: 'Localization service',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'map',
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_, Rproc, _, OBJ_out).
+
+'staber_geolocation_service_rproc_pattern::folders'(_, _, _, _):-
+    Conf_folder ={
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_geolocalization,
+        hasDsca: 'MicroServices (RADCORE)',
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__4gl_geolocation_service__001
+        ]
+    },
+    create_rprocess(_, Conf_folder, _, _).

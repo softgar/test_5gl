@@ -1,0 +1,3349 @@
+﻿/**
+@descr	staber_rdlg <br>
+		staber_rdlg
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_rdlg') :-
+	class +$ 'staber_rdlg' d ( es,'Patrón rproc para diálogos') sc function,
+    'staber_rdlg::usecase__000'(_, _, _, _),
+    'staber_rdlg::confirm_dialog_from_rowaction'(_, _, _, _),
+    'staber_rdlg::usecase__001'(_, _, _, _),
+    'staber_rdlg::usecase__002'(_, _, _, _),
+    'staber_rdlg::usecase__003_selection'(_, _, _, _),
+    'staber_rdlg::usecase__020_selection_kmgt'(_, _, _, _),
+    'staber_rdlg::usecase__004_single'(_, _, _, _),
+    'staber_rdlg::usecase__005_multi'(_, _, _, _),
+    'staber_rdlg::usecase__005_multi_withNonSelectableRows'(_, _, _, _),
+    'staber_rdlg::usecase__006'(_, _, _, _),
+    'staber_rdlg::usecase__007'(_, _, _, _),    
+    'staber_rdlg::usecase__008'(_, _, _, _),
+    'staber_rdlg::usecase__009'(_, _, _, _),
+    'staber_rdlg::usecase__010'(_, _, _, _),
+    'staber_rdlg::usecase__011'(_, _, _, _),
+    'staber_rdlg::usecase__012'(_, _, _, _),
+    'staber_testapp_ktalogue::usecase__002_noDialog'(_, _, _, _),
+    'staber_testapp_ktalogue::usecase__002_dialog'(_, _, _, _),
+    %'staber_rdlg::dialog_with_kpivot'(_, _, _, _),
+    'staber_rdlg::kform_with_zoom_multiselection'(_, _, _, _),
+    'staber_rdlg::selection::folders'(_, _, _, _),
+    'staber_rdlg::dialog-nodialog::folders'(_, _, _, _),
+    'staber_rdlg::concatenate_two_dlg'(_, _, _, _),
+    'staber_rdlg::concatenate_two_dlg_conditionals'(_, _, _, _),
+    'staber_rdlg::changeActions_inbuttons'(_, _, _, _),
+    'staber_rdlg::changeActions_rprocess'(_, _, _, _),
+    'staber_rdlg::changeActions_kform'(_, _, _, _),
+    'staber_rdlg::changeActions_folder'(_, _, _, _),
+    'staber_rdlg::folders'(_, _, _, _).
+
+'staber_rdlg::folders'(_, _, _, _):-    
+     Title =  'Diálogos usando dialog_exec/dialog_add',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_rdlg,            
+            hasDsca: Title,            
+            hasIcon: 'list-add',
+            isRoot: false, 
+            hasERCPart: [
+                rdlg_test_001,
+                rdlg_test_from_rowaction,
+                rdlg_test_002,
+                rdlg_test_003,
+                rdlg_test_004,
+                rdlg_test_006,
+                rdlg_test_007,
+                rdlg_test_008,
+                rdlg_test_009,
+                % TODO, Probar bien el ejemplo y sin "ramas"
+                % rdlg_test_010
+                folder__repositorioTests_selection_rdlg,
+                folder__repositorioTests_dialog_nodialog_rdlg,
+               % rdlg_test_dialog_with_kpivot,
+                dlg_multiseleccion_en_zoom_formulario,
+                rdlg_test_concatenate_dlgs,
+                rdlg_test_concatenate_conditionals_dlgs,
+                folder__repositorioTests_rdlg_changeactions,
+                rprocess_dlg_test_cached_content_error,
+                rdlg_test_012
+            ],     
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },_,_).
+
+'staber_rdlg::changeActions_folder'(_, _, _, _):-
+    Title =  'Diálogos que cambian las acciones',
+    create_rprocess(_,
+    {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_rdlg_changeactions,
+        hasDsca: Title,
+        hasIcon: 'folder',
+        isRoot: false, 
+        hasERCPart: [
+            rprocess_dlg_with_enable_buttons,
+            rprocess_dlg_with_rprocess_changeactions,
+            rprocess_dlg_with_kform_changeactions
+        ],     
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+},_,_).
+
+'staber_rdlg::selection::folders'(_, _, _, _):-    
+     Title =  'Comportamientos de selección en dialog_exec',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_selection_rdlg,            
+            hasDsca: Title,            
+            hasIcon: 'folder',
+            isRoot: false, 
+            hasERCPart: [
+                rdlg_test_003_selection,
+                rdlg_test_020_selection_kmgt,
+                rdlg_test_004_single,
+                rdlg_test_005_multi,
+                rdlg_test_multi_withNonSelectableRows
+            ],     
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },_,_).
+
+'staber_rdlg::usecase__000'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__000', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: '',
+        hasAgent: 'builderweb',
+        hasDataset: 'dataset__test_5gl_server'
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_000,            
+        hasDsca: 'Diálogo emergente que selecciona desde una fila de tabla',
+        hasIcon: 'list-add',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+    
+'staber_rdlg::rc_gui_out::usecase__000'(_,OBJ_in,_,OBJ_out):-
+    obj_get(busId, OBJ_in,  BUS_PARENT),
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    obj_get(in:hasDataset, OBJ_in, I_dataset, 'Default'),
+    'staber_rdlg::usecase_000'(DLG1),
+    DATA1 = {
+        type: 'kresult',
+        busId: 'bus__kresult__rdlg_example',
+        hasChannel: '_.dlg.hasChannel',
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: I_dataset,
+            hasKw: 'testapp:contact',
+            singleselection: true,
+            selectable: true,
+            includedProperties:['hasIcon','contact:hasName'],
+            schema:{
+                data: [
+                    {
+                        label: {
+                            d: 'Nombre'
+                        },
+                        class: 'user',
+                        arc: 'contact:hasName',
+                        filter: true
+                    },
+                    {
+                        label: {
+                            d: 'Código'
+                        },
+                        arc: 'hasKw',
+                        filter: true
+                    }
+                ]
+            }
+        },
+        evtPublish: [{ topic: 'setPayload', channel: '_.dlg.hasChannel'}]
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'text',
+                label: {
+                    d: 'Diálogo emergente de selección'
+                },
+                value: CAMPO1,
+                actions: [{
+                    label: {
+                        icon: 'zoom'
+                    },
+                    collapse: false,
+                    events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_PARENT,
+                        payload:{
+                            campo1:'Dato aceptado'
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'method', in: { data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                { type: 'method', in: {campo1: '?CAMPO1', pattern: {'hasKw': '_.hasKw', selectedKw: '_.selectedKw'}}, name: 'map',  module: 'Mapper' },
+                                { type: 'function', in: {prop: 'campo1'}, name: 'parseMultiSelectionToStringValue',  context:{ delegatedTo: 'builderweb'} },
+                                { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                            ]
+                        }
+                    }]
+                }]
+            }                
+        ]
+    }.
+
+'staber_rdlg::usecase_000'(Obj_out):-
+    Obj_out = {
+        type: 'rdlg',        
+        in: {
+            width: 40,
+            close: false,
+            options: {
+                label: {
+                    d: 'Diálogo de selección'
+                },
+                actions: [
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Aceptar'
+                        },
+                        enabled: true,
+                        events: [{
+                            type: 'click',
+                            method: 'accept',
+                            targetBusId: '_.dlg.busId'
+                        }]
+                    },
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Cancelar'
+                        },
+                        enabled: true,
+                        events: [{
+                            type: 'click',
+                            method: 'cancel',
+                            targetBusId: '_.dlg.busId'
+                        }]
+                    }
+                ]
+            }
+        }
+    }.
+
+'staber_testapp_ktalogue::usecase__002_noDialog'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_testapp_ktalogue::usecase__002_noDialog::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: ''
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_002_nodialog,
+        hasDsca: 'Mostrar un diálogo sin enviarle los datos necesarios y continuando secuencia',
+        hasIcon: 'layout04',            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_testapp_ktalogue::usecase__002_dialog::rc_gui_out'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    Bus_ktalogue = 'bus__ktalogue_rdlg_002',
+    'staber_testapp_ktalogue_all::dlg'(DLG1, {accept: false, cancel: true, enableButtonsOnSelect: true} ),     
+    I_dataset = 'dataset__erc_ofita_product_v0_builderWeb_test',
+    I_agent = 'builderweb',    
+
+    Nav_Schema = [
+        {
+            label: {
+                d: 'Descripción'
+            },
+            arc: 'hasDsca',
+            sorted: false,
+            enabled: false
+        }
+    ],
+    Result_Schema = {
+        data: Nav_Schema
+    },
+    Catalogue_Schema = {
+        data: [
+            {
+                label: {
+                    d: 'Palabra Clave'
+                },
+                arc: 'hasKw',
+                sorted: true,
+                filter: true
+            },
+            {
+                label: {
+                    d: 'Descripción'
+                },
+                arc: 'hasDsca',
+                sorted: false,
+                filter: true
+            },
+            {
+                label: {
+                    d: 'Imagen'
+                },
+                arc: 'hasImage',
+                sorted: false
+            },
+            {
+                label: {
+                    d: 'Subclase de '
+                },
+                arc: 'subclassOf',
+                sorted: false
+            }
+        ]
+    },
+
+    IncludedProperties = ['hasKw', 'hasDsca', 'hasImage', 'subclassOf'],
+    NavigableProperties =['subclassOf'],
+
+    IN_NAV_RESULT= {
+        query: 'stmt(subclassOf, HASKW, ?hasInstance)',
+        hasAgent: I_agent,
+        persistence: 'remote',
+        hasDataset: I_dataset,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Nav_Schema,
+        searchType: 'rem',
+        hasProperty: ['subclassOf'],
+        hasTemplate: {
+            class:{
+                hasDsca:  '_.hasDsca',
+                hasKw : '_.hasKw',
+                hasImage: '/repcon/f_get/repository/{_.hasImage}',
+                subclassOf: '_.subclassOf'
+            },
+            default:{
+                hasKw : '_.hasKw',
+                subclassOf: '_.subclassOf',
+                hasIconClass: 'folder',
+                type: 'myBox'
+            }                      
+        }
+    },
+    IN_NAV_CATALOGUE= {
+        query: 'stmt(subclassOf, HASKW, ?hasInstance)',
+        hasAgent: I_agent,
+        persistence: 'remote',
+        hasDataset: I_dataset,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Catalogue_Schema,
+        searchType: 'rem',
+        hasProperty: ['subclassOf'],
+        hasTemplate: {
+            class:{
+                hasDsca:  '_.hasDsca',
+                hasKw : '_.hasKw',
+                hasImage: '/repcon/f_get/repository/{_.hasImage}',
+                subclassOf: '_.subclassOf'
+            },
+            default:{
+                hasKw : '_.hasKw',
+                subclassOf: '_.subclassOf',
+                hasIconClass: 'folder',
+                type: 'myBox'
+            }                      
+        }
+    },
+
+    NAVRESULT = [{ hasProperty: 'subclassOf',  in: IN_NAV_RESULT}],
+    NAVCATALOGUE = [{ hasProperty: 'subclassOf',  in: IN_NAV_CATALOGUE}],
+    IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,        
+        hasKw: 'ditemOfita',
+        persistence: 'remote',
+        searchLayout: 'basic',
+        hasLayout: 'genericSelection',
+        selectable: true,
+        hasArea:{
+            result: {
+                hasAgent: I_agent,
+                hasDataset: I_dataset,
+                do_exec: true,
+                query: 'stmt(subclassOf, HASKW, {$.hasKw})', 
+                persistence: 'remote',
+                layoutType:'kpivotgrid',
+                schemaHeader: false,
+                singleselection: true,
+                includedProperties : IncludedProperties,
+                navigableProperties: NavigableProperties,
+                nav: NAVRESULT,
+                stmtFilter: '[HASKW]',
+                searchType: 'rem',
+                schema: Result_Schema,
+                hasTemplate: {
+                    class:{
+                        hasDsca:  '_.hasDsca',
+                        hasKw : '_.hasKw',
+                        hasImage: '/repcon/f_get/repository/{_.hasImage}',
+                        subclassOf: '_.subclassOf'
+                    },
+                    default:{
+                        hasKw : '_.hasKw',
+                        hasDsca:  '_.hasDsca',
+                        subclassOf: '_.subclassOf',
+                        hasIconClass: 'folder',
+                        type: 'myBox'
+                    }                      
+                }
+            },
+            catalogue: {      
+                hasAgent: I_agent,
+                hasDataset: I_dataset,
+                do_exec: true,
+                query: 'stmt(subclassOf, HASKW, {$.hasKw})', 
+                persistence: 'remote',
+                layoutType:'kgallery',
+                multiselection: true,
+                reset: true,
+                hasIncludedProperties : IncludedProperties,
+                hasNavigableProperties: NavigableProperties,
+                nav: NAVCATALOGUE,
+                stmtFilter: '[HASKW]',
+                searchType: 'rem',
+                schema: Catalogue_Schema,
+                hasTemplate: {
+                    class:{
+                        hasDsca:  '_.hasDsca',
+                        hasKw : '_.hasKw',
+                        hasImage: '/repcon/f_get/repository/{_.hasImage}',
+                        subclassOf: '_.subclassOf'
+                    },
+                    default:{
+                        hasKw : '_.hasKw',
+                        hasDsca:  '_.hasDsca',
+                        subclassOf: '_.subclassOf',
+                        hasIconClass: 'folder',
+                        type: 'myBox'
+                    }                      
+                }
+            }
+        }        
+    },   
+    DATA1 = {
+        type: 'ktalogue',
+        busId: Bus_ktalogue,
+        in: IN,      
+        hasKw: 'ditemOfita',
+        hasKwc: 'ditemOfita',  
+        hasChannel: '{_.dlg.hasChannel}_pruebaRdlgConZoom',
+        evtPublish:[{ topic:'setNode', channel: '_.dlg.hasChannel'}]
+    },
+    
+    OBJ_out = {
+        type: 'assembly',
+        children:
+            [
+                {
+                    type: 'text',
+                    label: {
+                        d: 'Diálogo con multiselección usando un catálogo'
+                    },
+                    value: CAMPO1,
+                    actions: [{
+                        label: {
+                            icon: 'zoom'
+                        },
+                        collapse: false,
+                        events: [
+                            {
+                                type: 'click',
+                                method: 'log',
+                                targetBusId: BUS_PARENT,
+                                payload:{
+                                    '?CAMPO1':'Dato aceptado'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'method', in: { dlg_data: DATA1, dlg: DLG1, dlg_connection: 'setNodeFromCatalogue'}, name: 'dialog_exec', busId: BUS_PARENT},
+                                        { type: 'method', in: {campo1: '?CAMPO1', pattern: {'campo1': '_.selectedKw'}}, name: 'map',  module: 'Mapper' },
+                                        { type: 'function', name: 'trimMultiselectionToString', context:{ delegatedTo: 'builderweb'}},
+                                        { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                    ]
+                                }
+                            }]
+                    }]
+                }                
+            ]
+    }.
+'staber_testapp_ktalogue::usecase__002_noDialog::rc_gui_out'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    OBJ_out = {
+        type: 'assembly',
+        children:
+            [
+                {
+                    type: 'text',
+                    label: {
+                        d: 'Llamada a dialog_exec sin datos, que continúa la secuencia'
+                    },
+                    value: CAMPO1,
+                    actions: [{
+                        label: {
+                            icon: 'zoom'
+                        },
+                        collapse: false,
+                        events: [
+                            {
+                                type: 'click',
+                                method: 'log',
+                                targetBusId: BUS_PARENT,
+                                payload:{
+                                    campo1:'Dato aceptado'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'method', name: 'dialog_exec', busId: BUS_PARENT},
+                                        { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                    ]
+                                }
+                            }]
+                    }]
+                }                
+            ]
+    }.
+
+'staber_testapp_ktalogue::usecase__002_dialog'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_testapp_ktalogue::usecase__002_dialog::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: ''
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_001_dialog,            
+        hasDsca: 'Diálogo con multiselección usando un catálogo',
+        hasIcon: 'layout04',            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rdlg::dialog-nodialog::folders'(_, _, _, _):-    
+     Title =  'Comportamientos en diálogos para Selección de genéricos',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_dialog_nodialog_rdlg,            
+            hasDsca: Title,            
+            hasIcon: 'folder',
+            isRoot: false, 
+            hasERCPart: [
+                rdlg_test_001_dialog,
+                rdlg_test_002_nodialog
+            ],     
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },_,_).
+
+'staber_rdlg::usecase__001'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__001', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: '',
+        hasAgent: 'builderweb'
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        dlg:{
+            busId: busId__256768011720617227__dlg_no_in,
+            type: rdlg
+        },
+        hasKw: rdlg_test_001,            
+        hasDsca: 'Diálogo de confirmación',
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+    
+'staber_rdlg::rc_gui_out::usecase__001'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    'staber_rdlg::dlg'(DLG1, _),
+    DATA1 = {
+        type: 'label',
+        d: 'Pulse "Aceptar" para terminar este ejemplo',
+        icon: 'h4'
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+            [
+                {
+                    type: 'text',
+                    label: {
+                        d: 'Diálogo de confirmación'
+                    },
+                    value: CAMPO1,
+                    actions: [{
+                        label: {
+                            icon: 'zoom'
+                        },
+                        collapse: false,
+                        events: [
+                            {
+                                type: 'click',
+                                method: 'log',
+                                targetBusId: BUS_PARENT,
+                                payload:{
+                                    campo1:'Dato aceptado'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'method', in: { data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                        { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                    ]
+                                }
+                            }]
+                    }]
+                }                
+            ]
+    }.
+    
+'staber_rdlg::usecase__012'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__012', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: '',
+        hasAgent: 'builderweb'
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        dlg:{
+            busId: busId__256768011720617257__dlg_no_in,
+            type: rdlg
+        },
+        hasKw: rdlg_test_012,            
+        hasDsca: 'Diálogo con accept en enter',
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+    
+'staber_rdlg::rc_gui_out::usecase__012'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    DLG = {
+        type: 'rdlg',
+        busId: '_.dlg.busId',
+        busChannel: '_.dlg.hasChannel',
+        in: {
+            close: false,
+            options: {
+                label: {
+                    d: 'Introducción de texto'
+                },
+                actions: [
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Aceptar'
+                        },
+                        enabled: true,
+                        events: [{
+                            type: 'click',
+                            method: 'accept',
+                            targetBusId: '_.dlg.busId'
+                        }]
+                    },
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Cancelar'
+                        },
+                        enabled: true,
+                        events: [{
+                            type: 'click',
+                            method: 'cancel',
+                            targetBusId: '_.dlg.busId'
+                        }]
+                    }
+                ]
+            }
+        }
+    },
+    DLG_DATA = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'text',
+                label:{
+                    d: 'Texto:'
+                },
+                autofocus: true,
+                enabled: true,
+                events: [
+                    {
+                        type: 'keyup',
+                        method: 'acceptIfEnter',
+                        targetBusId: '_.dlg.busId',
+                        payload: { property: 'campo1' }
+                    },
+                    {
+                        type: 'change',
+                        method: 'set_propertyValue',
+                        targetBusId: '_.dlg.busId',
+                        payload: { property: 'campo1' }
+                    }
+                ]
+            }
+        ]
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+            [
+                {
+                    type: 'text',
+                    label: {
+                        d: 'Diálogo de confirmación'
+                    },
+                    value: CAMPO1,
+                    actions: [{
+                        label: {
+                            icon: 'zoom'
+                        },
+                        collapse: false,
+                        events: [
+                            {
+                                type: 'click',
+                                method: 'log',
+                                targetBusId: BUS_PARENT,
+                                payload:{
+                                    campo1:'Dato aceptado'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'method', in: { data: DLG_DATA, dlg: DLG}, name: 'dialog_exec', busId: BUS_PARENT},
+                                        { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                    ]
+                                }
+                            }]
+                    }]
+                }                
+            ]
+    }.
+
+'staber_rdlg::confirm_dialog_from_rowaction'(_, _, _, OBJ_out):-
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),
+    newKw('bus__kresult', BUSID_RESULT),
+    concatConstants([BUSID_RESULT, '__dlg'], Bus_dialog),
+    DLG1 = {
+        type: 'rdlg',
+        busId: Bus_dialog,
+        in: {
+            enableButtonsOnSelect: false,
+            close: false,
+            options: {
+                label: {
+                    d: 'Confirmación'
+                },
+                actions: [
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Aceptar'
+                        },
+                        enabled: true,
+                        events: [{
+                            type: 'click',
+                            method: 'accept',
+                            targetBusId: Bus_dialog
+                        }]
+                    },
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Cancelar'
+                        },
+                        enabled: true,
+                        events: [{
+                            type: 'click',
+                            method: 'cancel',
+                            targetBusId: Bus_dialog
+                        }]
+                    }
+                ]
+            }
+        }
+    },
+    DATA1 = {
+        type: 'label',
+        d: 'Pulse "Aceptar" para terminar este ejemplo',
+        icon: 'h4'
+    },
+    'staber_kresult::schema::usecase__000'(_CTX, {busId: BUSID_RESULT}, _CTX, Schema),
+    Row_Actions = {
+        fixed: true,
+        icon: 'menu2',
+        align: 'right',
+        actions: [
+            {
+                label: {
+                    icon: 'ok',
+                    d: 'Confirmar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_RESULT,
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                { type: 'method', in: { dlg_data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUSID_RESULT}
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+	IN = {
+        enabled: true,
+        hasAgent: I_agent,
+        hasDataset: 'dataset__test_5gl_server',
+        hasKw: 'testapp:contact',
+        schema: Schema,
+        rowTemplate: 'style=\"background-color: ##_.hasKw##\"//class=\"##_.hasKw##\"',
+        rowactions: Row_Actions,
+        includedProperties: [
+            'hasIcon',
+            'contact:hasName',
+            'contact:hasEmail',
+            'contact:hasPhoneNumber',
+            'contact:hasAge',
+            'contact:hasBirthDate',
+            'contact:hasResidenceCountry'
+        ]
+    },
+	Obj_class = {  
+        type : 'kresult',
+        hasDlg: true,
+        in : IN,          
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT, 
+        hasKw: rdlg_test_from_rowaction,
+        hasDsca: 'Diálogo de confirmación desde rowaction',
+        hasIcon: 'app',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        evtPublish: [{topic: 'setNode', channel:CHANNEL_RESULT}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+/* Cajas de diálogo para conectar con motor de procesos */
+'staber_rdlg::usecase__002'(_, _, _, OBJ_out):-
+
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__002', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: ''
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_002,            
+        hasDsca: 'Diálogo emergente con introducción de datos',
+        hasIcon: 'edit',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+
+'staber_rdlg::rc_gui_out::usecase__002'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    'staber_rdlg::dlg'(DLG1, {dlgTitle: 'Diálogo de introducción de datos'}),
+    DATA1 = {
+       type: 'assembly',
+       children: [
+            {
+                type: 'text',
+                label: {
+                    d: 'Introduzca el nuevo valor'
+                },
+                events: [
+                    {
+                        type: 'change',
+                        method: 'set_propertyValue',
+                        targetBusId: '_.dlg.busId',
+                        payload: { property: 'campo1' }
+                    }
+                ]
+            }
+        ]
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'text',
+                label: {
+                    d: 'Diálogo emergente con introducción de datos'
+                },
+                value: CAMPO1,
+                actions: [{
+                    label: {
+                        icon: 'zoom'
+                    },
+                    collapse: false,
+                    events: [
+                        {
+                            type: 'click',
+                            method: 'log',
+                            targetBusId: BUS_PARENT,
+                            payload:{
+                                campo1:'Dato aceptado'
+                            },
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: { data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                    { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                ]
+                            }
+                        }]
+                }]
+            }                
+        ]
+    }.
+
+'staber_rdlg::usecase__003_selection'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [
+         {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__003', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }
+    ],
+    IN = {
+        campo1: ''
+    },
+	Obj_class = {
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_003_selection,
+        hasDsca: 'Selección con retorno',
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rdlg::rc_gui_out::usecase__003'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    'staber_rdlg::dlg'(DLG1, {dlgTitle: 'Seleccionar fila'}),
+     SCHEMA_DLG = {
+        data: [           
+            {
+                label: {
+                    d: 'Kw'
+                },
+                arc: 'hasKw'
+            }
+        ]
+    },
+    DATA1 = {
+        type: 'kresult',
+        busId: 'bus__kresult__003',
+        hasChannel: '_.dlg.hasChannel',
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'dataset__semantic_test',
+            hasKw: 'ss:project',
+            includedProperties:['hasKw', 'hasDsca', 'hasERCPart'],
+            navigableProperties:['hasERCPart'],
+            hasLayout: 'result',
+            searchType: 'rem',
+            schema: SCHEMA_DLG,
+            selectable: true,
+            hasTemplate:{
+                'ss:project':{
+                        hasDsca:  '_.hasDsca',
+                        hasDscaIcon:  'project',
+                        hasIconClass: 'project'
+                },
+                'default':{
+                    hasDsca:  '_.hasDsca',
+                    hasIconClass: 'folder'
+                }          
+            }
+        }
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+            [
+                {
+                    type: 'text',
+                    label: {
+                        d: 'Selección de datos desde tabla con retorno'
+                    },
+                    value: CAMPO1,
+                    actions: [{
+                        label: {
+                            icon: 'zoom'
+                        },
+                        collapse: false,
+                        events: [
+                            {
+                                type: 'click',
+                                method: 'log',
+                                targetBusId: BUS_PARENT,
+                                payload:{
+                                    '?CAMPO1':'Dato aceptado'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'method', in: { data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                        { type: 'method', in: {campo1: '?CAMPO1', pattern: {'campo1': '_.hasKw'}}, name: 'map',  module: 'Mapper' },
+                                        { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                    ]
+                                }
+                            }]
+                    }]
+                }                
+            ]
+    }.
+
+'staber_rdlg::usecase__004_single'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__004_single', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: ''
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_004_single,            
+        hasDsca: 'Selección sin retorno automático',
+        hasIcon: 'search',            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rdlg::rc_gui_out::usecase__004_single'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    'staber_rdlg::dlg'(DLG1, {accept: false, cancel: true, enableButtonsOnSelect: true, dlgTitle: 'Seleccionar fila y aceptar'} ),
+     SCHEMA_DLG = {
+        data: [
+            {
+                label: {
+                    d: 'Kw'
+                },
+                arc: 'hasKw',
+                enabled: false,
+                sorted: true,
+                filter: true
+            }
+        ]
+    },
+    DATA1 = {
+        type: 'kresult',
+        busId: 'bus__kresult__004',
+        hasChannel: '_.dlg.hasChannel',
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'dataset__ssa_test',
+            hasKw: 'ss:project',
+            hasLayout: 'result',
+            includedProperties:['hasKw', 'hasDsca', 'hasERCPart'],
+            navigableProperties:['hasERCPart'],
+            searchType: 'rem',
+            schema: SCHEMA_DLG,
+            singleselection: true,
+            selectable: true, 
+            reset: true,
+            hasTemplate:{
+                'ss:project':{
+                        hasDsca:  '_.hasDsca',
+                        hasDscaIcon:  'project',
+                        hasIconClass: 'project'
+                },
+                'default':{
+                    hasDsca:  '_.hasDsca',
+                    hasIconClass: 'folder'
+                }          
+            }
+        }
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'text',
+                label: {
+                    d: 'Selección de datos desde tabla con acción de aceptar'
+                },
+                value: CAMPO1,
+                actions: [{
+                    label: {
+                        icon: 'zoom'
+                    },
+                    collapse: false,
+                    events: [
+                        {
+                            type: 'click',
+                            method: 'log',
+                            targetBusId: BUS_PARENT,
+                            payload:{
+                                '?CAMPO1':'Dato aceptado'
+                            },
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: { dlg_data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                    { type: 'method', in: {campo1: '?CAMPO1', pattern: {'hasKw': '_.hasKw', selectedKw: '_.selectedKw'}}, name: 'map',  module: 'Mapper' },
+                                    { type: 'function', in: {prop: 'campo1'}, name: 'parseMultiSelectionToStringValue',  context:{ delegatedTo: 'builderweb'} },
+                                    { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                ]
+                            }
+                        }]
+                }]
+            }                
+        ]
+    }.
+
+'staber_rdlg::usecase__005_multi'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__005_multi', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: ''
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_005_multi,            
+        hasDsca: 'Diálogo con selección múltiple',
+        hasIcon: 'search',            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rdlg::usecase__005_multi_withNonSelectableRows'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__multi_withNonSelectableRows', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: ''
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_multi_withNonSelectableRows,            
+        hasDsca: 'multiSelection con filas no seleccionables',
+        hasIcon: 'search',            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+    
+'staber_rdlg::rc_gui_out::usecase__005_multi'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    'staber_rdlg::dlg'(DLG1, {accept: false, cancel: true, enableButtonsOnSelect: true, dlgTitle: 'Seleccionar una o más filas' } ),
+     SCHEMA_DLG = {
+        data: [
+            {
+                label: {
+                    d: 'Kw'
+                },
+                arc: 'hasKw',
+                enabled: false,
+                sorted: true,
+                filter: true
+            }
+        ]
+    },
+    DATA1 = {
+        type: 'kresult',
+        busId: 'bus__kresult__005',
+        hasChannel: '_.dlg.hasChannel',
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'dataset__ssa_test',
+            hasKw: 'ss:project',
+            hasLayout: 'result',
+            includedProperties:['hasKw', 'hasDsca', 'hasERCPart'],
+            navigableProperties:['hasERCPart'],
+            searchType: 'rem',
+            schema: SCHEMA_DLG,
+            multiselection: true,
+            reset: true,
+            hasTemplate:{
+                'ss:project':{
+                        hasDsca:  '_.hasDsca',
+                        hasDscaIcon:  'project',
+                        hasIconClass: 'project'
+                },
+                'default':{
+                    hasDsca:  '_.hasDsca',
+                    hasIconClass: 'folder'
+                }          
+            }
+        }
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'text',
+                label: {
+                    d: 'Diálogo con introducción de múltiples datos por selección en tabla'
+                },
+                value: CAMPO1,
+                actions: [{
+                    label: {
+                        icon: 'zoom'
+                    },
+                    collapse: false,
+                    events: [
+                        {
+                            type: 'click',
+                            method: 'log',
+                            targetBusId: BUS_PARENT,
+                            payload:{
+                                '?CAMPO1':'Dato aceptado'
+                            },
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: { dlg_data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                    { type: 'method', in: {campo1: '?CAMPO1', pattern: {'hasKw': '_.hasKw', selectedKw: '_.selectedKw'}}, name: 'map',  module: 'Mapper' },
+                                    { type: 'function', in: {prop: 'campo1'}, name: 'parseMultiSelectionToStringValue',  context:{ delegatedTo: 'builderweb'} },
+                                    { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                ]
+                            }
+                        }]
+                }]
+            }                
+        ]
+    }.
+'staber_rdlg::rc_gui_out::usecase__multi_withNonSelectableRows'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    'staber_rdlg::dlg'(DLG1, {accept: false, cancel: true, enableButtonsOnSelect: true, dlgTitle: 'Seleccionar una o más filas' } ),
+     SCHEMA_DLG = {
+        data: [
+            {
+                label: {
+                    d: 'Kw'
+                },
+                arc: 'hasKw',
+                enabled: false,
+                sorted: true,
+                filter: true
+            }
+        ]
+    },
+    DATA1 = {
+        type: 'kresult',
+        busId: 'bus__kresult__004',
+        hasChannel: '_.dlg.hasChannel',
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'dataset__test_5gl_server',
+            hasKw: 'testapp:contact',
+            hasLayout: 'result',
+            includedProperties:['hasKw', 'hasDsca', 'selectableRow'],
+            searchType: 'rem',
+            schema: SCHEMA_DLG,
+            multiselection: true,
+            reset: true
+        }
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'text',
+                label: {
+                    d: 'Diálogo con introducción de múltiples datos por selección en tabla'
+                },
+                value: CAMPO1,
+                actions: [{
+                    label: {
+                        icon: 'zoom'
+                    },
+                    collapse: false,
+                    events: [
+                        {
+                            type: 'click',
+                            method: 'log',
+                            targetBusId: BUS_PARENT,
+                            payload:{
+                                '?CAMPO1':'Dato aceptado'
+                            },
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: { dlg_data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                    { type: 'method', in: {campo1: '?CAMPO1', pattern: {'hasKw': '_.hasKw', selectedKw: '_.selectedKw'}}, name: 'map',  module: 'Mapper' },
+                                    { type: 'function', in: {prop: 'campo1'}, name: 'parseMultiSelectionToStringValue',  context:{ delegatedTo: 'builderweb'} },
+                                    { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                ]
+                            }
+                        }]
+                }]
+            }                
+        ]
+    }.
+
+'staber_rdlg::usecase__006'(_, _, _, OBJ_out):-
+
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__006', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: ''
+    },    
+	Obj_class = {
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_006,
+        hasDsca: 'Diálogo con tabla y selección por celda - override pivotGrid + rql',
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rdlg::rc_gui_out::usecase__006'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    'staber_rdlg::dlg'(DLG1, {dlgTitle: 'Seleccionar una celda'}),
+    OVERRIDES = [            
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'testapp_kmgt::result::rc_gui_out::rql__pivotgrid_sust', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }        
+    ],
+    DATA1 = {
+        type: 'kresult',
+        busId: 'bus__kresult__006',
+        hasChannel: '_.dlg.hasChannel',
+        overrides: OVERRIDES,
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'dataset__semantic_test',
+            hasKw: 'ss:project',
+            selectable: true,        
+            searchType: 'rql'
+        }
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+            [
+                {
+                    type: 'text',
+                    label: {
+                        d: 'Diálogo con selección por celda'
+                    },
+                    value: CAMPO1,
+                    actions: [{
+                        label: {
+                            icon: 'zoom'
+                        },
+                        collapse: false,
+                        events: [
+                            {
+                                type: 'click',
+                                method: 'log',
+                                targetBusId: BUS_PARENT,
+                                payload:{
+                                    '?CAMPO1':'Dato aceptado'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'method', in: { data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                        { type: 'method', in: {campo1: '?CAMPO1', pattern: {'campo1': '_.hasKw'}}, name: 'map',  module: 'Mapper' },
+                                        { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                    ]
+                                }
+                            }]
+                    }]
+                }                
+            ]
+    }.
+
+'staber_rdlg::usecase__007'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__007', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: ''
+    },    
+	Obj_class = {
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_007,
+        hasDsca: 'Diálogo con selección por galería - override GALLERY + rql',
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rdlg::rc_gui_out::usecase__007'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    'staber_rdlg::dlg'(DLG1, {dlgTitle: 'Seleccionar de la galería'}),
+    OVERRIDES = [            
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'testapp_kmgt::result::rc_gui_out::rql__pivotgrid_sust', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }        
+    ],
+    DATA1 = {
+        type: 'kresult',
+        busId: 'bus__kresult__007',
+        hasChannel: '_.dlg.hasChannel',
+        overrides: OVERRIDES,
+        in: {
+            layoutType: 'kgallery',
+            hasAgent: 'builderweb',
+            hasDataset: 'dataset__semantic_test',
+            hasKw: 'ss:project',
+            selectable: true,        
+            searchType: 'rql',        
+            cols: 4,    
+            backButton: true,
+            hasTemplate:{
+                'ss:project':{
+                        hasDsca:  '_.hasDsca',
+                        hasDscaIcon:  'project',
+                        hasIconClass: 'project'
+                },
+                'default':{
+                    hasDsca:  '_.hasDsca',
+                    hasIconClass: 'folder'
+                }          
+            }
+        }
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'text',
+                label: {
+                    d: 'Diálogo con selección de datos desde galería'
+                },
+                value: CAMPO1,
+                actions: [{
+                    label: {
+                        icon: 'zoom'
+                    },
+                    collapse: false,
+                    events: [
+                        {
+                            type: 'click',
+                            method: 'log',
+                            targetBusId: BUS_PARENT,
+                            payload:{
+                                '?CAMPO1':'Dato aceptado'
+                            },
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: { data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                    { type: 'method', in: {campo1: '?CAMPO1', pattern: {'hasKw': '_.hasKw', selectedKw: '_.selectedKw'}}, name: 'map',  module: 'Mapper' },
+                                    { type: 'function', in: {prop: 'campo1'}, name: 'parseMultiSelectionToStringValue',  context:{ delegatedTo: 'builderweb'} },
+                                    { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                ]
+                            }
+                        }]
+                }]
+            }                
+        ]
+    }.
+
+'staber_rdlg::usecase__008'(_, _, _, OBJ_out):-
+    newKw('busId_', BUS),
+    newKw('busId_', Kmgt1),
+    newKw('channelId_', ChannelKmgt1),
+    newKw('busId_', Kmgt2),
+    newKw('channelId_', ChannelKmgt2),
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    IN = {
+        hasDataset: I_dataset,
+        hasAgent: I_agent
+    },
+    DLG = {
+        in: {
+            options: {
+                label: {
+                    d: 'Kmgt vacío por mala configuración'
+                }
+            },
+            height: '1px'}
+    },
+    DLGDATA = {
+        type: assembly,
+        children:[{
+            type: 'kmgt',           
+            busId: Kmgt2,
+            hasChannel: ChannelKmgt2,
+            searchType: 'rem',
+            in:{
+                hasTitle: 'Contactos modelo de Tests',
+                hasAgent: I_agent,
+                hasDataset: I_dataset,
+                hasKw: 'testapp_contacto_001',
+                hasKwc: 'testapp:contact'
+            }
+        }]
+    },
+    DLGDATA1 = {
+        type: assembly,
+        children:[
+            {
+            type: 'kmgt',
+            busId: Kmgt1,
+            hasChannel: ChannelKmgt1,
+            searchType: 'rem',
+            proc:{
+                type:'sequence',
+                hasProcess:[
+                        { type:'function', name:'failing_function',context:{delegatedTo:builderweb} },
+                        { type: 'method', in:{
+                            hasKw: 'testapp_contacto_001',
+                            hasKwc: 'testapp:contact'},
+                        name: 'merge_in', busId: Kmgt1 }
+                ]
+            },
+            in:{
+                hasTitle: 'Contactos modelo de Tests',
+                hasAgent: I_agent,
+                hasDataset: I_dataset,
+                hasKw: 'Estonovalepana',
+                hasKwc: 'estaclasenoexiste'
+            }
+        }
+        ]
+    },
+    BUTTON1 = {
+        type: button,
+        label: {
+            d: 'dialog_add sin control'
+        },
+        events: [
+            {
+                type: 'click',
+                method: 'dialog_add',
+                targetBusId: BUS,
+                payload: {
+                    dlg_data: DLGDATA1,
+                    dlg: DLG
+                }
+            }
+        ]
+    },
+    BUTTON3 = {
+        type: button,
+        label: {
+            d: 'dialog_add controlado'
+        },
+        events: [
+            {
+                type: 'click',
+                method: 'dialog_add',
+                targetBusId: BUS,
+                payload: {
+                    dlg_data: DLGDATA,
+                    dlg: DLG
+                },
+                p_exec: {
+                        type:'sequence',
+                        hasProcess:[
+                             { type:'function', name:'failing_function',context:{delegatedTo:builderweb} }
+                        ]
+                    }
+            }
+        ]
+    },
+    BUTTON2 = {
+        type: button,
+        label: {
+            d: 'dialog_exec controlado'
+        },
+        events: [
+            {
+                type: 'click',
+                method: 'log',
+                targetBusId: BUS,
+                p_exec:{
+                    type: sequence,
+                    hasProcess:[
+                        { type:'function',name:'failing_function',context:{delegatedTo:builderweb} },
+                        { type: method, in: { dlg_data: DLGDATA, dlg: DLG }, name: 'dialog_exec', busId: BUS}
+                    ]
+                }
+            }
+        ]
+    },
+    BUTTON4 = {
+        type: button,
+        label: {
+            d: 'dialog_exec sin control'
+        },
+        events: [
+            {
+                type: 'click',
+                method: 'log',
+                targetBusId: BUS,
+                p_exec:{
+                    type: sequence,
+                    hasProcess:[
+                        { type: method, in: { dlg_data: DLGDATA1, dlg: DLG}, name: 'dialog_exec', busId: BUS}
+                    ]
+                }
+            }
+        ]
+    },
+    ASSEMBLY = {
+        type: assembly,
+        children: [
+            {
+                type: assembly,
+                children: [
+                    {
+                        type: label,
+                        d: 'Diálogos generados sin control sobre su contenido'
+                    },
+                    BUTTON1,
+                    BUTTON4
+                ]
+            },
+            {
+                type: assembly,
+                children: [
+                    {
+                        type: label,
+                        d: 'Diálogos generados con check de contenido correcto'
+                    },
+                    BUTTON3,
+                    BUTTON2
+                ]
+            }
+        ]
+    },   
+	Obj_class = {
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_008,
+        hasDsca: 'Como generar mismo contenido con dialog_add o dialog_exec y simulación de control de datos',
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: ASSEMBLY
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+    'failing_function'(_, _, _, Obj_out):-
+    Obj_out = {
+        apperror:{
+            code: 9999,
+            async:true,
+            type: 'infoMsg',
+            txt: 'Falla la función que genera los resultados y la configuración del kmgt'
+        }
+    }.
+
+'staber_rdlg::usecase__009'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__009', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: '',
+        hasAgent: 'builderweb'
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_009,            
+        hasDsca: 'Menú integrado en botonera de diálogo',
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rdlg::usecase__010'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__010', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: '',
+        hasAgent: 'builderweb'
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_010,            
+        hasDsca: 'rdlg__010  dialog_exec con zoom: false en el paso previo de la secuencia *En Desarrollo*',
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rdlg::rc_gui_out::usecase__010'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    'staber_rdlg::dlg'(DLG1, _),
+    DATA1 = {
+        type: 'label',
+        d: 'Pulse Aceptar para Terminar este ejemplo',
+        icon: 'h4'
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+            [
+                {
+                    type: 'text',
+                    label: {
+                        d: 'Probar con la rama de radcore krf-feature/dialog_exec-resolve-and-continue-if-zoom-false'
+                    },
+                    value: CAMPO1,
+                    actions: [{
+                        label: {
+                            icon: 'zoom'
+                        },
+                        collapse: false,
+                        events: [
+                            {
+                                type: 'click',
+                                method: 'log',
+                                targetBusId: BUS_PARENT,
+                                payload:{
+                                    campo1:'Dato aceptado'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'zoom_false', context: { delegatedTo: 'builderweb' } },
+                                        { type: 'method', in: { data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                        { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                    ]
+                                }
+                            }]
+                    }]
+                }                
+            ]
+    }.
+
+'zoom_false'(ObjCtx, _ObjIn, ObjCtx, ObjOut):-
+    ObjOut = {
+        zoom: false
+    }.
+
+'staber_rdlg::dlg'(Obj_out, Obj_ButtonStatus):-
+    obj_get(accept, Obj_ButtonStatus, Ok_Enabled, true),
+    obj_get(cancel, Obj_ButtonStatus, Cancel_Enabled, true),
+    obj_get(enableButtonsOnSelect, Obj_ButtonStatus, EnableButtonsOnSelect, false),
+    obj_get(dlgTitle, Obj_ButtonStatus, DlgTitle, 'Diálogo de Confirmación'),
+    obj_get(width, Obj_ButtonStatus, Width, '90%'),
+    Obj_out = {
+        type: 'rdlg',
+        busId: '_.dlg.busId',
+        in: {
+            width: Width,               
+            enableButtonsOnSelect: EnableButtonsOnSelect,
+            close: false,
+            options: {
+                label: {
+                    d: DlgTitle
+                },                
+                actions: [
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Aceptar'
+                        },
+                        enabled: Ok_Enabled,
+                        events: [{
+                            type: 'click',
+                            method: 'accept',
+                            targetBusId: '_.dlg.busId'
+                        }]
+                    },
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Cancelar'
+                        },
+                        enabled: Cancel_Enabled,
+                        events: [{
+                            type: 'click',
+                            method: 'cancel',
+                            targetBusId: '_.dlg.busId'
+                        }]
+                    }
+                ]
+            }
+        }
+    }.
+
+'staber_rdlg::rc_gui_out::usecase__009'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    'staber_rdlg::dlgwithmenu'(_, BUS_PARENT, DLG1),
+    DATA1 = {
+        type: 'kresult',
+        busId: 'bus__kresult__rdlgmenu',
+        hasChannel: '_.dlg.hasChannel',
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'Default',
+            hasKw: 'testapp:contact',
+            singleselection: true,
+            selectable: true            
+        },
+        evtPublish: [{ topic: 'setPayload', channel: '_.dlg.hasChannel'}]
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'text',
+                label: {
+                    d: 'rDlg de confirmación'
+                },
+                value: CAMPO1,
+                actions: [{
+                    label: {
+                        icon: 'zoom'
+                    },
+                    collapse: false,
+                    events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_PARENT,
+                        payload:{
+                            campo1:'Dato aceptado'
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'method', in: { data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                { type: 'method', in: {campo1: '?CAMPO1', pattern: {'hasKw': '_.hasKw', selectedKw: '_.selectedKw'}}, name: 'map',  module: 'Mapper' },
+                                { type: 'function', in: {prop: 'campo1'}, name: 'parseMultiSelectionToStringValue',  context:{ delegatedTo: 'builderweb'} },
+                                { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                            ]
+                        }
+                    }]
+                }]
+            }                
+        ]
+    }.
+
+'staber_rdlg::dlgwithmenu'(Obj_ButtonStatus, _BUSPARENT, Obj_out):-
+    obj_get(accept, Obj_ButtonStatus, Ok_Enabled, true),
+    obj_get(cancel, Obj_ButtonStatus, Cancel_Enabled, true),
+    newKw('bus_menu', BUSMENU),
+    MENU_RDLG_OVERRIDES = [          
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function', 
+                        name: 'staber_kmenu_rdlg::rc_gui_out', 
+                        context: { delegatedTo: 'builderweb' }
+                    }
+                ]
+            }
+        }         
+    ],
+    Obj_out = {
+        type: 'rdlg',        
+        in: {
+            width: 40,           
+            hasMenu: {
+                type: 'kmenu',
+                busId: BUSMENU,
+                in: {
+                    state: { visible: false },
+                    dlgBusId: '_.dlg.busId',
+                    floating: true
+                },
+                overrides: MENU_RDLG_OVERRIDES,
+                evtSubscribe: [{ topic: 'setPayload', channel: '_.dlg.hasChannel'}]                   
+            },
+            close: false,
+            options: {
+                label: {
+                    d: 'Diálogo con menú integrado en botonera'
+                },
+                actions: [
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Aceptar'
+                        },
+                        enabled: Ok_Enabled,
+                        events: [{
+                            type: 'click',
+                            method: 'accept',
+                            targetBusId: '_.dlg.busId'
+                        }]
+                    },
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Cancelar'
+                        },
+                        enabled: Cancel_Enabled,
+                        events: [{
+                            type: 'click',
+                            method: 'cancel',
+                            targetBusId: '_.dlg.busId'
+                        }]
+                    }
+                ]
+            }
+        }
+    }.
+
+'staber_kmenu_rdlg::rc_gui_out'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    OBJ_out =  
+    {
+        type: 'menunav',
+        menuBtn: {},
+        state: '$.in.state',
+        floating: '$.in.floating',
+        children: [
+            {
+                label: {
+                    text: 'Acciones sobre diálogo',
+                    icon: 'group'
+                },
+                actions: [
+                    {
+                        label: {
+                            d: 'Aceptar'
+                        },
+                        collapse: true,                        
+                        events: [{
+                            type: 'click',                            
+                            method: 'accept',
+                            targetBusId: '$.in.dlgBusId'
+                            % payload: {
+                            %     action: 'action1'
+                            % }
+                        }]
+                    },
+                    {
+                        label: {
+                            d: 'cancelar'
+                        },
+                        collapse: true,
+                        events: [{
+                            type: 'click',
+                            method: 'cancel',
+                            targetBusId: '$.in.dlgBusId'
+                        }]
+                    }
+                ],
+                children: [
+                    {
+                        type: 'menuchild',
+                        children: [
+                            {
+                                label: {
+                                    text: 'Aceptar Selección'
+                                },
+                                events: [{
+                                    type: 'click',                            
+                                    method: 'accept',
+                                    targetBusId: '$.in.dlgBusId'
+                                }]
+                            }                                    
+                        ]  
+                    }                                                      
+                ]
+            },
+            {
+                label: {
+                    text: 'Acción genérica'
+                },
+                events: [{
+                            type: 'click',                            
+                            method: 'log',
+                            targetBusId: '$.in.dlgBusId',
+                            payload: {
+                                action: 'action1'
+                            }
+                        }]
+            },
+            {
+                label: {
+                    icon: 'on'
+                }
+            }                           
+        ]
+    }.
+
+parseMultiSelectionToStringValue(_, Obj_in, _, Obj_out):-
+    obj_get(prop, Obj_in, KwProp, 'campo1'),
+    obj_get(hasKw, Obj_in, Kw),
+    !,
+    obj_set(KwProp, Obj_in, Kw, Obj_out).
+
+parseMultiSelectionToStringValue(_, Obj_in, _, Obj_out):-
+    obj_get(prop, Obj_in, KwProp, 'campo1'),
+    obj_get(selectedKw, Obj_in, Lkw),
+    concatConstants( Lkw, ';', Skw),
+    obj_set(KwProp, Obj_in, Skw, Obj_out).
+
+
+'staber_rdlg::usecase__020_selection_kmgt'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::usecase__020', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: ''
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_020_selection_kmgt,            
+        hasDsca: 'singleSelection en KMGT con retorno',
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rdlg::rc_gui_out::usecase__020'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    'staber_rdlg::dlg'(DLG1, _),
+     SCHEMA_DLG = {
+        data: [           
+            {
+                label: {
+                    d: 'Kw'
+                },
+                arc: 'hasKw'
+            }
+        ]
+    },
+    DATA1 = {
+        type: 'kmgt',
+        busId: 'bus__kmgt__020',
+        hasChannel: '_.dlg.hasChannel',
+        in: {            
+            hasArea:{
+                result:{
+                    hasAgent: 'builderweb',
+                    hasDataset: 'dataset__semantic_test',
+                    hasKw: 'ss:project',
+                    includedProperties:['hasKw', 'hasDsca', 'hasERCPart'],
+                    navigableProperties:['hasERCPart'],
+                    hasLayout: 'result',
+                    searchType: 'rem',
+                    schema: SCHEMA_DLG,
+                    selectable: true,
+                    hasTemplate:{
+                        'ss:project':{
+                                hasDsca:  '_.hasDsca',
+                                hasDscaIcon:  'project',
+                                hasIconClass: 'project'
+                        },
+                        'default':{
+                            hasDsca:  '_.hasDsca',
+                            hasIconClass: 'folder'
+                        }          
+                    }
+                }
+            }
+        },
+        evtPublish:[{ topic: 'setNode', channel: '_.dlg.hasChannel'}]
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+            [
+                {
+                    type: 'text',
+                    label: {
+                        d: 'rDlg con introducción de Datos a través de Kmgt'
+                    },
+                    value: CAMPO1,
+                    actions: [{
+                        label: {
+                            icon: 'zoom'
+                        },
+                        collapse: false,
+                        events: [
+                            {
+                                type: 'click',
+                                method: 'log',
+                                targetBusId: BUS_PARENT,
+                                payload:{
+                                    '?CAMPO1':'Dato aceptado'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'method', in: { data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                        { type: 'method', in: {campo1: '?CAMPO1', pattern: {'campo1': '_.hasKw'}}, name: 'map',  module: 'Mapper' },
+                                        { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                    ]
+                                }
+                            }]
+                    }]
+                }                
+            ]
+    }.
+
+'staber_rdlg::dialog_with_kpivot'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::dialog_with_kpivot', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: ''
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: rdlg_test_dialog_with_kpivot,            
+        hasDsca: 'Selección desde diálogo con kpivot',
+        hasIcon: 'search',            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rdlg::rc_gui_out::dialog_with_kpivot'(_, OBJ_in, _, OBJ_out):-
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    'staber_rdlg::dlg'(DLG1, {accept: false, cancel: true, enableButtonsOnSelect: true, dlgTitle: 'Seleccionar fila y aceptar'} ),
+     SCHEMA_DLG = [
+        {
+            label: {
+                d: 'Kw'
+            },
+            arc: 'hasKw',
+            enabled: false,
+            sorted: true,
+            filter: true
+        }
+    ],
+    DATA1 = {
+        type: 'kpivotgrid',
+        busId: 'bus__dialog_with_kpivot',
+        hasChannel: '_.dlg.hasChannel',
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'Default',
+            hasKw: 'testapp:contact',
+            hasLayout: 'result',
+            includedProperties:['hasKw', 'hasDsca'],
+            % navigableProperties:['hasERCPart'],
+            searchType: 'rem',
+            schema: SCHEMA_DLG,
+            singleselection: true,
+            selectable: true, 
+            reset: true
+        }
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'text',
+                label: {
+                    d: 'Selección de datos desde tabla (kpivot)'
+                },
+                value: CAMPO1,
+                actions: [{
+                    label: {
+                        icon: 'zoom'
+                    },
+                    collapse: false,
+                    events: [
+                        {
+                            type: 'click',
+                            method: 'log',
+                            targetBusId: BUS_PARENT,
+                            payload:{
+                                '?CAMPO1':'Dato aceptado'
+                            },
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: { dlg_data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                    { type: 'method', in: {campo1: '?CAMPO1', pattern: {'hasKw': '_.hasKw', selectedKw: '_.selectedKw'}}, name: 'map',  module: 'Mapper' },
+                                    { type: 'function', in: {prop: 'campo1'}, name: 'parseMultiSelectionToStringValue',  context:{ delegatedTo: 'builderweb'} },
+                                    { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                ]
+                            }
+                        }]
+                }]
+            }                
+        ]
+    }.
+
+
+'staber_rdlg::kform_with_zoom_multiselection'(_, _, _, OBJ_out):-
+
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    newKw(busId_kform_dlg_with_multiselection, BUSID),
+    newKw(busId_kform_dlg_with_multiselection_pivot, BUSIDPIVOT),
+    newKw(busId_kform_dlg_with_multiselection_channel, CHANNEL),
+    concatConstants([CHANNEL, '__zoom'], CHANNELZOOM),
+    'get_kform_multiselection_zoom'(BUSIDPIVOT, CHANNELZOOM, Dlg_Data),
+    'staber_rdlg::dlg'(DLG, {accept: true, cancel: true, enableButtonsOnSelect: true, dlgTitle: 'Seleccionar una o más filas' } ),
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_005',
+        hasKwc: 'testapp:contact',
+        hasCKDIStatusFrom: ckdiStatusK,
+        hasCKDIStatusArc: ckdiStatusK,
+        hasCKDIStatusTo: ckdiStatusK,
+        enabled: true,
+        navigationFilter: 'all',
+        stylesVars: {
+            cols: 2,
+            width: '75%',
+            spaceElements: 'big',
+            colSpace: 'extra',
+            align: center
+        },
+        template:{
+            type: assembly,
+            children:[{
+                arc: 'contact:hasAddress',
+                actions:[
+                    {
+                        label: {
+                            icon: 'search'
+                        },
+                        collapse: false
+                    }
+                ]
+            }]
+        }
+    },     
+    
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: { options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',
+        in: IN,
+        proc: PROC,
+        busId: BUSID,
+        hasChannel: CHANNEL,
+        do_exec: true,
+        hasKw: dlg_multiseleccion_en_zoom_formulario,
+        hasDsca: [('es', 'Formulario de contacto con zoom multiselección (* En Desarrollo)')],
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasDlg: true,
+        isSession: true,
+        hasNavbar: false,
+        events: [
+            {
+                type: zoom,
+                method: 'zoom',
+                targetBusId: BUSID,
+                payload: {
+                    hasZoomChannel: CHANNELZOOM,
+                    hasDataset: 'Default',
+                    hasKwc: '_.hasKwc',
+                    applyRules: true,
+                    scope: 'testapp_contacto_005',
+                    '?STMT': '_.stmt',
+                    '?HASKW': '_.hasKw'
+                },
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        {
+                            type: 'method',
+                            name: 'dialog_exec',
+                            busId: BUSID,
+                            in: {
+                                dlg_data: Dlg_Data,
+                                dlg: DLG
+                            }
+                        },
+                        {
+                            type: 'method',
+                            in: {
+                                stmt: '?STMT',
+                                hasKw: '?HASKW',
+                                pattern: {
+                                    'root': '_.stmt.from',
+                                    'from': '_.stmt.from',
+                                    'arc': '_.stmt.arc',
+                                    'cto': '_.stmt.cto',
+                                    'to': '_.hasKw',
+                                    'hasDataset': 'Default'
+                                }
+                            },
+                            name: 'map',
+                            module: 'Mapper'
+                        },
+                        {
+                            type: 'function',
+                            name: 'builder50_updStmt',
+                            context: {
+                                delegatedTo: 'builderweb'
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'get_kform_multiselection_zoom'(BUS_PIVOT, CHANNEL_KPIVOTGRID, Obj_out):-
+    IN = {
+        hasAgent: 'builderweb',
+        hasDataset: 'Default',
+        hasKw: 'testapp:contactAddress',
+        rootElement: true,
+        expanded: false,
+        enabled: false,
+        limit: 20,
+        searchType: rem,
+        persistence : 'remote',
+        schemaHeader: true,
+        schema: [{label: {d: 'Descripción'}, arc: 'hasDsca', filter: true, enabled: false, sorted: true}],
+        hasIncludedProperties: ['hasDsca'],
+        stmtFilter: '[HASKW]',
+        inlineCount: true,
+        multiselection: true,
+        reset: true,
+        hasTemplate: false
+    },
+    Obj_out = {
+        in : IN,
+        type : kpivotgrid,
+        do_exec: true,
+        hasChannel: CHANNEL_KPIVOTGRID,
+        busId: BUS_PIVOT,
+        proc: {
+            type: sequence,
+            hasProcess: [
+                {
+                    type: method,
+                    name: schemaToQuery,
+                    module: 'QueryFilterService'
+                },
+                {
+                    type: function,
+                    name: remql,
+                    context: { delegatedTo: builderweb }
+                }
+            ]
+        },
+        evtPublish: [
+            { topic: setNode, channel: CHANNEL_KPIVOTGRID },
+            { topic: setSelected, channel: CHANNEL_KPIVOTGRID },
+            { topic: setNodes, channel: CHANNEL_KPIVOTGRID },
+            { topic: setPayload, channel: CHANNEL_KPIVOTGRID },
+            { topic: setSelected, channel: CHANNEL_KPIVOTGRID }
+        ],
+        evtSubscribe: [{ topic: clearSelected, channel: CHANNEL_KPIVOTGRID }, { topic: clearSelection, channel: CHANNEL_KPIVOTGRID }]
+    }.
+
+'staber_rdlg::concatenate_two_dlg'(_,_OBJ_in,_,OBJ_out):-
+    newKw('bus_dlgconcatenate', BUS_RPROCESS),
+    'staber_rdlg::dlg'(DLG, _),
+    DATA1 = {
+        type: 'label',
+        d: 'Pulse "Aceptar" para pasar al segundo diálogo',
+        icon: 'h4'
+    },
+    DATA2 = {
+        type: 'label',
+        d: 'Pulse "Aceptar" para finalizar la secuencia',
+        icon: 'h4'
+    },
+    OBJ_dlgs = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'button',
+                id: 'button-dlg_concatenate',
+                label: {
+                    d: 'Ejecución de secuencia con dialogos concatenados'
+                },
+                appearance: 'line',
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_RPROCESS,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [    
+                                { type: 'method', in: { data: DATA1, dlg: DLG}, name: 'dialog_exec', busId: BUS_RPROCESS},         
+                                { type: 'method', in: { data: DATA2, dlg: DLG}, name: 'dialog_exec', busId: BUS_RPROCESS},
+                                { 
+                                    type: 'function', 
+                                    in: { hasDataset: 'Default', hasKw: 'mmResource__testapp_rform_003'}, 
+                                    name: 'get_krp_resource',
+                                    context: { delegatedTo: 'builderweb' } 
+                                },
+                                { type: 'method', name: 'openFile', module: 'FileManager' }               
+                            ]
+                        }
+                    }
+                ]
+            }                   
+        ]
+    },
+
+    IN = {                
+        % campo1: '',
+        hasAgent: 'builderweb'
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS_RPROCESS,
+        hasDlg : true,
+        hasKw: rdlg_test_concatenate_dlgs,
+        hasDsca: 'Diálogos concatenados',
+        hasIcon: 'search',
+        gui_out: OBJ_dlgs,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rdlg::concatenate_two_dlg_conditionals_firstconditiontrue'(CTX, _OBJ_in, CTX, OBJ_out):-
+    'staber_rdlg::dlg'(DLG, _),
+    OBJ_out = {
+        dlg: DLG,
+        data : {
+            type: 'label',
+            d: 'Pulse "Aceptar" para pasar al segundo diálogo',
+            icon: 'h4'
+        } 
+    }.
+
+'staber_rdlg::concatenate_two_dlg_conditionals_firstconditionfalse'(CTX, _OBJ_in, CTX, OBJ_out):-
+    OBJ_out = {
+    }.
+        
+'staber_rdlg::concatenate_two_dlg_conditionals_secondcondition'(CTX, _OBJ_in, CTX, OBJ_out):-
+    'staber_rdlg::dlg'(DLG, _),
+    OBJ_out = {
+        dlg: DLG,
+        data : {
+            type: 'label',
+            d: 'Pulse "Aceptar" para finalizar la secuencia',
+            icon: 'h4'
+        }    
+    }.
+
+'staber_rdlg::concatenate_two_dlg_conditionals'(_,_OBJ_in,_,OBJ_out):-
+    newKw('bus_dlgconcatenate', BUS_RPROCESS),
+    OBJ_dlgs = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'button',
+                id: 'button-dlg_concatenate_with',
+                label: {
+                    d: 'Ejecución de secuencia con dialogos concatenados y condición CON dialogo'
+                },
+                appearance: 'line',
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_RPROCESS,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [    
+                                {
+                                    type: 'function',
+                                    name: 'staber_rdlg::concatenate_two_dlg_conditionals_firstconditiontrue',
+                                    context: {
+                                        delegatedTo: 'builderweb'
+                                    }
+                                },
+                                { type: 'method', name: 'dialog_exec', busId: BUS_RPROCESS},       
+                                {
+                                    type: 'function',
+                                    name: 'staber_rdlg::concatenate_two_dlg_conditionals_secondcondition',
+                                    context: {
+                                        delegatedTo: 'builderweb'
+                                    }
+                                },
+                                { type: 'method', name: 'dialog_exec', busId: BUS_RPROCESS},
+                                { 
+                                    type: 'function', 
+                                    in: { hasDataset: 'Default', hasKw: 'mmResource__testapp_rform_003'}, 
+                                    name: 'get_krp_resource',
+                                    context: { delegatedTo: 'builderweb' } 
+                                },
+                                { type: 'method', name: 'openFile', module: 'FileManager' }               
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                type: 'button',
+                id: 'button-dlg_concatenate_without',
+                label: {
+                    d: 'Ejecución de secuencia con dialogos concatenados y condición SIN dialogo'
+                },
+                appearance: 'line',
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_RPROCESS,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [    
+                                {
+                                    type: 'function',
+                                    name: 'staber_rdlg::concatenate_two_dlg_conditionals_firstconditionfalse',
+                                    context: {
+                                        delegatedTo: 'builderweb'
+                                    }
+                                },
+                                { type: 'method', name: 'dialog_exec', busId: BUS_RPROCESS},       
+                                {
+                                    type: 'function',
+                                    name: 'staber_rdlg::concatenate_two_dlg_conditionals_secondcondition',
+                                    context: {
+                                        delegatedTo: 'builderweb'
+                                    }
+                                },
+                                { type: 'method', name: 'dialog_exec', busId: BUS_RPROCESS},
+                                { 
+                                    type: 'function', 
+                                    in: { hasDataset: 'Default', hasKw: 'mmResource__testapp_rform_003'}, 
+                                    name: 'get_krp_resource',
+                                    context: { delegatedTo: 'builderweb' } 
+                                },
+                                { type: 'method', name: 'openFile', module: 'FileManager' }               
+                            ]
+                        }
+                    }
+                ]
+            }                     
+        ]
+    },
+
+    IN = {                
+        % campo1: '',
+        hasAgent: 'builderweb'
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS_RPROCESS,
+        hasDlg : true,
+        hasKw: rdlg_test_concatenate_conditionals_dlgs,            
+        hasDsca: 'Diálogos concatenados condicionando la visualización del primer diálogo',
+        hasIcon: 'search',
+        gui_out: OBJ_dlgs,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rdlg::changeActions_inbuttons'(_, _, _, OBJ_out):-
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    newKw(busId_rproc_changeActions, BUSID),
+    newKw(channel_rproc_changeActions, CHANNEL),
+    'staber_rdlg::dlg_button_change'(DLG1),
+    DATA1= {
+        type: assembly,
+        children:[{
+            type: rprocess,
+            channel: '_.dlg.hasChannel',
+            busId: 'dlg_data_changeactions_buttons',
+            in: {
+                hasAgent: I_agent,
+                hasDataset: I_dataset
+            },
+            gui_out:{
+                type: assembly,
+                children: [
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Reemplazar botones'
+                        },
+                        enabled: true,
+                        events: [{
+                            type: 'click',
+                            method: 'setButtons',
+                            payload: {
+                                actions: [
+                                    {
+                                        type: 'button',
+                                        appearance: 'line',
+                                        label:{
+                                            d:'Aceptar'
+                                        },
+                                        enabled: true,
+                                        events: [{
+                                            type: 'click',
+                                            method: 'accept',
+                                            targetBusId: '_.dlg.busId'
+                                        }]
+                                    }
+                                ]
+                            },
+                            targetBusId: '_.dlg.busId'
+                        }]
+                    }
+                ]
+            }
+        }]
+    },
+    Gui_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'button',
+                label: {
+                    d: 'Diálogo emergente'
+                },
+                events: [
+                {
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BUSID,
+                    payload:{
+                        campo1:'Dato aceptado'
+                    },
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { type: 'method', in: { data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUSID}
+                        ]
+                    }
+                }]
+            }                
+        ]
+    },
+    Obj_rproc = {
+        type: 'rprocess',
+        hasKw: rprocess_dlg_with_enable_buttons,
+        busId: BUSID,
+        hasChannel: CHANNEL,
+        in:{
+            hasAgent: I_agent,
+            hasDataset: I_dataset
+        },
+        gui_out: Gui_out,
+        hasDlg : true,
+        hasDsca: 'Diálogo emergente que actualiza estado de botonera de diálogo',
+        hasIcon: 'list-add',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest]
+    },
+    create_rprocess(_,Obj_rproc,_,OBJ_out).
+
+'staber_rdlg::dlg_button_change'(Obj_out):-
+    DlgTitle = 'Diálogo con acciones que cambian',
+    Action_ok = {
+        type: 'button',
+        appearance: 'line',
+        label:{
+            d:'Aceptar'
+        },
+        enabled: false,
+        events: [{
+            type: 'click',
+            method: 'accept',
+            targetBusId: '_.dlg.busId'
+        }]
+    },
+    Action_ko = {
+        type: 'button',
+        appearance: 'line',
+        label:{
+            d:'Cancelar'
+        },
+        enabled: true,
+        events: [{
+            type: 'click',
+            method: 'cancel',
+            targetBusId: '_.dlg.busId'
+        }]
+    },
+    Action_extra = {
+        type: 'button',
+        appearance: 'line',
+        label:{
+            d:'Reemplazar botones'
+        },
+        enabled: true,
+        events: [{
+            type: 'click',
+            method: 'setButtons',
+            payload: {
+                actions: [
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Aceptar'
+                        },
+                        enabled: true,
+                        events: [{
+                            type: 'click',
+                            method: 'accept',
+                            targetBusId: '_.dlg.busId'
+                        }]
+                    },
+                    Action_ko
+                ]
+            },
+            targetBusId: '_.dlg.busId'
+        }]
+    },
+    Obj_out = {
+        type: 'rdlg',
+        busId: '_.dlg.busId',
+        in: {
+            width: '90%',
+            enableButtonsOnSelect: true,
+            close: false,
+            options: {
+                label: {
+                    d: DlgTitle
+                },
+                actions: [
+                    Action_extra,
+                    Action_ok,
+                    Action_ko
+                ]
+            }
+        }
+    }.
+
+'staber_rdlg::changeActions_rprocess'(_, _, _, OBJ_out):-
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    newKw(busId_rproc_changeActions_rprocess, BUSID),
+    newKw(channel_rproc_changeActions_rprocess, CHANNEL),
+    Overrides = [
+         {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::dialog_change_actions_rprocess', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }
+    ],
+    Obj_rproc = {
+        type: 'rprocess',
+        hasKw: rprocess_dlg_with_rprocess_changeactions,
+        busId: BUSID,
+        hasChannel: CHANNEL,
+        in:{
+            hasAgent: I_agent,
+            hasDataset: I_dataset
+        },
+        overrides: Overrides,
+        do_exec: true,
+        hasDlg : true,
+        hasDsca: 'Diálogo emergente con rprocess que cambia acciones',
+        hasIcon: 'list-add',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest]
+    },
+create_rprocess(_,Obj_rproc,_,OBJ_out).
+
+'staber_rdlg::rc_gui_out::dialog_change_actions_rprocess'(_, Obj_in, _, Obj_out):-
+    obj_get(busId, Obj_in, BusId),
+    newKw(busId_rproc_changeActions_inner_rprocess, BusIdRprocess),
+    newKw(busId_rproc_changeActions_inner_kform, BusIdKform),
+    newKw(channel_rproc_changeActions_inner_kform, ContentChannel),
+    'staber_rdlg::dlg_button_change'(DLG1),
+    Content = {
+        type: assembly,
+        scroll: main,
+        children: [{
+            type: kform,
+            busId: BusIdKform,
+            hasChannel: ContentChannel,
+            in: {
+                hasAgent: builderweb,
+                hasDataset: 'Default',
+                hasKw: 'testapp_contacto_005',
+                enabled: true,
+                notifyChange: true
+            },
+            events:[{
+                type: updateStmt,
+                payload: { hasDataset: '_.in.dataset' },
+                method: updateStmt,
+                targetBusId: BusIdKform,
+                p_exec:{
+                    type: sequence,
+                    hasProcess:[{type: function, name: createExampleNewActions, context:{ delegatedTo: builderweb}}]
+                }
+            }]
+        }]
+    },
+    DATA1= {
+        type: assembly,
+        scroll: main,
+        children: [{
+            type: rprocess,
+            hasChannel: '_.dlg.hasChannel',
+            busId: BusIdRprocess,
+            gui_out: Content,
+            do_exec: true,
+            evtPublish: [{ topic: 'updateDialog', channel:'_.dlg.hasChannel'}],
+            evtSubscribe: [{topic: refreshNode, subTopic: notifyDialogChange, channel: ContentChannel}]
+        }
+        ]
+    },
+    Obj_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'button',
+                label: {
+                    d: 'Diálogo emergente'
+                },
+                events: [
+                {
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BusId,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { type: 'method', in: { data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BusId}
+                        ]
+                    }
+                }]
+            }                
+        ]
+    }.
+
+'staber_rdlg::changeActions_kform'(_, _, _, OBJ_out):-
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    newKw(busId_rproc_changeActions_rprocess, BUSID),
+    newKw(channel_rproc_changeActions_kform, CHANNEL),
+    Overrides = [
+         {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_rdlg::rc_gui_out::dialog_change_actions_on_edit_kform', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }
+    ],
+    Obj_rproc = {
+        type: 'rprocess',
+        hasKw: rprocess_dlg_with_kform_changeactions,
+        busId: BUSID,
+        hasChannel: CHANNEL,
+        in:{
+            hasAgent: I_agent,
+            hasDataset: I_dataset
+        },
+        overrides: Overrides,
+        do_exec: true,
+        hasDlg : true,
+        hasDsca: 'Diálogo emergente con formulario que actualiza acciones del diálogo',
+        hasIcon: 'list-add',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest]
+    },
+create_rprocess(_,Obj_rproc,_,OBJ_out).
+
+
+createExampleNewActions(_, Obj_in, _, Obj_out):-
+    Actions = {actions: [{
+        type: 'button',
+        appearance: 'line',
+        label:{
+            d:'Aceptar'
+        },
+        enabled: true,
+        events: [{
+            type: 'click',
+            method: 'accept',
+            targetBusId: '_.dlg.busId'
+        }]
+    }]},
+    obj_merge(Obj_in, Actions, Obj_out).
+
+'staber_rdlg::rc_gui_out::dialog_change_actions_on_edit_kform'(_, Obj_in, _, Obj_out):-
+    obj_get(busId, Obj_in, BusId),
+    newKw(busId_rproc_changeActions_kform, BUSIDKFORM),
+    'staber_rdlg::dlg_button_change'(DLG1),
+    DATA1= {
+        type: assembly,
+        scroll: main,
+        children: [{
+            type: kform,
+            hasChannel: '_.dlg.hasChannel',
+            busId: BUSIDKFORM,
+            in: {
+                hasAgent: builderweb,
+                hasDataset: 'Default',
+                hasKw: 'testapp_contacto_005',
+                enabled: true,
+                notifyChange: true
+            },
+            evtPublish: [{ topic: 'updateDialog', channel:'_.dlg.hasChannel'}],
+            events:[{
+                type: updateStmt,
+                payload: { hasDataset: '_.in.dataset' },
+                method: updateStmt,
+                targetBusId: BUSIDKFORM,
+                p_exec:{
+                    type: sequence,
+                    hasProcess:[{type: function, name: createExampleNewActions, context:{ delegatedTo: builderweb}}]
+                }
+            }]
+        }
+        ]
+    },
+    Obj_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'button',
+                label: {
+                    d: 'Diálogo emergente'
+                },
+                events: [
+                {
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BusId,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { type: 'method', in: { data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BusId}
+                        ]
+                    }
+                }]
+            }                
+        ]
+    }.
+
+'staber_rdlg::usecase__011'(_, _, _, Obj_out):-
+    newKw(busId__dlg11__, BusId1),
+    Obj_rproc = {
+        type: 'rprocess',
+        hasKw: rprocess_dlg_test_cached_content_error,
+        busId: BusId1,
+        do_exec: true,
+        hasDlg : true,
+        hasDsca: 'Prueba de diálogo con instancias de rprocess que no se borran',
+        hasIcon: 'arrow-ccw',
+        hasNavbar: true,
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        gui_out: {
+            type: assembly,
+            children: [{
+                type: button,
+                label: {
+                    d: 'Ver diálogo'
+                },
+                events: [
+                    {
+                        type: click,
+                        method: log,
+                        targetBusId: BusId1,
+                        p_exec:{
+                            type: sequence,
+                            hasProcess:[
+                                {type: function, name: 'staber_rdlg::usecase__011::content', context: { delegatedTo: 'builderweb' }},
+                                {type: method, name: dialog_exec, busId: BusId1}
+                            ]
+                        }
+                    }
+                ]
+            }]
+        }
+    },
+create_rprocess(_,Obj_rproc,_,Obj_out).
+
+'staber_rdlg::gui_out::usecase__011_content'(Channel, Obj_out):-
+    newKw(rdlg11_content__, BusId),
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_005',
+        hasCKDIStatusFrom: ckdiStatusK,
+        hasCKDIStatusArc: ckdiStatusK,
+        hasCKDIStatusTo: ckdiStatusK,
+        enabled: true,
+        navigationFilter: 'all',
+        allowNavigation: false,
+        stylesVars: {
+            cols: 2,
+            width: '75%',
+            spaceElements: 'big',
+            colSpace: 'extra',
+            align: center
+        }
+    },
+    Obj_out = {
+        type: assembly,
+        scroll: main,
+        children:[
+            {
+                type: kform,
+                busId: BusId,
+                do_exec: true,
+                hasChannel: Channel,
+                in: IN
+            }
+        ]
+    }.
+
+'staber_rdlg::usecase__011::content'(_, _Obj_in, _, Obj_out):-
+    newKw('DIFFERENT_BUSID_SAME_CHANNEL__', BusId),
+    newKw(rdlg_11_in_channel__, Channel),
+    Dlg = {
+        in: {
+            close: true
+        }
+    },
+    'staber_rdlg::gui_out::usecase__011_content'(Channel, KFORM),
+    Rproc = {
+        type: rprocess,
+        do_exec: true,
+        busId: BusId,
+        hasChannel: '_.dlg.hasChannel',
+        in: {
+            innerChannel: Channel
+        },
+        evtSubscribe: [{ topic: refreshNode, channel: Channel}],
+        gui_out: KFORM,
+        proc: {
+			type: sequence,
+			hasProcess: [
+				{type: 'function', name: 'staber_rdlg::usecase__011::content_proc', context: { delegatedTo: builderweb}}
+			]
+		}
+    },
+    Data = {
+        type: assembly,
+        children: [
+            Rproc
+        ]
+    },
+    Obj_out = {
+        dlg: Dlg,
+        dlg_data: Data
+}.
+'staber_rdlg::usecase__011::content_proc'(_, Obj_out, _, Obj_out).

@@ -1,0 +1,156 @@
+﻿/**
+@descr	rc_test_5gl_server_model_schema <br>
+		rc_test_5gl_server_model_schema
+@author XXX
+@date	20XX_XX_XX
+**/
+
+rc_class('rc_test_5gl_server_model_schema'):-
+	class +$ 'rc_test_5gl_server_model_schema'  d ( 'es', 'rc_test_5gl_server_model_schema' )
+		sc [ 'rComponent' ].
+
+rc_schema('rc_test_5gl_server_model_schema'):-
+    'test_5gl_server::folders'(_,_,_,_).
+
+'test_5gl_server::folders'(_, _, _, _):-
+    Title =  'Test 5GL',              
+    create_rprocess(_, 
+        {
+            type: 'krp:folder',
+            hasKw: folder__test_5gl_server_repositorio5GL,            
+            hasDsca: Title,            
+            hasIcon: 'dinamic',
+            isRoot: true,            
+            security_edit: [], 
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [
+                folder__repositorioTests_rproc_kadvancedsearch,
+                folder__repositorioTests_kmqtlite,
+                folder__repositorioTests_rproc_kanvas,
+                folder__repositorioTests_kapp,
+                folder__repositorioTests_kbrowser,
+                folder__repositorioTests_kchart,
+                folder__repositorioTests_kchat,
+                folder__repositorioTests_kdetail,
+                folder__repositorioTests_kfooter,
+                folder__repositorioTests_rproc_kform,
+                folder__repositorioTests_gallery_rproc,
+                folder__repositorioTests_kgraph,
+                folder__repositorioTests_kflow,
+                folder__repositorioTests_kheader,               
+                folder__repositorioTests_kmgt,
+                folder__repositorioTests_kmgt_class,
+                folder__repositorioTests_pivotgrid_rproc,
+                folder__repositorioTests_kresult,
+                folder__repositorioTests_kscheduler,
+                folder__repositorioTests_ksearch,
+                folder__repositorioTests_rproc_ksearchform,
+                folder__repositorioTests_kstatusview,
+                folder__repositorioTests_ktab,
+                folder__repositorioTests_ktalogue,
+                folder__repositorioTests_kmenu,
+                folder__repositorioTests_kmerge,
+                folder__repositorioTests_ktoolbar,
+                folder__repositorioTests_k3d
+                % folder__repositorioTests_kworkspace
+            ]
+    },_,_),
+    Title1 =  'Funcionalidades de componentes 5GL',
+    create_rprocess(_, 
+        {
+            type: 'krp:folder',
+            hasKw: folder__test_5gl_server_5glfeatures,
+            hasDsca: Title1,
+            hasIcon: 'dinamic',
+            isRoot: true,
+            security_edit: [],
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [
+                folder__repositorioTests_rproc_pattern,
+                folder__repositorioTests_rdlg,
+                folder__repositorioTests_ksm,
+                folder__repositorioTests_kmgt_ktalogue_compare,
+                folder__repositorioTests_navigation,                
+                folder__repositorioTests_kmgt_SM,
+                folder__repositorioTests_component_connector,
+                folder__repositorioTests_stmtedition,
+                folder__rendering_controls_bymodel,
+                folder_template_replace_kresult,
+                folder__repositorioTests_interval,
+                folder__repositorioTests_container_overrides,
+                folder__repositorioTests_control_focus,
+                folder__repositorioTests_refresh_controls_signal,
+                folder__repositorioTests_sessions,
+                folder__repositorioTests_table_filters,
+                folder__repositorioTests_rproc_execprocess,
+                folder__funcionalities_table_selection,
+                folder__repositorioTests_error_server,
+                folder__repositorioTests_advancedSearch,
+                folder___server_aggrupation,
+                folder__staber_general_features,
+                folder__form_behaviors_list,
+                folder__pattern_5gl
+            ]
+        },_,_),
+    Title2 =  'Test Componentes no RProcess',    
+    create_rprocess(_, 
+        {
+            type: 'krp:folder',
+            hasKw: folder__test_5gl_server_repositorioTests,            
+            hasDsca: Title2,            
+            hasIcon: 'dinamic',
+            isRoot: true,            
+            security_edit: [], 
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [
+                folder__repositorioTests_rproc_dynamictab,
+                folder__repositorioTests_rproc_gantt,
+                folder__repositorioTests_rproc_geolocalization,
+                folder__repositorioTests_rproc_passwordhard,
+                folder__repositorioTests_rproc_rdlg,
+                folder__repositorioTests_rproc_showLoading,
+                folder__repositorioTests_rproc_rform,
+                folder__repositorioTests_rproc_rtable,
+                folder__repositorioTests_rproc_scheduler,
+                folder__repositorioTests_rproc_signaturepad,
+                folder__repositorioTests_test_in_progress,
+                folder__repositorioTests_pdfviewer,
+                folder__repositorioTests_rgraph,
+                folder__repositorioTests_rcanvas,
+                folder__testapp_merge
+            ]
+        },_,_),
+    Title3 =  'Test UI/UX',
+    create_rprocess(_, 
+        {
+            type: 'krp:folder',
+            hasKw: folder__test_5gl_server_uiux,            
+            hasDsca: Title3,            
+            hasIcon: 'dinamic',
+            isRoot: true,            
+            security_edit: [], 
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [
+                ui_ux_for_table,
+                ui_ux_for_graph,
+                ui_ux_dlg_heights,
+                ui_ux_ktoolbar_stylesvars,
+                ui_ux_kdetail_stylesvars,
+                folder_ui_ux_form
+            ]
+        },_,_),
+    Title4 = 'API integraciones staber_builder40',
+    create_rprocess(_, 
+        {
+            type: 'krp:folder',
+            hasKw: folder__test_5gl_server_api_staber_builder40,
+            hasDsca: Title4,            
+            hasIcon: 'dinamic',
+            isRoot: true,            
+            security_edit: [], 
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [
+                folder__repositorioTest_api_staber_builder40_5gl
+            ]
+        },_,_).
+

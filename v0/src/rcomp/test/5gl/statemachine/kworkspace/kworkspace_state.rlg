@@ -1,0 +1,24 @@
+
+/* Estados de la máquina */
+
+
+'kworkspace_state::state_init'(State_init):-    
+    State_init ={    
+        type: 'state',
+         gui_out: {
+            type: 'assembly',
+            class : 'layout-desktopwidth body-builder',
+            children: [
+                {
+                    type: 'kbrowser',
+                    busId: '{$.busId}__browser',
+                    do_exec: true,
+                    hasChannel: '$.hasAppChannel.content',
+                    result: '$.out.resultset',
+                    hasAnchor: '$.hasAnchor', 
+                    evtSubscribe :[ {topic:'setNode', channel:'$.hasChannel'},
+                                    {topic:'addNavigateTo', channel:'channel__broadcast'} ]
+                }
+            ]
+        }
+    }.

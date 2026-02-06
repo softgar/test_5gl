@@ -1,0 +1,313 @@
+﻿/**
+@descr	staber_kscheduler <br>
+		staber_kscheduler
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kscheduler') :-
+	class +$ 'staber_kscheduler' d ( es,'Patrón rproc para kscheduler') sc function,
+    'staber_kscheduler::usecase__basic_remote'(_, _, _, _),
+    'staber_kscheduler::usecase__basic_local'(_, _, _, _),
+    'staber_kscheduler::folders'(_, _, _, _).
+    
+
+'staber_kscheduler::usecase__basic_local'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('kscheduler_busId__', BusId),
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    concatConstants(['<div style="font-weight: bold;">#: title # </div>',
+        '<div style="font-weight: bold;">#: text # </div>',
+        '# const rooms = resources.filter(elem => elem.name === "roomId"); #',
+        '# const members = resources.filter(elem => elem.name === "membersId"); #',
+        '<div style="background-color: #: rooms[0].color #;">#: rooms[0].title # : #: rooms[0].text #</div>',
+        '<div>#: members[0].title # :',
+            '# for (var i = 0; i < members.length; i++) { #',
+                '<div style="font-weight: bold;">#: members[i].text #</div>',
+            '# } #',
+        '</div>'],AgendaEventTemplate),
+    concatConstants(['<div style="font-weight: bold;">#: title # - #: text #</div>',
+        '# const rooms = resources.filter(elem => elem.name === "roomId"); #',
+        '# const members = resources.filter(elem => elem.name === "membersId"); #',
+        '<div>#: rooms[0].text # ',
+            '# for (var i = 0; i < members.length; i++) { #',
+                '-#: members[i].text #',
+            '# } #',
+        '</div>'],WeekEventTemplate),
+    HasViews = [
+        {
+            type: 'day',
+            eventTemplate: AgendaEventTemplate
+        },
+        {
+            type: 'workWeek',
+            eventTemplate: WeekEventTemplate
+        },        
+        {
+            type: 'timelineWorkWeek',
+            eventHeight: 'auto',
+            eventTemplate: WeekEventTemplate
+        },
+        {
+            type: 'agenda',
+            eventTemplate: AgendaEventTemplate
+        }
+    ],
+    getBasicExampleResources(HasResources),
+    IN = {
+        enabled: true,
+        selectedView: 'day',
+        persistence: local,
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        height: 'auto',
+        hasDate: 1748217600000
+        % % 25-05-2025 06:00:00 - 20:00:00
+        % hasStartTime: 1748232000000, 
+        % hasEndTime: 1748282400000,
+    },     
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', name :'get_schedulerinfo', context: {delegatedTo: 'builderweb'}}]
+    },
+    OBJ_form = {
+        type: 'kscheduler',
+        busId: BusId,
+        in: IN,
+        proc: PROC,
+        hasViews: HasViews,
+        hasResources: HasResources,
+        do_exec: true,
+        hasDlg: true,
+        hasKw: kscheduler_test_contactos_simple,
+        hasDsca: kscheduler_test_contactos_simple_uiML,
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true
+        % events: [
+        %     {
+        %     type: drop,
+        %     method: refresh_gui_out,
+        %     targetBusId: BusId,
+        %     p_exec: {
+        %         type: sequence,
+        %         hasProcess: [
+        %             {  type: 'function', name :'get_schedulerinfo', context: {delegatedTo: 'builderweb'}},
+        %             { type: 'method', name: 'updateData', busId: BusId }
+        %         ]
+        %     }
+        % }
+        % ]
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kscheduler::usecase__basic_remote'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('kscheduler_busId__', BusId),
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    HasViews = [
+        'day','workWeek','timelineWorkWeek','agenda'
+    ],
+    getBasicExampleResources(HasResources),
+    IN = {
+        enabled: true,
+        persistence: local,
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        height: 'auto',
+        hasDate: 1748217600000,
+        % 25-05-2025 06:00:00 - 20:00:00
+        hasStartTime: 1748232000000, 
+        hasEndTime: 1748282400000
+        % filterResources:[
+        %     {
+        %         resource: 'roomId',
+        %         selected: ['2']
+        %     }
+        % ]
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', name :'get_schedulerinfo', context: {delegatedTo: 'builderweb'}}]
+    },
+    OBJ_form = {
+        type: 'kscheduler',
+        busId: BusId,
+        in: IN,
+        proc: PROC,
+        hasViews: HasViews,
+        hasResources: HasResources,
+        do_exec: true,
+        hasDlg: true,
+        % events:[{
+        %     type: drop,
+        %     method: updateOnDrop,
+        %     targetBusId: BusId,
+        %     p_exec:{
+        %         type: sequence,
+        %         hasProcess:[
+        %             {type: function, name: 'showKschedulerDropMessage', context:{delegatedTo: I_agent}}
+        %         ]
+        %     }
+
+        % }],
+        dropSequence: [
+            {type: function, name: 'showKschedulerDropMessage', context:{delegatedTo: I_agent}}
+        ],
+        hasKw: kscheduler_test_contactos_simple_remote,
+        hasDsca: kscheduler_test_contactos_simple_remote_uiML,
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+
+
+'staber_kscheduler::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kscheduler,
+        hasDsca: 'folder__repositorioTests_kscheduler_uiML',
+        hasIcon: 'calendar',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            kscheduler_test_contactos_simple,
+            kscheduler_test_contactos_simple_remote
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).
+
+format_milis(MS, DATETIMESTRING):-
+    millisecondsToDatime( MS, datime( _Year, _Month_, _Day_, HH1, MN1, SS1, _MS)),
+    fillWith0s_( HH1, 2, HH),
+    fillWith0s_( MN1, 2, MN),
+    fillWith0s_( SS1, 2, SS),
+    concatConstants(
+                [HH, ':', MN, ':', SS ],
+                DATETIMESTRING ).
+
+'showKschedulerDropMessage'(_, Obj_in, _, Obj_in):-
+    % obj_get(data:title, Obj_in, Title),
+    obj_get(hasKw, Obj_in, HasKw),
+    obj_get(data:hasStartDate, Obj_in, PrevStart0),
+    obj_get(data:hasEndDate, Obj_in, PrevEnd0),
+    obj_get(hasStartDate, Obj_in, Start0),
+    obj_get(hasEndDate, Obj_in, End0),
+    millisecondsToDatime(PrevStart0, PrevStart1),
+    millisecondsToDatime(PrevEnd0, PrevEnd1),
+    millisecondsToDatime(Start0, Start1),
+    millisecondsToDatime(End0, End1),
+    datimeFormat(PrevStart1, 'dd/mm/yyyy', PrevStart),
+    datimeFormat(PrevEnd1, 'dd/mm/yyyy', PrevEnd),
+    datimeFormat(Start1, 'dd/mm/yyyy', Start),
+    datimeFormat(End1, 'dd/mm/yyyy', End),
+    
+    wAddInfoMsgML('Aviso1', 'Se ha reorganizado la tarjeta referente al keyword <b>?a{1}</b>.</br> Estaba planificada desde ?a{2} a ?a{3} y se ha movido a <b>?a{4}</b> - <b>?a{5}</b>', [HasKw, PrevStart, PrevEnd, Start, End], {showTime:10}).
+
+'getBasicExampleResources'(HasResources):-
+    HasResources = [
+        {
+            hasKw: roomId,
+            data: [
+                { hasDsca: 'Sala Reuniones pequeña', hasKw: '1', hasColor: '#2572c0' },
+                { hasDsca: 'Sala Reuniones Grande', hasKw: '2', hasColor: '#f8a398' }
+            ],
+            hasTitle: 'Salas de Reuniones'
+        },
+        {
+            hasKw: membersId,
+            data: [
+                { hasDsca: 'Marta Sanchez', hasKw: '1'},
+                { hasDsca: 'Laura Hernández', hasKw: '2'},
+                { hasDsca: 'Carlos López', hasKw: '3'}
+            ],
+            multiple: true,
+            hasTitle: 'Personas Convocadas'
+        }
+    ].
+
+'get_schedulerinfo'(_, _ObjIn, _, ObjOut):-
+
+ObjOut = {
+    resultset:[
+        {
+            'hasKw': 1,
+            'hasStartDate': 1748266200000,
+            'hasEndDate': 1748271600000,
+            'data':{
+                'hasTitle': 'Proyecto 2',
+                'hasDsca': 'Reunión de Inicio',
+                'hasColor': '#00ACC1'
+            },
+            'resources': {
+                'membersId': ['1','2','3'],
+                'roomId': 2
+            }
+        },
+        {
+            'hasKw': 2,
+            'hasStartDate': 1748354400000,
+            'hasEndDate': 1748358000000,
+            'data':{
+                'hasTitle': 'Proyecto 2',
+                'hasDsca':  'Reunión Seguimiento',
+                'hasColor': '#FFA726'
+            },
+            'resources': {
+                'membersId': ['2','3'],
+                'roomId': 1
+            }
+        },
+        {
+            'hasKw': 3,
+            'hasStartDate': 1748440800000,
+            'hasEndDate': 1748444400000,
+            'data':{
+                'hasTitle': 'Proyecto 2',
+                'hasDsca':  'Reunión Seguimiento',
+                'hasColor': '#FFA726'
+            },
+            'resources': {
+                'membersId': ['2','3'],
+                'roomId': 1
+            }
+        },
+        {
+            'hasKw': 4,
+            'title':  'Proyecto 2',
+            'hasStartDate': 1748527200000,
+            'hasEndDate': 1748530800000,
+            'data':{
+                'hasTitle': 'Proyecto 2',
+                'hasDsca':  'Reunión Seguimiento',
+                'hasColor': '#FFA726'
+            },
+            'resources': {
+                'membersId': ['2','3'],
+                'roomId': 1
+            }
+        },
+        {
+            'hasKw': 5,
+            'hasStartDate': 1748613600000,
+            'hasEndDate': 1748617200000,
+            'data':{
+                'hasTitle': 'Proyecto 2',
+                'hasDsca':  'Entrega Parcial',
+                'hasColor': '#26A69A'
+            },
+            'resources': {
+                'membersId': ['2','1'],
+                'roomId': 2
+            }
+        }
+    ]
+}.

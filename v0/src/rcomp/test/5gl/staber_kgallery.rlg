@@ -1,0 +1,745 @@
+﻿/**
+@descr	staber_gallery <br>
+		staber_gallery
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kgallery') :-
+	class +$ 'staber_kgallery' d ( es,'Patrón rproc para Gallery') sc function,
+    'staber_gallery::usecase__rql_gallery'(_, _, _, _),
+    'staber_gallery::usecase__rql_galleryOfita'(_, _, _, _),
+    'staber_gallery::usecase__rql_gallery_nav_without_selection'(_, _, _, _),
+    'staber_gallery::folders'(_, _, _, _).
+
+'staber_gallery::usecase__rql_gallery'(_, _OBJ_in, _, OBJ_out) :-
+
+    I_agent_doc = 'builderweb',
+    I_dataset   = 'dataset__ssa_test',                
+    newKw('bus__',Bus_Kgallery),
+
+	Table_Schema = [
+                {
+                    label: {
+                        d: 'Descripción'
+                    },
+                    arc: 'hasKw',
+                    path: '$.hasDsca'
+                    %selectable: true
+                }
+                
+	],
+    IncludedProperties = ['krp:hasERCTask', 'krp:hasActivity','hasDsca', 'hasIDI', 'hasCustomer','isResponsible', 'hasStartDate', 'hasEndDate','plannedHours', 'realHours'],
+    NavigableProperties =['isResponsible','hasCustomer'],
+
+    concatConstants([
+        '?hasDataset @ ( \n',
+        '?I type ?hasClass.\n',
+        'like_ci(?hasKw, ?I). \n',
+        'get_dsca(?I, ?D). \n',
+        'like_ci(?hasDsca, ?D). \n',
+        '?pointer = {navigableProperties: ?hasNavigableProperties, includedProperties:?hasIncludedProperties,hasDataset:?hasDataset,hasKw:?I}. \n',
+        'rg_obj_get(_,?pointer,_,?OUT). \n'
+
+    ],DOC_S_CODE),
+	concatConstants([
+        '?hasDataset @ ( \n',
+        '?hasInstance ?hasProperty ?I.\n',
+        'like_ci(?hasKw, ?I). \n',
+        'get_dsca(?I, ?D). \n',
+        'like_ci(?hasDsca, ?D). \n',
+        '?pointer = {hasInstance: ?hasInstance, navigableProperties: ?hasNavigableProperties, includedProperties:?hasIncludedProperties,hasDataset:?hasDataset,hasKw:?I}. \n',
+        'rg_obj_get(_,?pointer,_,?OUT). \n'
+    ],_DOC_S_NAV),    
+    IN_NAV_ACTIVITY= {
+        hasAgent: I_agent_doc,
+        hasDataset: I_dataset,
+        hasInstance: 'ss:project',
+        hasProperty: 'krp:hasActivity',
+        hasKw: '*',
+        hasIDI: '*',
+        hasDsca: '*',
+        enabled: false,
+        limit: 30,
+        persistence: 'remote',
+        resizable: true,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Table_Schema,
+        hasTemplate: {
+                    'ss:project':{
+                        hasDsca:  '_.hasDsca',
+                        hasDscaIcon:  'project',
+                        hasTxt: 'Responsable <b>{_.isResponsible.hasDsca}</b>',
+                        hasIconClass: 'project',
+                        hasCaption: '_.hasIDI'
+                    },
+                    'ss:folder':{
+                        hasDsca:  '_.hasDsca',
+                        hasIconClass: 'folder'
+                    }                      
+        }
+    },
+    IN_NAV_PART = {
+        hasAgent: I_agent_doc,
+        hasDataset: I_dataset,
+        hasInstance: 'ss:project',
+        hasProperty: 'krp:hasERCTask',
+        hasKw: '*',
+        hasIDI: '*',
+        hasDsca: '*',
+        enabled: false,
+        limit: 40,
+            persistence: 'remote',
+        resizable: true,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Table_Schema,
+        hasTemplate: {
+                    'ss:project':{
+                        hasDsca:  '_.hasDsca',
+                        hasDscaIcon:  'project',
+                        hasTxt: 'Responsable <b>{_.isResponsible.hasDsca}</b>',
+                        hasIconClass: 'project',
+                        hasCaption: '_.hasIDI'
+                    },
+                    'ss:folder':{
+                        hasDsca:  '_.hasDsca',
+                        hasIconClass: 'folder'
+                    }                    
+        }
+    },
+    % En este ejemplo no es necesario gui_in, ni gui_out porque al meter type: krpsearch se sobrecarga por extension en JS
+    NAV = [{ hasProperty: 'krp:hasActivity',  in: IN_NAV_ACTIVITY},
+           { hasProperty: 'krp:hasERCTask',   in: IN_NAV_PART }
+    ],    
+    IN = {
+            hasAgent: I_agent_doc,
+            hasDataset: I_dataset,
+            hasClass: 'ss:project',
+            hasKw: '*',
+            hasIDI: '*',
+            hasDsca: '*',
+            code: DOC_S_CODE,
+            rootElement: true,
+            expanded: false,
+            enabled: false,
+            limit: 40,
+            persistence : 'remote',
+            schemaHeader: true,
+            resizable: true,
+            hasIncludedProperties : IncludedProperties,
+            hasNavigableProperties: NavigableProperties,
+            schema: Table_Schema,
+            nav: NAV,
+            cols: 4,
+            reset: true,
+            %multiple: true,
+            hasTemplate: {
+                    'ss:project':{
+                        hasDsca:  '_.hasDsca',
+                        hasDscaIcon:  'project',
+                        hasIconClass: 'project',
+                        hasTxt: 'Responsable <b>{_.isResponsible.hasDsca}</b>',
+                        hasCaption: '_.hasIDI'
+                    },
+                    'ss:folder':{
+                        hasDsca:  '_.hasDsca',
+                        hasIconClass: 'folder',
+                        type: 'myBox'
+                    }                      
+            }
+    },	
+    Obj_kgallery = {
+            in : IN,
+            type : 'kgallery',     
+            busId: Bus_Kgallery,            
+            proc: { type: 'function', name: 'rql', context: { delegatedTo: I_agent_doc } }
+    },
+    Obj_main = {
+        type:'assembly',
+        children: [            
+            {
+                type: 'assembly',
+                children:[
+                    {                
+                        type: 'button',                
+                        label: { icon: 'ray', d: 'Refresh' },                
+                        events: [{
+                            type: 'click',
+                            method: 'refresh_gui',
+                            targetBusId: Bus_Kgallery
+                        }]
+                    },
+                    {                
+                        type: 'button',                
+                        label: { icon: 'layout', d: '4 col' },                
+                        events: [{
+                            type: 'click',
+                            method: 'log',                            
+                            targetBusId: Bus_Kgallery,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: {cols: 4}, name: 'change_config', busId: Bus_Kgallery}
+                                ]
+                            }
+                        }]
+                    },
+                    {                
+                        type: 'button',                
+                        label: { icon: 'layout', d: '2 col' },                
+                        events: [{
+                            type: 'click',
+                            method: 'log',                            
+                            targetBusId: Bus_Kgallery,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: {cols: 2}, name: 'change_config', busId: Bus_Kgallery}
+                                ]
+                            }
+                        }]
+                    },
+                    {                
+                        type: 'button',                
+                        label: { icon: 'layout', d: '1 col' },                
+                        events: [{
+                            type: 'click',
+                            method: 'log',                            
+                            targetBusId: Bus_Kgallery,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: {cols: 1}, name: 'change_config', busId: Bus_Kgallery}
+                                ]
+                            }
+                        }]
+                    },
+                     {                
+                        type: 'button',                
+                        label: { icon: 'back', d: 'Volver' },                
+                        events: [{
+                            type: 'click',
+                            method: 'log',                            
+                            targetBusId: Bus_Kgallery,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', name: 'goBack', busId: Bus_Kgallery}
+                                ]
+                            }
+                        }]
+                    }
+                ]
+            },
+            {
+                type: 'assembly',
+                scroll: 'main',
+                children:[Obj_kgallery]
+            }
+        ]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: Obj_main,
+        hasKw: rproc__4gl_gallery,
+        hasDsca: 'kgallery: Exploración con RQL sobre proyectos y carpetas',
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_gallery::usecase__rql_galleryOfita'(_, _OBJ_in, _, OBJ_out) :-
+
+    I_agent_doc = 'builderweb',
+    I_dataset   = 'dataset__erc_ofita_product_v0_builderWeb_test',                
+    newKw('rprocess',NewKw),
+    atom_concat('bus__', NewKw, Bus_Kgallery),
+    atom_concat('channel__', NewKw, Channel_Kgallery),
+
+    Table_Schema = [
+        {
+            label: {
+                d: 'Palabra Clave'
+            },
+            arc: 'hasKw',
+            sorted: true
+        },
+         {
+            label: {
+                d: 'Descripción'
+            },
+            arc: 'hasDsca',
+            sorted: false
+        },
+        {
+            label: {
+                d: 'Imagen'
+            },
+            arc: 'hasImage',
+            sorted: false
+        }
+	],
+
+    IncludedProperties = ['hasKw', 'hasDsca', 'hasImage', 'subclassOf'],
+    NavigableProperties =['subclassOf'],
+
+    IN_NAV_DSCA= {
+        query: 'stmt(subclassOf, HASKW, ?hasInstance)',
+        hasAgent: I_agent_doc,
+        persistence: 'remote',
+        hasDataset: I_dataset,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Table_Schema,
+        searchType: 'rem',
+        hasProperty: ['subclassOf'],
+        hasTemplate: {
+            class:{
+                hasDsca:  '_.hasDsca',
+                hasKw : '_.hasKw',
+                hasImage: '/repcon/f_get/repository/{_.hasImage}',
+                subclassOf: '_.subclassOf'
+            },
+            default:{
+                hasKw : '_.hasKw',
+                subclassOf: '_.subclassOf',
+                hasIconClass: 'folder',
+                type: 'myBox'
+            }                      
+        }
+    },
+
+    NAV = [{ hasProperty: 'subclassOf',  in: IN_NAV_DSCA}],
+     
+    IN = {
+        hasAgent: I_agent_doc,
+        hasDataset: I_dataset,
+        query: 'stmt(subclassOf, HASKW, ditemOfita)', 
+        hasKw: 'ditemOfita',
+        persistence: 'remote',
+        multiselection: true,
+        reset: true,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        nav: NAV,
+        stmtFilter: '[HASKW]',
+        searchType: 'rem',
+        schema: Table_Schema,
+        hasTemplate: {
+            class:{
+                hasDsca:  '_.hasDsca',
+                hasKw : '_.hasKw',
+                hasImage: '/repcon/f_get/repository/{_.hasImage}',
+                subclassOf: '_.subclassOf'
+            },
+            default:{
+                hasKw : '_.hasKw',
+                hasDsca:  '_.hasDsca',
+                subclassOf: '_.subclassOf',
+                hasIconClass: 'folder',
+                type: 'myBox'
+            }                      
+        }
+    },
+
+    Obj_kgallery = {
+            in : IN,
+            type : 'kgallery',     
+            busId: Bus_Kgallery,
+            hasChannel: Channel_Kgallery,            
+            % do_exec: true,
+            evtPublish: [{ topic: 'setNode', channel: Channel_Kgallery }, { topic: 'setNodes', channel: Channel_Kgallery }],
+            evtSubscribe: [{ topic: 'clearSelected', channel: Channel_Kgallery }, { topic: 'clearSelection', channel: Channel_Kgallery }],
+            proc: { type: 'function', name: 'remql', context: { delegatedTo: I_agent_doc } }
+    },
+    Obj_main = {
+        type:'assembly',
+        children: [
+            {
+                type: 'assembly',
+                children:[
+                    {                
+                        type: 'button',                
+                        label: { icon: 'ray', d: 'Refresh' },                
+                        events: [{
+                            type: 'click',
+                            method: 'refresh_gui',
+                            targetBusId: Bus_Kgallery
+                        }]
+                    },
+                    {                
+                        type: 'button',                
+                        label: { icon: 'layout', d: '4 col' },                
+                        events: [{
+                            type: 'click',
+                            method: 'log',                            
+                            targetBusId: Bus_Kgallery,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: {cols: 4}, name: 'change_config', busId: Bus_Kgallery}
+                                ]
+                            }
+                        }]
+                    },
+                    {                
+                        type: 'button',                
+                        label: { icon: 'layout', d: '2 col' },                
+                        events: [{
+                            type: 'click',
+                            method: 'log',                            
+                            targetBusId: Bus_Kgallery,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: {cols: 2}, name: 'change_config', busId: Bus_Kgallery}
+                                ]
+                            }
+                        }]
+                    },
+                    {                
+                        type: 'button',                
+                        label: { icon: 'layout', d: '1 col' },                
+                        events: [{
+                            type: 'click',
+                            method: 'log',                            
+                            targetBusId: Bus_Kgallery,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: {cols: 1}, name: 'change_config', busId: Bus_Kgallery}
+                                ]
+                            }
+                        }]
+                    },
+                     {                
+                        type: 'button',                
+                        label: { icon: 'back', d: 'Volver' },                
+                        events: [{
+                            type: 'click',
+                            method: 'log',                            
+                            targetBusId: Bus_Kgallery,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', name: 'goBack', busId: Bus_Kgallery}
+                                ]
+                            }
+                        }]
+                    }
+                ]
+            },
+            {
+                type: 'assembly',
+                scroll: 'main',
+                children:[Obj_kgallery]
+            }
+        ]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: Obj_main,
+        hasKw: rproc__4gl_galleryOfita,
+        hasDsca: 'kgallery: Preparación y ejecución de la búsqueda sobre clases en RQL contra un agente remoto dataset__ssa_test',
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+    
+
+'staber_gallery::usecase__rql_gallery_nav_without_selection'(_, _, _, Obj_out):-
+     
+   'staber_gallery::usecase__rql_gallery_nav_without_selection::tag_machines'(L_machines),  
+   % TAnto gallery como la ficha del contacto so dos tags locales que se registran con hasAvailableStateMachine 
+   newKw(busId, BUS), 
+    Obj_main = {
+        type: 'rprocess',   
+        busId:  BUS,   
+        hasKw: rproc__4gl_gallery_nav_sin_selec,
+        hasDsca: 'kgallery: Ejemplo de contactos en gallery con navegación  y miga de pan sin selección',
+        hasIcon: 'group',
+        isSession: true,
+        hasNavbar: true,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],   
+        hasAvailableStateMachine: L_machines,
+        in: {
+            hasTag: 'mygallery'
+        }        
+    },       
+    create_rprocess(_,Obj_main,_,Obj_out).
+
+'staber_gallery::rql__folders'(_, _, _, _):-    
+     Title =  'Configuración RQL con escenarios de persistencia',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_rql_persistent,            
+            hasDsca: Title,            
+            hasIcon: 'folder',
+            isRoot: false, 
+            hasERCPart: [
+                rproc__4gl_pivotgrid_local,
+                rproc__4gl_pivotgrid_remote
+                
+            ],     
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },_,_).
+
+'staber_gallery::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_gallery_rproc,
+        hasDsca: 'kgallery (Radcore)',
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            rproc__4gl_gallery,
+            rproc__4gl_galleryOfita,
+            rproc__4gl_gallery_nav_sin_selec
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).
+
+
+
+'staber_gallery::usecase__rql_gallery_nav_without_selection::tag_machines'(L_machines):-
+    'staber_gallery::myprofile'(MyProfile),
+    'staber_gallery::mygallery'(MyGallery),
+    % Titulos multiIdioma
+    
+    L_machines = [
+        { hasKw: 'maintenance_000', hasDsca: 'Detalles de Contacto', hasTag: 'contactDetails', hasControl: MyProfile },
+        { hasKw: 'mygallery_000',   hasDsca: 'Galería', hasTag: 'mygallery', hasControl: MyGallery }
+    ].
+
+
+'staber_gallery::myprofile'(OBJ):-    
+    DATASET = 'Default',
+    AGENT = 'builderweb',
+    newKw('BusId__myProfile__', BUSID),
+    newKw('BusId__myProfile__form', BUSIDFORM),
+    'staber_gallery::my_profile_template'(TEMPLATE),    
+    OBJ={
+        type: kdetail,
+        do_exec: true,
+        busId: BUSID,
+        in: {        
+            hasEvent: 'e_init',
+            enabled: false,  
+            hasAgent: AGENT,
+            hasDataset: DATASET,
+            template: TEMPLATE,
+            hasKw: '$.in.hasKw',
+            hasKwc: '$.in.hasKwc',
+            hasArea:{
+                form:{
+                    busId: BUSIDFORM
+                }
+            }
+        }
+    }.
+
+
+'staber_gallery::my_profile_template'(TEMPLATE):-    
+    TEMPLATE = {
+        type: assembly,
+        children:[{
+            type: assembly,
+            label: {
+                d: 'profile.basic_information',
+                i18n: d
+            },
+            children:[
+                {
+                    arc: 'hasIcon',
+                    multiple: false,
+                    resourcepath: 'repository/data/profiles/',
+                    classList: ['user', 'lite-view'],
+                    appearance: 'wide',
+                    mimetype: 'app/img'
+                },
+                {
+                    arc: 'contact:hasName',
+                    hasIcon: 'user-line'
+                },
+                {
+                    arc: 'contact:hasEmail',
+                    inputtype: 'mailto',
+                    required: true,
+                    hasIcon: 'email-line',
+                    label:{
+                        d: 'profile.basic_information.hasEmail',
+                        i18n: 'd'
+                    },
+                    enabled: false
+                },
+                {
+                    arc: 'contact:hasPhoneNumber',
+                    inputtype: 'tel',
+                    required: true,
+                    hasIcon: 'phone-line',
+                    label:{
+                        d: 'profile.basic_information.hasMobile',
+                        i18n: 'd'
+                    }
+                }
+            ]
+        }        
+        ]
+    }.
+
+
+'staber_gallery::mygallery'(Obj_kgallery_assembly):-
+
+    I_agent = 'builderweb',
+    I_dataset   = 'Default',
+    IncludedProperties = ['hasDsca', 'hasImage' ],    
+    Table_Schema = [
+                {
+                    label: {
+                        d: 'Descripción'
+                    },
+                    arc: 'hasKw',
+                    path: '$.hasDsca'
+                    %selectable: true
+                }
+                
+	],
+    IN = {
+        cols: 8,
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        query: 'stmt(type, HASKW, \'testapp:contact\')', 
+        hasKw: 'testapp:contact',
+        persistence: 'remote',        
+        reset: true,
+        hasIncludedProperties : IncludedProperties,                
+        stmtFilter: '[HASKW]',
+        searchType: 'rem',
+        schema: Table_Schema,
+        hasTemplate: {
+            'testapp:contact':{
+                hasDsca:  '_.hasDsca',
+                hasKw : '_.hasKw',
+                hasImage: '/repcon/f_get/{_.hasImage}',
+                /*
+                children: [
+                    {
+                        'type': 'label',
+                        'd': 'Texto libre que podemos indicar como abstract de información y donde se puede meter cualquier control',
+                        'events': [
+                            {
+                                'type': 'click'
+                            }  
+                        ]  
+                    }
+                ],
+                hasActions : [
+                    {
+                        'label': {
+                            'text': 'Compartir',
+                            'icon': 'share2'
+                        }
+                    },
+                    {
+                        'label': {
+                            'd': 'Enviar por correo',
+                            'icon': 'email'
+                        }
+                    }
+                ],
+                */        
+                events:[{
+                    type: 'click',
+                    method: 'nav',                    
+                    targetBusId: '$.busId',
+                    payload:{
+                        in:{
+                            hasKw : '_.hasKw',
+                            hasKwc: 'testapp:contact'
+                        },
+                        hasDsca: 'Perfil de {_.hasDsca}',                        
+                        hasTag :'contactDetails',
+                        navOptions: {
+                            navbar: add
+                        }
+                    }
+                }]
+            }                      
+        }
+    },
+    newKw('gallery', NewKw),
+    atom_concat('bus__', NewKw, Bus_Kgallery),
+    atom_concat('channel__', NewKw, Channel_Kgallery),  
+      
+    Obj_kgallery = {
+            in : IN,
+            type : 'kgallery',     
+            hasDsca: 'GALLERY con navegación a TAGS sin selección',
+            hasKw: NewKw,
+            busId: Bus_Kgallery,
+            hasChannel: Channel_Kgallery,  
+            evtSubscribe: [{ topic: 'clearSelected', channel: Channel_Kgallery }, { topic: 'clearSelection', channel: Channel_Kgallery }],
+            proc: { type: 'function', name: 'remql', context: { delegatedTo: I_agent } }
+    },
+    Obj_kgallery_assembly = {
+        type: 'assembly',
+        children:[
+            {
+                type: 'assembly',
+                children:[
+                    {                
+                        type: 'button',                
+                        label: { icon: 'ray', d: 'Refresh' },                
+                        events: [{
+                            type: 'click',
+                            method: 'refresh_gui',
+                            targetBusId: Bus_Kgallery
+                        }]
+                    },
+                     {                
+                        type: 'button',                
+                        label: { icon: 'layout', d: '16 col' },                
+                        events: [{
+                            type: 'click',
+                            method: 'log',                            
+                            targetBusId: Bus_Kgallery,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: {cols: 16}, name: 'change_config', busId: Bus_Kgallery}
+                                ]
+                            }
+                        }]
+                    },
+                    {                
+                        type: 'button',                
+                        label: { icon: 'layout', d: '8 col' },                
+                        events: [{
+                            type: 'click',
+                            method: 'log',                            
+                            targetBusId: Bus_Kgallery,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    { type: 'method', in: {cols: 8}, name: 'change_config', busId: Bus_Kgallery}
+                                ]
+                            }
+                        }]
+                    }           
+                ]
+            },
+            {
+                type: 'assembly',
+                scroll: 'main',
+                children:[Obj_kgallery]
+            }
+        ]
+    }.

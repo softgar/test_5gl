@@ -1,0 +1,481 @@
+﻿/**
+@descr	staber_kadvancedsearch <br>
+		staber_kadvancedsearch
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kadvancedsearch') :-    
+	class +$ 'staber_kadvancedsearch' d ( es,'Patrón rproc para kadvancedsearch') sc function,
+    'staber_kadvancedsearch::usecase__1'(_, _, _, _),
+    'staber_kadvancedsearch::usecase__2'(_, _, _, _),
+    'staber_kadvancedsearch::usecase__3'(_, _, _, _),
+    'staber_kadvancedsearch::usecase__els_001'(_, _, _, _),
+    'staber_kadvancedsearch::usecase__els_002'(_, _, _, _),
+    'staber_kadvancedsearch::folders'(_, _, _, _).
+
+
+'staber_kadvancedsearch::usecase__1'(_, _OBJ_in, _, OBJ_out):-
+    KWC = 'testapp:contact',
+    I_dataset =  'Default',
+    TestDsca = '001 Búsquedas avanzadas sobre contactos ( classProperties)',
+    TestKW = 'test_kadvancedsearch__001',
+    Obj_in =  {
+        hasKwc: KWC,
+        enabled: true,
+        hasDataset: I_dataset,        
+        hasPropertySearchMode: 'classProperties'
+    },
+    'staber_kadvancedsearch::usecase__1_common'( TestKW, TestDsca, Obj_in, OBJ_out).
+
+'staber_kadvancedsearch::usecase__2'(_, _OBJ_in, _, OBJ_out):-
+    KWC = 'testapp:contact',
+    I_dataset =  'Default',
+    TestDsca = '002 Búsquedas avanzadas sobre contactos ( allProperties)',
+    TestKW = 'test_kadvancedsearch__002',
+    Obj_in = {
+        hasKwc: KWC,
+        enabled: true,
+        hasDataset: I_dataset,
+        hasPropertySelect: 'zoom',
+        hasPropertySearchMode: 'allProperties'
+    },
+    'staber_kadvancedsearch::usecase__1_common'( TestKW, TestDsca, Obj_in, OBJ_out).
+
+'staber_kadvancedsearch::usecase__3'(_, _OBJ_in, _, OBJ_out):-
+    KWC = 'testapp:contact',
+    I_dataset =  'Default',
+    TestDsca = '003 Búsquedas avanzadas sobre contactos ( customProperties)',
+    TestKW = 'test_kadvancedsearch__003',
+    Obj_in = {
+        hasKwc: KWC,
+        enabled: true,
+        hasDataset: I_dataset,
+        hasPropertySearchMode: 'customProperties',
+        hasCustomPropertyLst: [  'contact:hasName', 'contact:hasBirthDate', 'contact:hasAge']
+    },
+    'staber_kadvancedsearch::usecase__1_common'( TestKW, TestDsca, Obj_in, OBJ_out).
+
+
+'staber_kadvancedsearch::usecase__1_common'( TestKW, TestDsca, OBJ_in, OBJ_out):-
+    newKw('BusId_kadvancedsearch__',BUS_FORM),
+    newKw('BusId_search__',BUS_PROCESS),
+    concatConstants( ['kadvancedsearchForm_', TestKW], AdvancedSearchForm_KW),
+
+    Obj_form = {
+        type: 'kadvancedsearch',
+        busId: BUS_FORM,
+        hasKw: AdvancedSearchForm_KW,
+        hasDsca: TestDsca,
+        in: OBJ_in
+    },
+
+    Obj_search = {
+        type: 'assembly',
+        children: [
+            {
+                type: button,
+                label: {
+                    d: 'Buscar',
+                    icon: search
+                },
+                appearance: flat,
+                events: [
+                    {
+                        type: 'click',
+                        method: 'refresh_gui',
+                        targetBusId: BUS_PROCESS,                        
+                        p_exec:{
+                            type: sequence,
+                            hasProcess: [
+                                {  type: 'method', in: { format: 'json' },name: 'getSelectedProperties', busId : BUS_FORM},                                                                                                
+                                { type: 'method', in: {searchType: 'rem'}, name: 'selectedPropertiesToFilter', module: 'QueryFilterService' },    
+                                { type: 'method', name: 'merge_in', busId: BUS_PROCESS }    
+                            ]
+                        }
+                    }
+                ]
+            },
+            Obj_form
+        ]
+    },
+
+    IN = { selectedProperties: [] },
+
+    PROC = {
+        type: 'sequence',
+        context: { delegatedTo: 'builderweb' },
+        hasProcess: [
+            {
+                type: 'function',
+                name: 'staber_kadvancedsearch::usecase__1::gui_out',
+                context: { delegatedTo: 'builderweb' }
+            }                    
+        ]                                
+    },
+    
+    Obj_proc = {        
+        type: 'rprocess',        
+        in: IN,
+        busId: BUS_PROCESS,
+        do_exec: true,
+        hasDsca: [('es', TestDsca)],
+        hasKw: TestKW,
+        hasIcon: 'search',           
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_in: Obj_search,        
+        gui_out: PROC
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_kadvancedsearch::usecase__1::gui_out'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_get(in:selectedProperties, Obj_in, Value, ''),
+    Obj_out1= {
+            type: 'textarea',
+            editor:json,
+            hasNumberLines: 20,
+            expandAll: true,
+            value: Value,                
+            label: {
+                d: 'selectedProperties'
+            }                
+     },
+     obj_get(in:query, Obj_in, Value1, ''),
+     Obj_out2= {
+                type: 'textarea',                
+                hasNumberLines: 2,
+                value: Value1,                
+                label: {
+                    d: 'query'
+                }                
+    },
+    Obj_out = {
+        type:'assembly',
+        children:[Obj_out1, Obj_out2]
+    }.
+
+ 
+/* Ejemplo de Resultados en ELS */   
+'staber_kadvancedsearch::usecase__els_001'(_, _, _, OBJ_out) :-    
+    newKw(bus__search, BUS_SEARCH),
+    newKw(bus__process, BUS_PROCESS),
+    newKw(bus__result, BUS_RESULT),
+    IN = {
+           bus_ksearch: BUS_SEARCH,
+           bus_kresult: BUS_RESULT,
+           bus_rprocess: BUS_PROCESS,
+           value : '',
+           hasDataset: 'incidencias1',
+           hasKw: 'incident'
+    },
+    PROC_IN = {
+        type: 'sequence',
+        context: { delegatedTo: 'builderweb' },
+        hasProcess: [
+            {
+                type: 'function',
+                name: 'staber_kadvancedsearch::usecase__els::gui_in',
+                context: { delegatedTo: 'builderweb' }
+            }                    
+        ]                                
+    },
+    PROC_OUT = {
+        type: 'sequence',
+        context: { delegatedTo: 'builderweb' },
+        hasProcess: [
+            {
+                type: 'function',
+                name: 'staber_kadvancedsearch::usecase__els::gui_out',
+                context: { delegatedTo: 'builderweb' }
+            }                    
+        ]                                
+    },    
+    Title = 'Búsquedas texto libre sobre incidencias',    
+    Obj_proc = {        
+        type: 'rprocess',        
+        in: IN,
+        busId: BUS_PROCESS,
+        do_exec: true,
+        hasDsca: [('es', Title)],
+        hasKw: test_kadvancedsearch__004,
+        hasIcon: 'search',           
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_in:  PROC_IN,
+        gui_out: PROC_OUT
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+ 
+/* Ejemplo de Resultados en ELS */   
+'staber_kadvancedsearch::usecase__els_002'(_, _, _, OBJ_out) :-    
+    newKw(bus__search, BUS_SEARCH),
+    newKw(bus__process, BUS_PROCESS),
+    newKw(bus__result, BUS_RESULT),
+    IN = {
+           bus_ksearch: BUS_SEARCH,
+           bus_kresult: BUS_RESULT,
+           bus_rprocess: BUS_PROCESS,
+           value : '',
+           hasDataset: 'documentos',
+           hasKw: 'document'
+    },
+    PROC_IN = {
+        type: 'sequence',
+        context: { delegatedTo: 'builderweb' },
+        hasProcess: [
+            {
+                type: 'function',
+                name: 'staber_kadvancedsearch::usecase__els::gui_in',
+                context: { delegatedTo: 'builderweb' }
+            }                    
+        ]                                
+    },
+    PROC_OUT = {
+        type: 'sequence',
+        context: { delegatedTo: 'builderweb' },
+        hasProcess: [
+            {
+                type: 'function',
+                name: 'staber_kadvancedsearch::usecase__els::gui_out',
+                context: { delegatedTo: 'builderweb' }
+            }                    
+        ]                                
+    },    
+    Title = 'Búsquedas texto libre sobre Documentos (MD)',    
+    Obj_proc = {        
+        type: 'rprocess',        
+        in: IN,
+        busId: BUS_PROCESS,
+        do_exec: true,
+        hasDsca: [('es', Title)],
+        hasKw: test_kadvancedsearch__005,
+        hasIcon: 'search',           
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_in:  PROC_IN,
+        gui_out: PROC_OUT
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_kadvancedsearch::usecase__els::gui_in'(_,Obj_in,_,Obj_out):-    
+    obj_get(in:bus_ksearch, Obj_in, BUS_SEARCH),
+    obj_get(in:bus_rprocess, Obj_in, BUS_PROCESS),
+    obj_get(in:value, Obj_in, VALUE, ''),
+    IN_SEARCH = {
+        hiddenButtons: ['case'], 
+        value : VALUE       
+    },            
+    Obj_out = {
+        type : 'ksearch',
+        in: IN_SEARCH,
+        busId: BUS_SEARCH,
+        events:[{
+            type: 'search',
+            method: 'log',
+            targetBusId: BUS_PROCESS,   
+            p_exec:{
+                type: 'sequence',            
+                hasProcess: [{                
+                    type: 'method',
+                    name: 'exec',
+                    busId: BUS_PROCESS
+                },
+                {                
+                    type: 'method',
+                    name: 'exec',
+                    busId: BUS_SEARCH
+                }]                                
+            }
+        }]
+    }.
+'staber_kadvancedsearch::usecase__els::gui_out'(_,Obj_in,_,Obj_out):-    
+    obj_get(in:value, Obj_in, Query_aux, '*'),
+    obj_get(in:hasDataset, Obj_in, Dataset),
+    obj_get(in:hasKw, Obj_in, Kwc),
+    ( Query_aux == '' ->
+        Query = '*'
+    ; 
+        Query = Query_aux
+    ),
+    obj_get(in:bus_kresult, Obj_in, BUS_KRESULT),
+   'staber_kadvancedsearch::schema::usecase__els'(Kwc, OBJ_schema),
+    CODE = {
+        'query_string': {
+           'query': Query
+        }
+    },
+    IN_RESULT = {
+        selectable: true,
+        orderByOneColumn: false,
+        searchType: 'els',
+        hasDataset: Dataset,
+        hasAgent: 'repconELS',
+        hasELSServer:'http://192.168.21.226:9200',
+        code: CODE, 
+        schema: OBJ_schema
+    },    
+    Obj_out = {  
+        type : 'kresult',
+        in : IN_RESULT,
+        do_exec: true,
+        busId: BUS_KRESULT
+    }.
+
+
+'staber_kadvancedsearch::schema::usecase__els'(incident, OBJ_out):-
+   !,
+    Schema = [  
+                {
+                    label: {
+                        d: 'Tipo'
+                    },
+                    arc: 'type'
+                },                 
+                {
+                    label: {
+                        d: 'Palabra clave'
+                    },
+                    arc: 'hasKw'
+                },
+                {
+                    label: {
+                        d: 'Fecha de Creación'
+                    },
+                    arc: 'createdOn',
+                    inputtype: 'date',
+                    sorted: true,
+                    range: date,
+                    filter:true
+                },  
+                 {
+                    label: {
+                        d: 'Resumen'
+                    },
+                    arc: 'hasTxt',
+                    range: clob,
+                    control: {
+                        type: 'html'
+                    }
+                },
+                {
+                    label: {
+                        d: 'Usuario'
+                    },
+                    arc: 'hasUser',
+                    sorted: true,
+                    control: {
+                        type: 'html'
+                    }
+                },  
+                {
+                    label: {
+                        d: 'Equipo Soporte'
+                    },
+                    arc: 'hasSupportTeam',
+                    sorted: true,
+                    control: {
+                        type: 'html'
+                    }
+                },                                                                      
+
+                {
+                    label: {
+                        d: 'Grupo Soporte'
+                    },
+                    arc: 'hasSupportGroup',
+                    sorted: true,
+                    control: {
+                        type: 'html'
+                    }
+                },  
+                 {
+                    label: {
+                        d: 'Técnico asignado'
+                    },
+                    arc: 'hasTechnician',
+                    sorted: true,
+                    control: {
+                        type: 'html'
+                    }
+                },                                                                       
+				{
+                    label: {
+                        d: 'Facturable'
+                    },
+                    arc: 'isBillable',
+                    range: boolean,
+                    control:{
+                        type: 'checkbox',
+                        appearance: 'toggle2'
+                    }
+                }
+               
+	],
+    OBJ_out = {data: Schema}.
+'staber_kadvancedsearch::schema::usecase__els'(document, OBJ_out):-
+   !,
+    Schema = [  
+                {
+                    label: {
+                        d: 'Tipo'
+                    },
+                    arc: 'type'
+                },                 
+                {
+                    label: {
+                        d: 'Palabra clave'
+                    },
+                    arc: 'hasKw'
+                },
+                {
+                    label: {
+                        d: 'Descripción'
+                    },
+                    arc: 'hasDsca'
+                    
+                },  
+                 {
+                    label: {
+                        d: 'Resumen'
+                    },
+                    arc: 'hasTxt_c',
+                    range: clob,
+                    control: {
+                        type: 'textarea',
+                        enabled: true
+                    }
+                },
+                {
+                    label: {
+                        d: 'Url'
+                    },
+                    arc: 'hasUrl'
+                },   
+                {
+                    label: {
+                        d: 'Módulo'
+                    },
+                    arc: 'doc_has_module'
+                }
+               
+	],
+    OBJ_out = {data: Schema}.
+'staber_kadvancedsearch::folders'(_, _, _, _):-
+    Title = 'kadvancedsearch *(En desarrollo)',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_kadvancedsearch,
+        hasDsca: Title,
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasIcon: 'dinamic',
+        hasERCPart: [
+            test_kadvancedsearch__001,
+            test_kadvancedsearch__002,
+            test_kadvancedsearch__003,
+            test_kadvancedsearch__004,
+            test_kadvancedsearch__005
+        ]
+	},	
+    create_rprocess(_, Conf_folder, _, _).
+
+

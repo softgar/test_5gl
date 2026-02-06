@@ -1,0 +1,221 @@
+
+{
+    "data": {
+        "type": "assembly",
+        "children": [{
+            "type":"assembly",
+            "children":[{
+                "type": "assembly",
+                "width": 50,
+                "label": {
+                    "d": "1. Configurar evento X de cierre"
+                },
+                "children": [
+                    {
+                        "type": "button",
+                        "label": {
+                            "d": "ShowDialog"
+                        },
+                        "events": [{
+                            "type": "click",
+                            "targetBusId": "rdlg__001",
+                            "method": "showDialog"
+                        }]
+                    },
+                    {
+                        "type": "textarea",
+                        "editor":"json",
+                        "enabled": false,
+                        "lines": 7,
+                        "value": "{\"type\":\"rdlg\",\"busId\":\"rdlg__001\",\"in\":{\"visible\":false,\"close\":{\"type\":\"button\",\"classList\":[\"line-button\"],\"label\":{\"d\":\"Cerrar\"},\"enabled\":true,\"events\":[{\"type\":\"click\",\"targetBusId\":\"rdlg__001\",\"method\":\"cancel\"}]}}}"
+                    }
+                ]
+            },
+            {
+                "type": "assembly",
+                "width": 50,
+                "label": {
+                    "d": "2. Dialogo con evento de cierre personalizado en X pero sin acción de cierre"
+                },
+                "children": [
+                    {
+                        "type": "button",
+                        "label": {
+                            "d": "ShowDialog"
+                        },
+                        "events": [{
+                            "type": "click",
+                            "targetBusId": "rdlg__002",
+                            "method": "showDialog"
+                        }]
+                    },
+                    {
+                        "type": "textarea",
+                        "editor":"json",
+                        "enabled": false,
+                        "lines": 7,
+                        "value": "{\"type\":\"rdlg\",\"busId\":\"rdlg__002\",\"in\":{\"visible\":false,\"close\":{\"type\":\"button\",\"classList\":[\"line-button\"],\"visible\":false,\"label\":{\"d\":\"Cerrar\"},\"enabled\":true,\"events\":[{\"type\":\"click\",\"targetBusId\":\"rdlg__002\",\"method\":\"cancel\"}]}}}"
+                    }
+                ]
+            },
+            {
+                "type": "assembly",
+                "width": 50,
+                "label": {
+                    "d": "3. Dialogo sin X pero con acción de cierre"
+                },
+                "children": [
+                    {
+                        "type": "button",
+                        "label": {
+                            "d": "ShowDialog"
+                        },
+                        "events": [{
+                            "type": "click",
+                            "targetBusId": "rdlg__003",
+                            "method": "showDialog"
+                        }]
+                    },
+                    {
+                        "type": "textarea",
+                        "editor":"json",
+                        "enabled": false,
+                        "lines": 7,
+                        "value": "{\"type\":\"rdlg\",\"busId\":\"rdlg__003\",\"in\":{\"visible\":false,\"close\":false,\"options\":{\"label\":{\"d\":\"New user\",\"icon\":\"user\"},\"text\":\"Por favor, rellene los campos obligatorios\",\"actions\":[{\"type\":\"es6button\",\"classList\":[\"line-button\"],\"text\":\"Crear USuario\",\"enabled\":true},{\"type\":\"button\",\"classList\":[\"line-button\"],\"visible\":false,\"label\":{\"d\":\"Cerrar\"},\"enabled\":true,\"events\":[{\"type\":\"click\",\"targetBusId\":\"rdlg__003\",\"method\":\"cancel\"}]}]},\"data\":[{\"type\":\"assembly\",\"cols\":2,\"children\":[{\"type\":\"text\",\"required\":true,\"label\":{\"d\":\"Nombre\"}},{\"type\":\"text\",\"required\":true,\"label\":{\"d\":\"Apellidos\"}}]}]}}"
+                    }
+                ]
+            },
+            {
+                "type": "assembly",
+                "width": 50,
+                "label": {
+                    "d": "4. Dialogo con X pero sin acción de cierre (por defecto)"
+                },
+                "children": [
+                    {
+                        "type": "button",
+                        "label": {
+                            "d": "ShowDialog"
+                        },
+                        "events": [{
+                            "type": "click",
+                            "targetBusId": "rdlg__004",
+                            "method": "showDialog"
+                        }]
+                    },
+                    {
+                        "type": "textarea",
+                        "editor":"json",
+                        "enabled": false,
+                        "lines": 7,
+                        "value": "{\"type\":\"rdlg\",\"busId\":\"rdlg__004\"}"
+                    }
+                ]
+            }
+        ]
+        },
+        {
+            "type": "rdlg",
+            "busId": "rdlg__001",
+            "in":{
+                "visible": false,
+                "close":{
+                    "type": "button",
+                    "classList": ["line-button"],
+                    "label":{
+                        "d": "Cerrar"
+                    },
+                    "enabled": true,
+                    "events":[{
+                        "type": "click",
+                        "targetBusId": "rdlg__001",
+                        "method": "cancel"
+                    }]
+                }
+            }
+        },
+        {
+            "type": "rdlg",
+            "busId": "rdlg__002",
+            "in":{
+                "visible":false,
+                "close":{
+                    "type": "button",
+                    "classList": ["line-button"],
+                    "visible":false,
+                    "label":{
+                        "d": "Cerrar"
+                    },
+                    "enabled": true,
+                    "events":[{
+                        "type": "click",
+                        "targetBusId": "rdlg__002",
+                        "method": "cancel"
+                    }]
+                }
+            }
+        },
+        {
+            "type": "rdlg",
+            "busId": "rdlg__003",
+            "in":{
+                "visible":false,
+                "close":false,
+                "options":{
+                    "label":{
+                        "d": "New user",
+                        "icon": "user"
+                    },
+                    "text": "Por favor, rellene los campos obligatorios",
+                    "actions":[{
+                        "type": "es6button",
+                        "classList": ["line-button"],
+                        "text": "Crear USuario",
+                        "enabled": true
+                    },
+                    {
+                        "type": "button",
+                        "classList": ["line-button"],
+                        "visible":false,
+                        "label":{
+                            "d": "Cerrar"
+                        },
+                        "enabled": true,
+                        "events":[{
+                            "type": "click",
+                            "targetBusId": "rdlg__003",
+                            "method": "cancel"
+                        }]
+                    }]
+                },
+                "data":[
+                    {
+                        "type":"assembly",
+                        "cols":2,
+                        "children":[
+                            {
+                                "type": "text",
+                                "required":true,
+                                "label": {
+                                    "d": "Nombre"
+                                }
+                            },
+                            {
+                                "type": "text",
+                                "required":true,
+                                "label": {
+                                    "d": "Apellidos"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "type": "rdlg",
+            "busId": "rdlg__004"
+        }
+    ]}
+}
+                    

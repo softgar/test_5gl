@@ -1,0 +1,1680 @@
+﻿/**
+@descr	staber_kchart <br>
+		staber_kchart
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kchart') :-
+	class +$ 'staber_kchart' d ( es,'Patrón rproc para kchart') sc function,
+    'staber_kchart::contact_age_bar'(_, _, _, _),
+    'staber_kchart::usecase__000'(_, _, _, _), % Resumen
+    'staber_kchart::usecase__001'(_, _, _, _), % pie + sql
+    'staber_kchart::usecase__002'(_, _, _, _), % pie + rem
+    'staber_kchart::usecase__003'(_, _, _, _), % pie + rql
+    'staber_kchart::resultset_vars_in_event'(_, _, _, _),
+    'staber_kchart::bar_order_with_floats'(_, _, _, _),
+    'staber_kchart::bar_hasDsca_ordered_with_floats'(_, _, _, _),
+    'staber_kchart::usecase__serieColors'(_, _, _, _),
+    'staber_kchart::usecase__axis'(_, _, _, _),
+    'staber_kchart::usecase__legend'(_, _, _, _),
+    'staber_kchart::usecase__noLegend'(_, _, _, _),
+    'staber_kchart::nav_on_click'(_, _, _, _),
+    'staber_kchart_order_tests::folders'(_, _, _, _),
+    'staber_kchart_customization::folders'(_, _, _, _),
+    'staber_kchart_line_bar_series::folders'(_, _, _, _),
+    'staber_kchart::folders'(_, _, _, _).
+
+'staber_kchart::contact_age_bar'(_, _, _, OBJ_out):-
+    newKw('bus_', MYBUS),
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__test_5gl_server',    
+    Dimensions = [
+        {arc: 'hasKw'},
+        {arc: 'contact:hasName'},
+        {arc: 'contact:hasAge'}
+
+    ],
+    Ticks = {
+        hasLabel: 'contact:hasName',
+        hasDataValue: 'hasKw'
+    },
+    Metrics = {
+        arc: 'contact:hasAge',
+        aggregate: 'sum'
+    },
+    PREDICATE = 'staber_kchart::usecase__000__contact::rql',
+    IN = {
+        searchType: 'rql',
+        predicate: PREDICATE,
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        limit: 0,
+        hasDimension: Dimensions,
+        hasMetric: Metrics,
+        hasTick: Ticks,
+        hasDirection: 'vertical',
+        hasLayout: 'bar',
+        hasColors: true,
+        legend: true,
+        options: {
+            rowLimit: 10
+        },
+        categoryLabelsRotation: 45
+    },
+    OBJ_chart = {
+        type: 'kchart',
+        busId: MYBUS,
+        in: IN,
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: MYBUS,
+            payload:{
+                email: '_.contact:hasEmail'
+            },
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }],
+        hasKw: kchart__contact_age,
+        hasIcon: 'chart-line',
+        hasDsca: kchart_test_bar_contact_uiML,
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_chart, _,OBJ_out).
+
+'staber_kchart::nav_on_click'(_, _, _, OBJ_out):-
+    newKw('bus_', MYBUS),
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__test_5gl_server',    
+    Dimensions = [
+        {arc: 'hasKw'},
+        {arc: 'contact:hasName'},
+        {arc: 'contact:hasAge'}
+
+    ],
+    Ticks = {
+        hasLabel: 'contact:hasName',
+        hasDataValue: 'hasKw'
+    },
+    Metrics = {
+        arc: 'contact:hasAge',
+        aggregate: 'sum'
+    },
+    PREDICATE = 'staber_kchart::usecase__000__contact::rql',
+    IN = {
+        searchType: 'rql',
+        predicate: PREDICATE,
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        limit: 0,
+        hasDimension: Dimensions,
+        hasMetric: Metrics,
+        hasTick: Ticks,
+        hasDirection: 'vertical',
+        hasLayout: 'bar',
+        hasColors: true,
+        legend: true,
+        options: {
+            rowLimit: 10
+        },
+        categoryLabelsRotation: 45
+    },
+    OBJ_chart = {
+        type: 'kchart',
+        busId: MYBUS,
+        in: IN,
+        events:[{
+            type: 'click',
+            method: 'nav',
+            targetBusId: MYBUS,
+            payload: {
+                hasTag: 'contactTable',
+                in: { hasDataset: 'dataset__test_5gl_server' },
+                navOptions: { navbar:true }
+            }
+        }],
+        hasKw: kchart__nav_on_click,
+        hasIcon: 'chart-line',
+        hasDsca: kchart_test_bar_contact_uiML,
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_chart, _,OBJ_out).
+
+/* Ejemplos resumen que usan el mismo resultado */
+'staber_kchart::usecase__000'(_, _, _, _):- % Resumen
+
+    'staber_kchart::usecase__000::out'(ResultSet),
+    OUT = {
+        resultset : ResultSet
+    },
+    Dimensions = [
+        {arc: 'ID'},
+        {arc: 'DESCRIPCION'}
+         
+    ],
+    Metrics = {
+        arc: 'HORAS',
+        aggregate: 'sum'
+    },
+    
+    Ticks = {
+        hasLabel: 'DESCRIPCION',
+        hasDataValue: 'ID'
+    },
+    
+    IN1 = {
+        hasDimension: Dimensions,
+        hasMetric: Metrics,
+        hasTick: Ticks,
+        hasLayout: 'pie',
+        legend: true
+    },  
+
+    newKw('bus_', MYBUS1),     
+    OBJ_out_chart1= {
+        type: 'kchart',         
+        hasDsca: 'PIE',
+        hasKw: kchart__usecase__000_1,
+        busId: MYBUS1,        
+        execConfig: true,
+        in: IN1,          
+        out: OUT,
+        isSession: false,  
+        hasNavbar: false
+    },  
+
+    IN2 = {
+        hasDimension: Dimensions,
+        hasMetric: Metrics,
+        hasTick: Ticks,
+        hasLayout: 'donut',
+        legend: true
+    },  
+    newKw('bus_', MYBUS2),     
+    OBJ_out_chart2= {
+        type: 'kchart',                
+        busId: MYBUS2,        
+        hasDsca: 'DONUT',
+        hasKw: kchart__usecase__000_2,
+        execConfig: true,
+        in: IN2, 
+        out: OUT,
+        isSession: false,  
+        hasNavbar: false
+    },
+    IN3 = {
+        hasDimension: Dimensions,
+        hasMetric: Metrics,
+        hasTick: Ticks,
+        hasDirection: 'horizontal',
+        hasLayout: 'bar',
+        hasColors: true,
+        legend: true
+    },  
+    newKw('bus_', MYBUS3),     
+    OBJ_out_chart3= {
+        type: 'kchart',                        
+        hasDsca: 'BAR',
+        hasKw: kchart__usecase__000_3,
+        busId: MYBUS3,   
+        execConfig: true,
+        isSession: false,  
+        hasNavbar: false,   
+        in: IN3,          
+        out: OUT
+    },   
+    
+    create_rprocess(_,OBJ_out_chart1, _,_), 
+    create_rprocess(_,OBJ_out_chart2, _,_),
+    create_rprocess(_,OBJ_out_chart3, _,_).
+
+
+'staber_kchart::usecase__001'(_, _OBJ_in, _, OBJ_out) :-        
+    newKw('bus_', MYBUS),
+    Title =  'Gráfico de horas por proyecto I+D con leyenda (pie - sql) * En Pruebas',  
+    'staber_kchart::schema::usecase__001'(OBJ_schema),    
+    
+    Dimensions = [
+        {arc: 'ID'},
+        {arc: 'DESCRIPCION'}
+    ],
+    Metrics = {
+        arc: 'HORAS',
+        aggregate: 'sum',
+        ascending: false
+    },
+    Ticks = {
+        hasLabel: 'DESCRIPCION',
+        hasDataValue: 'ID'
+    },
+    CODE = 'SELECT ID, DESCRIPCION, IDTAREA, DESCRIPCIONTAREA, HORAS FROM ASIGNACIONESGLOBAL WHERE ID IN (000001, 000002, 000003, 000004, 000005, 000007, 000009)',   
+    IN = {
+        searchType: 'sql',
+        dbType: 'mysql',
+        dbConn: 'proyectosid',
+        code: CODE, 
+        limit: 0, 
+        persistence: 'remote',
+        schema: OBJ_schema,
+        hasDimension: Dimensions,
+        hasMetric: Metrics,
+        hasTick: Ticks,
+        legend: true
+    },         
+    OBJ_out_aux = {
+        type: 'kchart',                
+        busId: MYBUS,
+        in: IN,  
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: MYBUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+
+        }]                 
+        
+    },    
+    OBJ_out = {
+        type: 'rprocess',        
+        hasKw: kchart_test_001,
+        hasDsca: Title,
+        hasIcon: 'chart-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: OBJ_out_aux,
+        isSession: false,
+        hasNavbar: false
+        
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+'staber_kchart::usecase__002'(_, _OBJ_in, _, OBJ_out) :-     
+    newKw('bus_', MYBUS),
+    I_dataset = 'dataset__oOrder_test',
+    I_agent = 'builderweb',
+    Title =  'Gráfico de oportunidades por cliente (donut - rem)',  
+    'staber_kchart::schema::usecase__002'(OBJ_schema), 
+    % Configured without Ticks
+    Dimensions = [
+        {arc: 'hasDsca'},    
+        {arc: 'hasKw'}
+    ],
+    Metrics = {
+        arc: 'hasKw',
+        aggregate: 'count',        
+        ascending: false
+    },   
+    IN = {
+        searchType: 'rem',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'oOrder',
+        limit: 0,
+        hasIncludedProperties: ['order_hasCustomer', 'hasDsca'],
+        hasNavigableProperties: ['order_hasCustomer'],
+        query: 'stmt(isRoot, HASKW, true), stmt(order_hasCustomer, HASKW, CUSTOMER)',
+        hasDimension: Dimensions,
+        hasMetric: Metrics,
+        schema: OBJ_schema,
+        hasLayout: 'donut',
+        options: {
+            rowLimit: 10
+        }
+    },         
+    OBJ_out_aux = {
+        type: 'kchart',              
+        busId: MYBUS,
+        in: IN,  
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: MYBUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+
+        }]     
+    },    
+    OBJ_out = {
+        type: 'rprocess',        
+        hasKw: kchart_test_002,
+        hasDsca: Title,
+        hasIcon: 'chart-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: OBJ_out_aux,
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+'staber_kchart::usecase__003'(_, _OBJ_in, _, OBJ_out) :-  
+    newKw('bus_', MYBUS),
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__ssa_test',    
+    
+    Title =  'Gráfico de horas por proyecto con leyenda personalizada (pie - rql)',      
+    Dimensions = [
+        {arc: 'hasKw'},
+        {arc: 'dsca_project'},
+        {arc: 'kw_activity'},
+        {arc: 'kw_task'}
+    ],
+    Ticks = {
+        hasLabel: 'dsca_project',
+        hasDataValue: 'hasKw'
+    },
+    Metrics = {
+        arc: 'hours_r',
+        aggregate: 'sum',        
+        ascending: false
+    },
+    PREDICATE = 'staber_kchart::usecase__003::rql',
+    IN = {
+        searchType: 'rql',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss_project',
+        limit: 0,
+        predicate: PREDICATE,
+        hasDimension: Dimensions,
+        hasMetric: Metrics,    
+        hasTick: Ticks,  
+        hasLayout: 'donut',
+        options: {
+            rowLimit: 10
+        },
+        legend: true,
+        legendOptions:{
+            position: top,
+            labels:['proyecto1', 'proyecto2']
+        }
+    },         
+    OBJ_out_aux = {
+        type: 'kchart',               
+        busId: MYBUS,
+        in: IN,
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: MYBUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+
+        }]  
+    },    
+    OBJ_out = {
+        type: 'rprocess',        
+        hasKw: kchart_test_003,
+        hasDsca: Title,
+        hasIcon: 'chart-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: OBJ_out_aux,
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+'staber_kchart::usecase__legend'(_, _OBJ_in, _, OBJ_out) :-  
+    newKw('bus_', MYBUS),
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__ssa_test',    
+    
+    Title =  'Gráfica de donut con leyenda',
+    Dimensions = [
+        {arc: 'hasKw'},
+        {arc: 'dsca_project'},
+        {arc: 'kw_activity'},
+        {arc: 'kw_task'}
+    ],
+    Ticks = {
+        hasLabel: 'dsca_project',
+        hasDataValue: 'hasKw'
+    },
+    Metrics = {
+        arc: 'hours_r',
+        aggregate: 'sum',        
+        ascending: false
+    },
+    PREDICATE = 'staber_kchart::usecase__003::rql',
+    IN = {
+        searchType: 'rql',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss_project',
+        limit: 0,
+        predicate: PREDICATE,
+        hasLabel:{
+            mask: '##,###.#'
+        },
+        hasDimension: Dimensions,
+        hasMetric: Metrics,    
+        hasTick: Ticks,  
+        hasLayout: 'donut',
+        legend: true,
+        legendOptions: {
+            position: top,
+            labels: ['proyecto1']
+        },
+        options: {
+            rowLimit: 10
+        }
+    },         
+    OBJ_out_aux = {
+        type: 'kchart',               
+        busId: MYBUS,
+        in: IN,
+        events:[{
+            type: 'click',
+            method: 'log',
+            targetBusId: MYBUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }]   
+    },    
+    OBJ_out = {
+        type: 'rprocess',        
+        hasKw: kchart_test_legend,
+        hasDsca: Title,
+        hasIcon: 'chart-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: OBJ_out_aux,
+        isSession: false,
+        hasNavbar: false            
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+'staber_kchart::usecase__noLegend'(_, _OBJ_in, _, OBJ_out) :-  
+    newKw('bus_', MYBUS),
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__ssa_test',    
+    
+    Title =  'Gráfica de donut sin leyenda',      
+    Dimensions = [
+        {arc: 'hasKw'},
+        {arc: 'dsca_project'},
+        {arc: 'kw_activity'},
+        {arc: 'kw_task'}
+    ],
+    Ticks = {
+        hasLabel: 'dsca_project',
+        hasDataValue: 'hasKw'
+    },
+    Metrics = {
+        arc: 'hours_r',
+        aggregate: 'sum',        
+        ascending: false
+    },
+    PREDICATE = 'staber_kchart::usecase__003::rql',
+    IN = {
+        searchType: 'rql',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss_project',
+        limit: 0,
+        predicate: PREDICATE,
+        hasDimension: Dimensions,
+        hasMetric: Metrics,    
+        hasTick: Ticks,  
+        legend: false,
+        hasLayout: 'donut',
+        options: {
+            rowLimit: 10
+        },
+        legendOptions: {
+            position: top,
+            labels: ['proyecto1']
+        }
+    },         
+    OBJ_out_aux = {
+        type: 'kchart',               
+        busId: MYBUS,
+        in: IN,
+        events:[{
+            type: 'click',
+            method: 'log',
+            targetBusId: MYBUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }] 
+    },    
+    OBJ_out = {
+        type: 'rprocess',        
+        hasKw: kchart_test_noLegend,
+        hasDsca: Title,
+        hasIcon: 'chart-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: OBJ_out_aux,
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+% Auxiliary predicate functions
+'staber_kchart::schema::usecase__001'(OBJ_schema):-
+    OBJ_schema = [                   
+                {
+                    label: {
+                        d: 'ID'
+                    },
+                    arc: 'HASKW'                    
+                },                                                                         
+                {
+                    label: {
+                        d: 'Desc'
+                    },
+                    arc: 'DESCRIPTION'
+                },                                                                         
+				{
+                    label: {
+                        d: 'Id Tarea'
+                    },
+                    arc: 'IDTAREA'
+                },
+                {               
+                    label: {
+                        d: 'Desc Tarea'
+                    },
+                    arc: 'DESCRIPTIONTAREA'
+                },
+                {               
+                    label: {
+                        d: 'Horas'
+                    },
+                    arc: 'HORAS'
+                }
+
+	].
+'staber_kchart::schema::usecase__002'(OBJ_schema):-
+    OBJ_schema = [                   
+        {
+            label: {
+                d: 'Dsca Cliente'
+            },
+            path: '_.order_hasCustomer.hasDsca',
+            arc: 'hasDsca'                    
+        },                                                                         
+        {
+            label: {
+                d: 'KW Cliente'
+            },            
+            path: '_.order_hasCustomer.hasKw',
+            arc: 'hasKw'
+        }
+	].
+
+'staber_kchart::usecase__003::rql'(Ctx_in, Obj_in, Ctx_out, Obj_out):-
+    obj_get(hasDataset, Obj_in, DS),
+    openDataset(DS),
+    call_in_dataset(DS, 'staber_kchart::usecase__003::rql_aux'(Ctx_in, Obj_in, Ctx_out, Obj_out)).
+
+'staber_kchart::usecase__003::rql_aux'(_Ctx_in, _Obj_in, _Ctx_out, L_objs):-
+    DT0 = date( 2023, 1, 1),
+    dateToMilliseconds( DT0, MS0),
+    findall({hasKw: P, dsca_project: Dsca, kw_activity: A, kw_task:T, hours_p:H_P, hours_r: H_R},
+        (
+            stmt(type, P, 'ss:project'),
+            get_dsca(P, Dsca),
+            stmt('krp:hasActivity', P, A),
+            stmt('krp:hasERCTask', A, T),
+            stmt('hasStartDate', T, DT_START),
+            number(DT_START),
+            DT_START >= MS0,
+            stmt('plannedHours', T, H_P),
+            stmt('realHours', T, H_R)
+        ), L_objs).
+
+'staber_kchart::usecase__004'(_, _OBJ_in, _, OBJ_out) :-  
+    newKw('bus_', MYBUS),
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__ssa_test',    
+    
+    Title =  'Gráfico de horas por proyecto (bar - rql)',      
+    Dimensions = [
+        {arc: 'hasKw'},
+        {arc: 'dsca_project'},
+        {arc: 'kw_activity'},
+        {arc: 'kw_task'}
+    ],
+    Ticks = {
+        hasLabel: 'dsca_project',
+        hasDataValue: 'hasKw'
+    },
+    Metrics = {
+        arc: 'hours_r',
+        aggregate: 'sum',        
+        ascending: false
+    },
+    PREDICATE = 'staber_kchart::usecase__003::rql',
+    IN = {
+        searchType: 'rql',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss_project',
+        limit: 0,
+        predicate: PREDICATE,
+        hasDimension: Dimensions,
+        hasMetric: Metrics,    
+        hasTick: Ticks,  
+        hasDirection: 'vertical',
+        hasLayout: 'bar',
+        hasColors: true,        
+        legend: true,
+        options: {
+            rowLimit: 10
+        }
+    },         
+    OBJ_out_aux = {
+        type: 'kchart',               
+        busId: MYBUS,
+        in: IN,
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: MYBUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+
+        }]     
+    },    
+    OBJ_out = {
+        type: 'rprocess',        
+        hasKw: kchart_test_004,
+        hasDsca: Title,
+        hasIcon: 'chart-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: OBJ_out_aux,
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+'staber_kchart::usecase__serieColors'(_, _OBJ_in, _, OBJ_out) :-  
+    newKw('bus_', MYBUS),
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__ssa_test',    
+    
+    Title =  'Gráfica de barras con colores y leyenda personalizados',      
+    Dimensions = [
+        {arc: 'hasKw'},
+        {arc: 'dsca_project'},
+        {arc: 'kw_activity'},
+        {arc: 'kw_task'}
+    ],
+    Ticks = {
+        hasLabel: 'dsca_project',
+        hasDataValue: 'hasKw'
+    },
+    Metrics = {
+        arc: 'hours_r',
+        aggregate: 'sum',        
+        ascending: false
+    },
+    PREDICATE = 'staber_kchart::usecase__003::rql',
+    IN = {
+        searchType: 'rql',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss_project',
+        limit: 0,
+        predicate: PREDICATE,
+        hasDimension: Dimensions,
+        hasMetric: Metrics,    
+        hasTick: Ticks,  
+        hasDirection: 'vertical',
+        hasLayout: 'bar',
+        hasColors: true,        
+        legend: true,
+        legendOptions:{
+            position: right,
+            labels: ['Horas', 'Horas2', 'Horas3', 'Horas4']
+        },
+        hasColors: [
+            'Lime',
+            'Purple',
+            'Grey',
+            'Pink',
+            'Cyan',
+            'Turquoise',
+            'Brown',
+            'Black',
+            'Black',
+            'Black'
+        ],
+        options: {
+            rowLimit: 10
+        }
+    },         
+    OBJ_out_aux = {
+        type: 'kchart',               
+        busId: MYBUS,
+        in: IN,
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: MYBUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+
+        }]     
+    },    
+    OBJ_out = {
+        type: 'rprocess',
+        hasKw: kchart_test_serieColors,
+        hasDsca: Title,
+        hasIcon: 'chart-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: OBJ_out_aux,
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+'staber_kchart::usecase__axis'(_, _OBJ_in, _, OBJ_out) :-  
+    newKw('bus_', MYBUS),
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__ssa_test',    
+    
+    Title =  'Gráfica de barras con ejes personalizados',      
+    Dimensions = [
+        {arc: 'hasKw'},
+        {arc: 'dsca_project'},
+        {arc: 'kw_activity'},
+        {arc: 'kw_task'}
+    ],
+    Ticks = {
+        hasLabel: 'dsca_project',
+        hasDataValue: 'hasKw'
+    },
+    Metrics = {
+        arc: 'hours_r',
+        aggregate: 'sum',        
+        ascending: false
+    },
+    PREDICATE = 'staber_kchart::usecase__003::rql',
+    IN = {
+        searchType: 'rql',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss_project',
+        limit: 0,
+        predicate: PREDICATE,
+        hasDimension: Dimensions,
+        hasMetric: Metrics,    
+        hasTick: Ticks,
+        hasLabel:{
+            mask: '##,###.#'
+        },  
+        hasDirection: 'vertical',
+        hasLayout: 'bar',
+        valueAxisLabel: 'Horas',
+        categoryAxisLabel: 'Proyectos',
+        hasColors: true,        
+        legend: true,
+        categoryLabelsRotation: 45,
+        options: {
+            rowLimit: 10
+        }
+    },         
+    OBJ_out_aux = {
+        type: 'kchart',               
+        busId: MYBUS,
+        in: IN,
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: MYBUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+
+        }]     
+    },    
+    OBJ_out = {
+        type: 'rprocess',        
+        hasKw: kchart_test_axis,
+        hasDsca: Title,
+        hasIcon: 'chart-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: OBJ_out_aux,
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+
+
+
+'staber_kchart::usecase__000::out'(L_data):-
+    L_data =[
+        {
+            'HORAS': 1350,
+            'HORAS_P': 1100,
+            'IDTAREA': 'T11',
+            'ID': '000001',
+            'DESCRIPCION': 'BUILDER5GL',
+            'DESCRIPCIONTAREA': 'T1.1 Análisis y Diseño'
+        },
+        {
+            'HORAS': 5425,
+            'HORAS_P': 4000,
+            'IDTAREA': 'T21',
+            'ID': '000001',
+            'DESCRIPCION': 'BUILDER5GL',
+            'DESCRIPCIONTAREA': 'T2.1 Implementación'
+        },
+        {
+            'HORAS': 565,
+            'HORAS_P': 700,
+            'IDTAREA': 'T17',
+            'ID': '000002',
+            'DESCRIPCION': 'ATRIC',
+            'DESCRIPCIONTAREA': 'T1.7 Monitorización KPIs proyecto'
+        },
+        {
+            'HORAS': 6710,
+            'HORAS_P': 8000,
+            'IDTAREA': 'T23',
+            'ID': '000002',
+            'DESCRIPCION': 'ATRIC',
+            'DESCRIPCIONTAREA': 'T2.3 Plataforma de recogida y tratamiento de datos para el aseguramiento de la trazabilidad.'
+        },
+        {
+            'HORAS': 525,
+            'HORAS_P': 600,
+            'IDTAREA': 'T11',
+            'ID': '000003',
+            'DESCRIPCION': 'TECNOLOGIA',
+            'DESCRIPCIONTAREA': 'T1.1 Análisis y Diseño'
+        },
+        {
+            'HORAS': 175,
+            'HORAS_P': 200,
+            'IDTAREA': 'T21',
+            'ID': '000003',
+            'DESCRIPCION': 'TECNOLOGIA',
+            'DESCRIPCIONTAREA': 'T2.1 Implementación'
+        },
+        {
+            'HORAS': 1720,
+            'HORAS_P': 2000,
+            'IDTAREA': 'T31',
+            'ID': '000004',
+            'DESCRIPCION': 'SMARTNES',
+            'DESCRIPCIONTAREA': 'T3.1 Diseño y Desarrollo de Semantic Edge Data Lake'
+        },
+        {
+            'HORAS': 950,
+            'HORAS_P': 100,
+            'IDTAREA': 'T32',
+            'ID': '000004',
+            'DESCRIPCION': 'SMARTNES',
+            'DESCRIPCIONTAREA': 'T3.2 Diseño y Desar de interfaces de conexión con Protoc seguros orientados a la colab entre agentes'
+        },
+        {
+            'HORAS': 285,
+            'HORAS_P': 300,
+            'IDTAREA': 'T33',
+            'ID': '000004',
+            'DESCRIPCION': 'SMARTNES',
+            'DESCRIPCIONTAREA': 'T3.3 Investigación y desarrollo de Herramientas para la gestión de indicadores de Analá­tica Avanzada'
+        },
+        {
+            'HORAS': 895,
+            'HORAS_P': 1000,
+            'IDTAREA': 'T34',
+            'ID': '000004',
+            'DESCRIPCION': 'SMARTNES',
+            'DESCRIPCIONTAREA': 'T3.4 Análisis y diseño de modelos normalizados de manufactura por proceso continuo'
+        },
+        {
+            'HORAS': 1900,
+            'HORAS_P': 2000,
+            'IDTAREA': 'T35',
+            'ID': '000004',
+            'DESCRIPCION': 'SMARTNES',
+            'DESCRIPCIONTAREA': 'T3.5 Diseño de un modelo de simulación de procesos en continuo'
+        },
+        {
+            'HORAS': 1025,
+            'HORAS_P': 1000,
+            'IDTAREA': 'T44',
+            'ID': '000004',
+            'DESCRIPCION': 'SMARTNES',
+            'DESCRIPCIONTAREA': 'T4.4. Validación de los optimizadores'
+        },
+        {
+            'HORAS': 90,
+            'HORAS_P': 100,
+            'IDTAREA': 'T51',
+            'ID': '000004',
+            'DESCRIPCION': 'SMARTNES',
+            'DESCRIPCIONTAREA': 'T5.1 Difusión de los resultados'
+        },
+        {
+            'HORAS': 90,
+            'HORAS_P': 100,
+            'IDTAREA': 'T52',
+            'ID': '000004',
+            'DESCRIPCION': 'SMARTNES',
+            'DESCRIPCIONTAREA': 'T5.2 Protección y explotación de los resultados'
+        },
+        {
+            'HORAS': 580,
+            'HORAS_P': 600,
+            'IDTAREA': 'T43',
+            'ID': '000005',
+            'DESCRIPCION': 'DIPASS',
+            'DESCRIPCIONTAREA': 'T4.3. Diseño e Implementación de Cuadros de Mandos dinámicos'
+        },
+        {
+            'HORAS': 1825,
+            'HORAS_P': 2000,
+            'IDTAREA': 'T44',
+            'ID': '000005',
+            'DESCRIPCION': 'DIPASS',
+            'DESCRIPCIONTAREA': 'T4.4. Configurador de Procesos DIPass '
+        },
+        {
+            'HORAS': 205,
+            'HORAS_P': 300,
+            'IDTAREA': 'T53',
+            'ID': '000005',
+            'DESCRIPCION': 'DIPASS',
+            'DESCRIPCIONTAREA': 'T5.3. Ajustes y adaptación a Ejecución, Diagnóstico y Mantenimiento'
+        },
+        {
+            'HORAS': 925,
+            'HORAS_P': 1000,
+            'IDTAREA': 'T54',
+            'ID': '000005',
+            'DESCRIPCION': 'DIPASS',
+            'DESCRIPCIONTAREA': 'T5.4 Prototipado en entorno real'
+        },
+        {
+            'HORAS': 300,
+            'HORAS_P': 400,
+            'IDTAREA': 'T55',
+            'ID': '000005',
+            'DESCRIPCION': 'DIPASS',
+            'DESCRIPCIONTAREA': 'T5.5. Conclusiones y definición de adaptación del sistema'
+        },
+        {
+            'HORAS': 125,
+            'HORAS_P': 100,
+            'IDTAREA': 'T61',
+            'ID': '000005',
+            'DESCRIPCION': 'DIPASS',
+            'DESCRIPCIONTAREA': 'T6.1. Definición de la estrategia de explotación de DIPass'
+        },
+        {
+            'HORAS': 50,
+            'HORAS_P': 10,
+            'IDTAREA': 'T62',
+            'ID': '000005',
+            'DESCRIPCION': 'DIPASS',
+            'DESCRIPCIONTAREA': 'T6.2. Difusión de resultados'
+        },
+        {
+            'HORAS': 1875,
+            'HORAS_P': 2000,
+            'IDTAREA': 'T13',
+            'ID': '000007',
+            'DESCRIPCION': 'BIOLIVE',
+            'DESCRIPCIONTAREA': 'T1.3 Análisis del Sistema de adquisición de Datos'
+        },
+        {
+            'HORAS': 275,
+            'HORAS_P': 200,
+            'IDTAREA': 'T12',
+            'ID': '000009',
+            'DESCRIPCION': 'SMARTLIBS',
+            'DESCRIPCIONTAREA': 'T1.2. Definición de las especificaciones de la solución'
+        },
+        {
+            'HORAS': 470,
+            'HORAS_P': 500,
+            'IDTAREA': 'T21',
+            'ID': '000009',
+            'DESCRIPCION': 'SMARTLIBS',
+            'DESCRIPCIONTAREA': 'T2.1. Análisis de rendimiento de sensores en los procesos actuales '
+        },
+        {
+            'HORAS': 1880,
+            'HORAS_P': 2000,
+            'IDTAREA': 'T31',
+            'ID': '000009',
+            'DESCRIPCION': 'SMARTLIBS',
+            'DESCRIPCIONTAREA': 'T3.1 Diseño y desarrollo de Semantic Edge Data Lake '
+        },
+        {
+            'HORAS': 2920,
+            'HORAS_P': 3000,
+            'IDTAREA': 'T32',
+            'ID': '000009',
+            'DESCRIPCION': 'SMARTLIBS',
+            'DESCRIPCIONTAREA': 'T3.2 Diseño y Desarrollo de Scalable Semantic Graph Platform'
+        },
+        {
+            'HORAS': 1195,
+            'HORAS_P': 1000,
+            'IDTAREA': 'T33',
+            'ID': '000009',
+            'DESCRIPCION': 'SMARTLIBS',
+            'DESCRIPCIONTAREA': 'T3.3. Diseño y desarrollo de interfaces de conexión con Protocolos seguros'
+        },
+        {
+            'HORAS': 2205,
+            'HORAS_P': 2300,
+            'IDTAREA': 'T34',
+            'ID': '000009',
+            'DESCRIPCION': 'SMARTLIBS',
+            'DESCRIPCIONTAREA': 'T3.4 Investigación y desarrollo de Herramientas para la gestión de indicadores de Analá­tica Avanzada'
+        },
+        {
+            'HORAS': 1560,
+            'HORAS_P': 1600,
+            'IDTAREA': 'T35',
+            'ID': '000009',
+            'DESCRIPCION': 'SMARTLIBS',
+            'DESCRIPCIONTAREA': 'T3.5 Análisis y diseño de modelos de Procesamiento de LIBs'
+        },
+        {
+            'HORAS': 400,
+            'HORAS_P': 400,
+            'IDTAREA': 'T36',
+            'ID': '000009',
+            'DESCRIPCION': 'SMARTLIBS',
+            'DESCRIPCIONTAREA': 'T3.6 Diseño de los modelos de simulación de Tratamientos en Planta'
+        }
+    ].
+
+'staber_kchart::resultset_vars_in_event'(_, _, _, OBJ_out):-
+    newKw('bus_', MYBUS),
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__test_5gl_server',    
+    Dimensions = [
+        {arc: 'hasKw'},
+        {arc: 'contact:hasName'},
+        {arc: 'contact:hasAge'},
+        {arc: 'contact:hasEmail'}
+    ],
+    Ticks = {
+        hasLabel: 'contact:hasName',
+        hasDataValue: 'hasKw'
+    },
+    Metrics = {
+        arc: 'contact:hasAge',
+        aggregate: 'sum'
+    },
+    PREDICATE = 'staber_kchart::usecase__000__contact::rql',
+    IN = {
+        searchType: 'rql',
+        predicate: PREDICATE,
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        limit: 0,
+        hasDimension: Dimensions,
+        hasMetric: Metrics,
+        hasTick: Ticks,
+        hasDirection: 'vertical',
+        hasLayout: 'bar',
+        hasColors: true,
+        legend: true,
+        options: {
+            rowLimit: 10
+        },
+        categoryLabelsRotation: 45
+    },
+    OBJ_chart = {
+        type: 'kchart',
+        busId: MYBUS,
+        in: IN,
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: MYBUS,
+            payload:{
+                in: {
+                    email: '_.data.contact:hasEmail'
+                }
+            },
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kchart::doSelect_with_replace', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }],
+        hasKw: kchart__contact_resultset_vars_in_event,
+        hasIcon: 'chart-line',
+        hasDsca: 'Gráfica con reemplazo de variables de resultset',
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_chart, _,OBJ_out).
+
+'staber_kchart::usecase__000::out_with_floats'(_, _, _, OUT):-
+    'staber_kchart::usecase__000::out'(ResultSet0),
+    FLOAT = [{
+        'HORAS': 0.5,
+        'HORAS_P': 0.5,
+        'IDTAREA': 'T11',
+        'ID': '000001',
+        'DESCRIPCION': 'BUILDER5GL',
+        'DESCRIPCIONTAREA': 'T1.1 Análisis y Diseño'
+    }],
+    append( [ FLOAT, ResultSet0], OUT).
+
+'staber_kchart::bar_order_with_floats'(_, _, _, OBJ_out):-
+    'staber_kchart::usecase__000::out_with_floats'(_, _, _, OUT),
+    Dimensions = [
+        {arc: 'ID'},
+        {arc: 'DESCRIPCION', ascending: true}
+    ],
+    Ticks = {
+        hasLabel: 'DESCRIPCION',
+        hasDataValue: 'ID'
+    },
+    Metrics_series = {
+        arc: ['HORAS'],
+        aggregate: 'sum'
+    },
+    Serie_colors = [
+        '#E84539', '#6EB1E2'
+    ], 
+    IN = {
+        hasAgent: 'builderweb',
+        hasDataset: 'Default',
+        hasDimension: Dimensions,
+        hasMetric: Metrics_series,
+        hasTick: Ticks,          
+        hasLabel:{
+            mask: '##,###.#'
+        },         
+        hasSeriesColors: Serie_colors,
+        hasDirection: 'vertical',
+        hasLayout: 'bar',
+        valueAxisLabel: 'Horas',
+        categoryAxisLabel: 'Proyectos',
+        legend: true,
+        legendOptions: {
+            position: left,
+            labels:[
+                'kchart.serie1'
+            ],
+            i18n: true
+        },
+        searchType: local
+    },  
+    newKw('bus_', MYBUS),     
+    OBJ_chart= {
+        type: 'kchart',          
+        hasDsca: 'Graphbar with float values',
+        busId: MYBUS,
+        in: IN,          
+        out: {
+            resultset: OUT
+        },
+        hasKw: kchart__float_value_ordered,
+        hasIcon: 'chart-line',
+        hasDsca: 'Gráfica de barras con valores float',
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_chart, _,OBJ_out).
+
+'staber_kchart::bar_hasDsca_ordered_with_floats'(_, _, _, OBJ_out):-
+    OUT1 = [
+        {
+            type: hasHours,
+            hours: 1826,
+            hasDsca: 'Horas Teóricas',
+            hasData: 'TheoreticalHours|Todos|Todos|Todos|1712527200000|1713650400000'
+        },
+        {
+            type: hasHours,
+            hours: 1308,
+            hasDsca: 'Horas Imputadas',
+            hasData: 'ImputeHours|Todos|Todos|Todos|1712527200000|1713650400000'
+        },
+        {
+            type:hasHours,
+            hours: 85,
+            hasDsca: 'No Facturables',
+            hasData: 'NoBillableHours|Todos|Todos|Todos|1712527200000|1713650400000'
+        }
+    ],
+    OUT2 = [
+        {
+            type: hasHours,
+            hours: 1826.5,
+            hasDsca: 'Horas Teóricas',
+            hasData: 'TheoreticalHours|Todos|Todos|Todos|1712527200000|1713650400000'
+        },
+        {
+            type: hasHours,
+            hours: 1308.75,
+            hasDsca: 'Horas Imputadas',
+            hasData: 'ImputeHours|Todos|Todos|Todos|1712527200000|1713650400000'
+        },
+        {
+            type:hasHours,
+            hours: 85.3,
+            hasDsca: 'No Facturables',
+            hasData: 'NoBillableHours|Todos|Todos|Todos|1712527200000|1713650400000'
+        }
+    ],
+    OUT3 = [
+        {
+            type: hasHours,
+            hours: 1826,
+            hasDsca: 'Horas Teóricas',
+            hasData: 'TheoreticalHours|Todos|Todos|Todos|1712527200000|1713650400000'
+        },
+        {
+            type: hasHours,
+            hours: 1308.75,
+            hasDsca: 'Horas Imputadas',
+            hasData: 'ImputeHours|Todos|Todos|Todos|1712527200000|1713650400000'
+        },
+        {
+            type:hasHours,
+            hours: 85,
+            hasDsca: 'No Facturables',
+            hasData: 'NoBillableHours|Todos|Todos|Todos|1712527200000|1713650400000'
+        }
+    ],
+    newKw(float_order_example1, BUS1),
+    newKw(float_order_example2, BUS2),
+    newKw(float_order_example3, BUS3),
+    newKw(float_order_example4, BUS4),
+    newKw(float_order_example5, BUS5),
+    newKw(float_order_example6, BUS6),
+    'staber_ordered_kchart_builder'(BUS1, OUT1, true, Kchart1),
+    'staber_ordered_kchart_builder'(BUS2, OUT2, true, Kchart2),
+    'staber_ordered_kchart_builder'(BUS3, OUT3, true, Kchart3),
+    'staber_ordered_kchart_builder'(BUS4, OUT1, false, Kchart4),
+    'staber_ordered_kchart_builder'(BUS5, OUT2, false, Kchart5),
+    'staber_ordered_kchart_builder'(BUS6, OUT3, false, Kchart6),
+    Asembly1 = {
+        type: assembly,
+        label: {
+            size: h3,
+            d: 'Ordenados por hasDsca en hasDimension, ascending true'
+        },
+        children: [Kchart1, Kchart2, Kchart3]
+    },
+    Asembly2 = {
+        type: assembly,
+        label: {
+            size: h3,
+            d: 'Sin orden específico, según orden de datos'
+        },
+        children: [Kchart4, Kchart5, Kchart6]
+    },
+    Asembly = {
+        type: assembly,
+        cols: 2,
+        label: {
+            size: h3,
+            d: 'El orden en el que llegan los datos es: Teóricas, imputadas, no facturables'
+        },
+        children: [Asembly1, Asembly2]
+    },
+    newKw('ordered_graph_example', MYBUS),
+    OBJ_rproc= {
+        type: 'rprocess',          
+        busId: MYBUS,
+        gui_out: Asembly,
+        do_exec: true,
+        hasKw: kchart__float_value_hasDsca_ordered,
+        hasIcon: 'chart-line',
+        hasDsca: 'Gráfica de barras con valores float ordenada por hasDsca',
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_rproc, _,OBJ_out).
+
+'staber_ordered_kchart_builder'(BUS, OUT, ORDER, Kchart):-
+    (ORDER == true ->
+        HasDsca = {
+            arc: hasDsca,
+            ascending: true
+        }
+    ; HasDsca = {
+            arc: hasDsca
+        }
+    ),
+    Kchart = {
+        type: kchart,
+        busId: BUS,
+        out: {
+            resultset: OUT
+        },
+        in:{
+            hasAgent: 'builderweb',
+            hasDimension:[
+                {
+                    arc: hours
+                },
+                HasDsca,
+                {
+                    arc: hasData
+                }
+            ],
+            hasMetric:{
+                arc: hours,
+                aggregate: sum
+            },
+            hasTick:{
+                hasLabel: hasDsca,
+                hasDataValue: hasData
+            },
+            hasLayout: bar,
+            hasLabel:{
+                mask: '##,###.#'
+            }, 
+            hasDirection: vertical,
+            searchType: local,
+            legend: true
+        }
+    }.
+
+'staber_kchart::testing_order_with_floats_out'(_, IN, _, OUT):-
+    obj_get(hasDataOut, IN, OUT).
+
+'staber_kchart::doSelect'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_ppd(Obj_in),
+    obj_get(value, Obj_in, Kw),
+    obj_get(datavalue, Obj_in, Dsca),
+    wAddInfoMsgML('Aviso', 'Se ha seleccionado, <b>?a{1}</b>, <b>?a{2}</b>', [Kw,Dsca],{showTime:3}),
+    Obj_out = Obj_in.
+
+'staber_kchart::doSelect_with_replace'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_ppd(Obj_in),
+    obj_get(value, Obj_in, Kw),
+    obj_get(datavalue, Obj_in, Dsca),
+    obj_get(in:email, Obj_in, Email, ''),
+    wAddInfoMsgML('Aviso', 'Se ha seleccionado, <b>?a{1}</b>, <b>?a{2},</b> con email <b>?a{3},</b>', [Kw,Dsca,Email],{showTime:3}),
+    Obj_out = Obj_in.
+
+'staber_kchart::folders'(_, _, _, _):-
+     Title =  'kchart  [pie, donut, line]',              
+     create_rprocess(_, 
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_kchart,            
+            hasDsca: Title,            
+            hasIcon: 'chart-line',
+            isRoot: false,            
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [
+                        kchart__usecase__000_1,
+                        kchart__usecase__000_2,
+                        kchart__usecase__000_3,
+                        % kchart_test_001,
+                        kchart_test_002,
+                        kchart_test_003,
+                        kchart_test_004,
+                        folder__repositorioTests_kchart_customization,
+                        folder__repositorioTests_kchart_line_bar_series,
+                        kchart__contact_resultset_vars_in_event,
+                        folder__repositorioTests_kchart_ordered,
+                        kchart__nav_on_click
+            ]
+    },_,_).
+
+'staber_kchart_order_tests::folders'(_, _, _, _):-
+    Title =  'Orden de series',              
+     create_rprocess(_, 
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_kchart_ordered,            
+            hasDsca: Title,            
+            hasIcon: 'folder-line',
+            isRoot: false,            
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [                
+                kchart__float_value_ordered,
+                kchart__float_value_hasDsca_ordered
+            ]
+    },_,_).
+
+
+'staber_kchart_customization::folders'(_, _, _, _):-    
+     Title =  'Personalización',              
+     create_rprocess(_, 
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_kchart_customization,            
+            hasDsca: Title,            
+            hasIcon: 'folder-line',
+            isRoot: false,            
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [                
+                kchart_test_serieColors,
+                kchart_test_axis,
+                kchart_test_legend,
+                kchart_test_noLegend
+            ]
+    },_,_).
+
+
+ 'staber_kchart_line_bar_series::folders'(_, _, _, OBJ_out):- 
+    'staber_kchart::series_bar'(_, _, _, Obj_bar), 
+    'staber_kchart::series_line'(_, _, _, Obj_line),
+     Title =  'Line/bar con varias series, datos locales y leyenda personalizada con traducción',
+     Gallery_out= {
+        type: assembly,
+        children: [Obj_bar,Obj_line]
+    },               
+    OBJ_out = {
+        type: 'rprocess',        
+        hasKw: folder__repositorioTests_kchart_line_bar_series,
+        hasDsca: Title,
+        hasIcon: 'chart-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Gallery_out,
+        isSession: false,
+        hasNavbar: false
+        
+    },
+    create_rprocess(_,OBJ_out,_,_). 
+
+
+'staber_kchart::series_bar'(_, _, _, OBJ_out):-
+   'staber_kchart::usecase__000::out'(ResultSet),
+    OUT = {
+        resultset : ResultSet
+    },
+    Dimensions = [
+        {arc: 'ID'},
+        {arc: 'DESCRIPCION'}
+         
+    ],
+    Ticks = {
+        hasLabel: 'DESCRIPCION',
+        hasDataValue: 'ID'
+    },
+    Metrics_series = {
+        arc: ['HORAS', 'HORAS_P'],
+        aggregate: 'sum'
+    },
+    Serie_colors = [
+        '#E84539', '#6EB1E2'
+    ], 
+    IN = {
+        hasDimension: Dimensions,
+        hasMetric: Metrics_series,
+        hasTick: Ticks,
+        hasSeriesColors: Serie_colors,
+        hasDirection: 'vertical',
+        hasLayout: 'bar',
+        valueAxisLabel: 'Horas',
+        categoryAxisLabel: 'Proyectos',
+        legend: true,
+        legendOptions: {
+            position: left,
+            labels:[
+                'kchart.serie1',
+                'kchart.serie2'
+            ],
+            i18n: true
+        },
+        searchType: local
+    },  
+    newKw('bus_', MYBUS),     
+    OBJ_out= {
+        type: 'kchart',          
+        hasDsca: 'Graphbar with series',
+        busId: MYBUS,    
+        in: IN,          
+        out: OUT,
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: MYBUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }]
+    }. 
+
+'staber_kchart::series_line'(_, _, _, OBJ_out):-
+    'staber_kchart::usecase__000::out'(ResultSet),
+    OUT = {
+        resultset : ResultSet
+    },
+    Dimensions = [
+        {arc: 'ID'},
+        {arc: 'DESCRIPCION'}
+         
+    ],
+    Ticks = {
+        hasLabel: 'DESCRIPCION',
+        hasDataValue: 'ID'
+    },
+    Metrics_series = {
+        arc: ['HORAS', 'HORAS_P'],
+        aggregate: 'sum'
+    }, 
+    IN = {
+        hasDimension: Dimensions,
+        hasMetric: Metrics_series,
+        hasTick: Ticks,
+        hasDirection: 'vertical',
+        hasLayout: 'line',
+        hasColors: true,
+        legend: true,
+        legendOptions: {
+            position: bottom,
+            labels:[
+                'Horas consumidas',
+                'Horas contratadas',
+                'Esta no se ve'
+            ]
+        },
+        searchType: local
+    },  
+    newKw('bus_', MYBUS),     
+    OBJ_out= {
+        type: 'kchart',         
+        hasDsca: 'GraphLine with series',
+        busId: MYBUS,    
+        in: IN,          
+        out: OUT,
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: MYBUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }]
+    }.
+
+'staber_kchart::usecase__000__contact::rql'(Ctx_in, Obj_in, Ctx_out, Obj_out):-
+    obj_get(hasDataset, Obj_in, DS),
+    openDataset(DS),
+    call_in_dataset(DS, 'staber_kchart::usecase__000__contact::rql_data'(Ctx_in, Obj_in, Ctx_out, Obj_out)).
+
+'staber_kchart::usecase__000__contact::rql_data'(_Ctx_in, _Obj_in, _Ctx_out, L_objs):-
+    findall({hasKw: C, hasDsca: Dsca, 'contact:hasName': N, 'contact:hasAge':A, 'contact:hasEmail': E},
+        (
+            stmt(type, C, 'testapp:contact'),
+            get_dsca(C, Dsca),
+            stmt('contact:hasName', C, N),
+            stmt('contact:hasAge', C, A),
+            stmt('contact:hasEmail', C, E)
+        ), L_objs).

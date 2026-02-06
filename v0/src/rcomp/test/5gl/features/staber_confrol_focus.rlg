@@ -1,0 +1,73 @@
+﻿/**staber_k
+@descr	staber_confrol_focus <br>
+		staber_confrol_focus
+@author opr
+@date	2024_04_04
+**/
+rc_class('staber_confrol_focus') :-
+	class +$ 'staber_confrol_focus' d ( es,'Gestion de foco en controles y formularios') sc function,
+    'staber_confrol_focus::preact_controls'(_, _, _, _),
+    'staber_confrol_focus::folders'(_, _, _, _).
+
+'staber_confrol_focus::preact_controls'(_, _OBJ_in, _, OBJ_out) :-
+    Obj_controls = {  
+        type: 'assembly',       
+        children: [            
+            {
+                type:'r-text',           
+                label: {
+                    d: 'Label 1'    
+                }
+            },
+            {
+                type: 'r-combobox',
+                elements: [
+                    {
+                        label: {
+                            d: 'Opción 1'
+                        }
+                    },
+                    {
+                        label: {
+                            d: 'Opción 2'
+                        }
+                    }
+                ]
+            },
+            {
+                type:'r-text',           
+                label: {
+                    d: 'Label 2'    
+                }
+            }
+        ]
+    },
+    Obj_class = {
+        type: 'rprocess',
+        hasKw: staber_preact_focus,           
+        hasDsca: 'Gestión de focos en controles p-react',
+        hasIcon: 'right-simple-arrow',
+        isRoot: false, 
+        isSession: true,
+        hasNavbar: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_controls
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_confrol_focus::folders'(_, _, _, _):-
+    Title = 'Test para comprobar el funcionamiento del foco',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_control_focus,
+        hasDsca: Title,
+        hasIcon: 'right-simple-arrow',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            staber_preact_focus
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

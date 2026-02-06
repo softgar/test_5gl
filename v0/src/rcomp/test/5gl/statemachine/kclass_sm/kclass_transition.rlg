@@ -1,0 +1,89 @@
+
+/* Estados de la máquina */
+'kclass_transition::transition_init'(Transition_init):-
+    Transition_init = {
+        type: 'transition',
+        stateTo: 'state_init'
+    }.
+
+'kclass_transition::transition_delete'(Transition_delete):-
+    Transition_delete = {
+        type: 'transition',
+        stateTo: 'state_init',
+        proc: {
+            type: 'sequence',
+            payload: {hasKw: '$.hasArea.form.hasKw', hasDataset: '$.hasArea.form.hasDataset'},
+            hasProcess: [
+                { type: 'method', name: 'deleteInstanceDlg', module: 'DataComponents' },      
+                { type: 'method', name: 'deleteLocalInstance',  module: 'OntoLogic'}
+            ]
+        }
+    }.
+
+'kclass_transition::transition_edit'(Transition_edit):-
+    Transition_edit = {
+        type: 'transition',
+        stateTo: 'state_edit',
+        proc: {
+            type: 'sequence',
+            payload: {hasKw: '$.hasArea.form.hasKw', hasDataset: '$.hasArea.form.hasDataset'},
+            hasProcess: [
+                { type: 'method', name: 'lockDlg', module: 'DataComponents' },
+                { type: 'function', name: 'lock_node', context: {delegatedTo: '$.hasArea.form.hasAgent'}}
+            ]
+        }
+    }.
+
+'kclass_transition::transition_load'(Transition_load):-
+    Transition_load = {
+        type: 'transition',
+        stateTo: 'state_noedit'
+    }.
+
+'kclass_transition::transition_new'(Transition_new):-
+    Transition_new = {
+        type: 'transition',
+        stateTo: 'state_edit',
+        proc: {
+            type: 'sequence',
+            payload: {
+                hasChannel: '$.hasChannel.detail', 
+                hasKwc: '$.hasKw',
+                hasKw: '$.hasArea.form.hasKw', 
+                hasDataset: '$.hasArea.form.hasDataset'            
+            },
+            hasProcess: [
+                { type: 'method', in: { subFamilyOf: false}, name: 'newInstanceDlg', module: 'DataComponents' },
+                { type: 'function', name: 'new_instance', context: {delegatedTo: '$.hasArea.form.hasAgent'}}
+            ]
+        }
+    }.
+
+'kclass_transition::transition_save'(Transition_save):-
+    Transition_save = {
+        type: 'transition',
+        stateTo: 'state_edit',
+        proc: {
+            type: 'sequence',
+            payload: {hasKw: '$.hasArea.form.hasKw', hasDataset: '$.hasArea.form.hasDataset'},
+            hasProcess: [
+                { type: 'method', name: 'checkCompulsoryToSave', module: 'DataParameters' },
+                { type: 'method', name: 'subgraphExport', module: 'DataProcess'},
+                { type: 'function', name: 'save_instance', context: {delegatedTo: '$.hasArea.form.hasAgent'}}
+            ]
+        }
+    }.
+
+'kclass_transition::transition_unlock'(Transition_unlock):-
+    Transition_unlock = {
+        type: 'transition',
+        stateTo: 'state_noedit',
+        proc: {
+            type: 'sequence',
+            payload: {hasKw: '$.hasArea.form.hasKw', hasDataset: '$.hasArea.form.hasDataset'},
+            hasProcess: [
+                { type: 'method', name: 'lockPrepare', module: 'DataParameters' },
+                { type: 'function', name: 'unlock_node', context: {delegatedTo: '$.hasArea.form.hasAgent'}}
+            ]
+        }
+    }.

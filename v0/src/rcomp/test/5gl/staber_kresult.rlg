@@ -1,0 +1,3207 @@
+﻿/**
+@descr	staber_kresult <br>
+		staber_kresult
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kresult') :-
+	class +$ 'staber_kresult' d ( es,'Patrón rproc para kresult') sc function,
+    'staber_kresult_pivotgrid::usecase__000'(_, _, _, _),
+    'staber_kresult_pivotgrid::customization_columns'(_, _, _, _),
+    'staber_kresult_pivotgrid::usecase__rowactions_and_multiselection'(_, _, _, _),
+    'staber_kresult_pivotgrid::usecase__preselected_rows_and_multiselection'(_, _, _, _),
+    'staber_kresult_pivotgrid::usecase__001'(_, _, _, _),
+    'staber_kresult_pivotgrid::usecase__002'(_, _, _, _),
+    'staber_kresult_pivotgrid::usecase__003'(_, _, _, _),
+    'staber_kresult_pivotgrid::usecase__004'(_, _, _, _),
+    'staber_kresult_pivotgrid::usecase__005'(_, _, _, _),
+    'staber_kresult_gallery::usecase__006'(_, _, _, _),
+    'staber_kresult_pivotgrid::usecase__007'(_, _, _, _),
+    'staber_kresult_pivotgrid::usecase__010'(_, _, _, _),
+    'staber_kresult::rql_treeformat_with_kmenu'(_, _, _, _),
+    'staber_kresult::rql_treeformat_with_kmenu_onTheLeft'(_, _, _, _),
+    'staber_kresult_pivotgrid::usecase__011'(_, _, _, _),
+    'staber_kresult_pivotgrid::usecase__012'(_, _, _, _),
+    'staber_kresult::contact_ontology_tree'(_, _, _, _),
+    'staber_kresult_pivotgrid::schema_range_differ_property'(_, _, _, _),
+    'staber_kresult_pivotgrid::result_control_when_is_editable'(_, _, _, _),
+    'staber_kresult_pivotgrid::usecase__setSelected'(_, _, _, _),
+    'staber_kresult_pivotgrid::editable_from_model'(_, _, _, _),
+    'staber_kresult_pivotgrid::tipsontables'(_, _, _, _),
+    'staber_kresult_pivotgrid::external_row_add'(_, _, _, _),
+    'staber_kresult_pivotgrid::external_refresh'(_, _, _, _),
+    'staber_kresult::folders'(_, _, _, _).
+
+/* Ejemplo de Resultados en REM */   
+'staber_kresult_pivotgrid::usecase__000'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),
+    newKw('bus__kresult', BUSID_RESULT),
+
+    'staber_kresult::schema::usecase__000'(_CTX, {busId: BUSID_RESULT}, _CTX, Schema),
+    Row_Actions = {
+        fixed: true,
+        icon: 'menu2',
+        align: 'right',
+        actions: [
+            {
+                label: {
+                    icon: 'pencil',
+                    d: 'Editar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_RESULT,
+                        payload: {action: 'editar'},
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                {type: 'function', name: 'kresult000:actionNotification', context:{ delegatedTo: 'builderweb' }}
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                label: {
+                    icon: 'copy',
+                    d: 'Copiar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_RESULT,
+                        payload: {action: 'copiar'},
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                {type: 'function', name: 'kresult000:actionNotification', context:{ delegatedTo: 'builderweb' }}
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                label: {
+                    icon: 'paste',
+                    d: 'Pegar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_RESULT,
+                        payload: {action: 'pegar'},
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                {type: 'function', name: 'kresult000:actionNotification', context:{ delegatedTo: 'builderweb' }}
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+	IN = {
+        enabled: true,
+        hasAgent: I_agent,
+        hasDataset: 'dataset__test_5gl_server',
+        hasKw: 'testapp:contact',
+        schema: Schema,
+        rowTemplate: 'style=\"background-color: ##_.hasKw##\"//class=\"##_.hasKw##\"',
+        rowactions: Row_Actions,
+        includedProperties: [
+            'hasIcon',
+            'contact:hasName',
+            'contact:hasEmail',
+            'contact:hasPhoneNumber',
+            'contact:hasAge',
+            'contact:hasBirthDate',
+            'contact:hasResidenceCountry'
+        ],
+        limit: 5
+    },
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,
+        pagination:{
+            align: both
+        },
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT, 
+        hasKw: kresult_test_000,
+        hasDsca: 'kresult_test_000_uiML',
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        evtPublish: [{topic: 'setNode', channel:CHANNEL_RESULT}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+/* Ejemplo de personalización de columnas */
+'staber_kresult_pivotgrid::customization_columns'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'dataset__test_5gl_server',
+    
+    newKw('channel__rprocess', CHANNEL_RPROCESS),
+    newKw('bus__rprocess', BUSID_RPROCESS),
+
+    newKw('channel__table', CHANNEL_RESULT),
+    newKw('bus__table', BUSID_RESULT),
+
+    newKw('channel__tree', CHANNEL_TREE),
+    newKw('bus__tree', BUSID_TREE),
+
+    newKw('channel__ktoolbar', ChannelKtoolbar),
+    newKw('bus__ktoolbar', BusIdKtoolbar),
+
+    KtoolbarOverrides = [
+        {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function', 
+                        name: 'rc_gui_out:ktoolbar::kresultCustomizable', 
+                        context: { delegatedTo: 'builderweb' } 
+                    }
+                ]
+            }
+        }
+    ],
+    ObjKtoolbar = {
+        type: 'ktoolbar',
+        do_exec: true,
+        busId: BusIdKtoolbar,
+        hasChannel: ChannelKtoolbar,
+        overrides: KtoolbarOverrides,
+        hasStyle: {layout: compact},
+        in: {
+            parentBusId: BUSID_RESULT,
+            parentChannel: CHANNEL_RPROCESS
+        },
+        evtSubscribe:[{topic: "customizationApplied", channel: CHANNEL_RESULT, subTopic: "exec"}]
+    },
+
+    %% Para probar la traducción usar este formato de label en el schema de TODAS las columnas
+    % label: {
+    %     d: 'builderModule.generics',
+    %     i18n: 'd'
+    % },
+    SCHEMA = {
+        data: [
+            {
+                label: {
+                    d: 'Nombre'
+                },
+                class: 'user',
+                arc: 'contact:hasName',
+                control: {
+                    type: 'text',
+                    events: [
+                        {
+                            type: 'change',
+                            method: 'refreshGUIOut',
+                            targetBusId: BUSID_RESULT
+                        }
+                    ]
+                }
+            },
+            {
+                label: {
+                    d: 'Email'
+                },
+                arc: 'contact:hasEmail',
+                mandatory: true
+            },
+            {
+                label: {
+                    d: 'Teléfono'
+                },
+                arc: 'contact:hasPhoneNumber'
+            },
+            {
+                label: {
+                    d: 'Edad'
+                },
+                arc: 'contact:hasAge'
+            }
+        ]
+    },        
+
+	IN_TABLE = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        schema: SCHEMA,
+        includedProperties: [
+            'contact:hasName',
+            'contact:hasEmail',
+            'contact:hasPhoneNumber',
+            'contact:hasAge',
+            'contact:hasBirthDate',
+            'contact:hasResidenceCountry'
+        ],        
+        limit: 5
+    },
+    Obj_table = {
+        type : 'kresult',
+        hasChannel: CHANNEL_RESULT,
+        busId: BUSID_RESULT,
+        in : IN_TABLE,
+        hasDlg: true,
+        hasCustomization: {
+            hasCustomizationId: "my_table_customization",
+            % showInToolbar: false,
+            % refreshPivot: true,
+            columns: true
+        },
+        evtSubscribe: [ { topic: "showCustomizationDlg", channel: CHANNEL_RPROCESS} ]
+    },
+
+    RESULT_OVERRIDES = [
+        {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function', 
+                        name: 'rc_gui_out:tree:testapp:contact', 
+                        context: { delegatedTo: 'builderweb' } 
+                    }
+                ]
+            }
+        }
+    ], 
+    IN_TREE = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,       
+        hasKw: 'testapp:contact',
+        schemaHeader: true
+    },
+    Obj_tree = {
+        type : 'kresult',
+        hasChannel: CHANNEL_TREE,
+        busId: BUSID_TREE,
+        in : IN_TREE, 
+        overrides: RESULT_OVERRIDES,
+        hasCustomization: {
+            hasCustomizationId: "my_tree_customization2",
+            % showInToolbar: false,
+            refreshPivot: true,
+            columns: true
+        }
+    },
+
+    Obj_main = {
+        type: 'assembly',
+        children: [
+            ObjKtoolbar,
+            Obj_table,
+            Obj_tree
+        ]        
+    },
+	Obj_class = {
+        in : {},
+        type : 'rprocess',
+        busId: BUSID_RPROCESS,
+        hasChannel: CHANNEL_RPROCESS,
+        isSession: true,
+        hasDlg : true,
+        hasKw: kresult_test_choose_006,
+        hasDsca: 'kresult_test_choose_006_uiML',
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        gui_out: Obj_main  
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).   
+
+'rc_gui_out:ktoolbar::kresultCustomizable'(_, ObjIn, _, ObjOut):-
+
+    obj_get('in', ObjIn, In),
+    obj_get('busId', ObjIn, BusIdKtoolbar),
+    obj_get('parentBusId', In, ParentBusId),
+    obj_get('parentChannel', In, ParentChannel),
+    obj_get('hasCustomizationId', In, CustomId, 'none'),
+    (CustomId == 'none' ->
+        Icon = 'cog-line',
+        Icon2 = 'cog-alt-line'
+        ; Icon = 'cog',
+        Icon2 = 'cog-alt'
+    ),
+    ObjOut = {
+        type: 'assembly',
+        classList: ["r-toolbar"],
+        children:[
+            {
+                type: actions,
+                actions:[
+                    {
+                type: 'button',
+                appearance: 'line',
+                label: {
+                    icon: {
+                        source: Icon,
+                        width: '16px',
+                        height: '16px'
+                    },
+                    tip: {
+                        value: 'Customize in secuence',
+                        delay: 0,
+                        position: 'bottom'
+                    }
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BusIdKtoolbar,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { type: 'method', name: 'getCustomizationDlg', busId: ParentBusId },
+                            { type: 'method', name: 'dialog_exec', busId: ParentBusId }
+                        ]
+                    }
+                }]
+            },
+            {
+                type: 'button',
+                appearance: 'line',
+                label: {
+                    icon: {
+                        source: Icon2,
+                        width: '16px',
+                        height: '16px'
+                    },
+                    tip: {
+                        value: 'Customize using pubSub',
+                        delay: 0,
+                        position: 'bottom'
+                    }
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BusIdKtoolbar,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { 
+                                type: 'method',
+                                name: 'publish',
+                                module: 'PubSub',
+                                in: {
+                                    publish:[
+                                        {
+                                            topic: 'showCustomizationDlg', 
+                                            channel: ParentChannel
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }]
+            }
+                ]
+            }
+        ]
+    }.
+
+'staber_kresult_pivotgrid::usecase__010'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__result', CHANNEL_RESULT),
+    newKw('bus__kresult', BUSID_RESULT),
+    I_agent = 'builderweb',
+
+    IN = {
+        enabled: true,
+        hasAgent: I_agent,
+        hasDataset: 'dataset__test_5gl_server',
+        hasKw: 'testapp:contact',
+        schema: {
+            data: [
+                {
+                    label: { d: 'Nombre' },
+                    class: 'user',
+                    arc: 'contact:hasName',
+                    enabled: false,
+                    sorted: false,
+                    filter: false,
+                    control: {
+                        type: 'label',
+                        d: '',
+                        actions: [
+                            {
+                                label: { icon: 'edit' },
+                                collapse: false,
+                                events: [
+                                    {
+                                        type: 'click',
+                                        method: 'refreshGUIOut',
+                                        targetBusId: BUSID_RESULT
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    label: {
+                        d: 'Email'
+                    },
+                    arc: 'contact:hasEmail',
+                    filter: true,
+                    enabled: false
+                },
+                {
+                    label: {
+                        d: 'Edad'
+                    },
+                    width: '100px',
+                    arc: 'contact:hasAge',
+                    filter: true,
+                    inputtype: 'integer',
+                    enabled: false,
+                    range: 'integer'
+                }
+            ]
+        }
+    },
+
+    Obj_class = {
+        type : 'kresult',
+        in : IN,
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT,
+        hasKw: kresult_test_010,
+        hasDsca: kresult_test_010_uiML,
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        evtPublish: [{topic: 'setNode', channel:CHANNEL_RESULT}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_, Obj_class, _, OBJ_out).
+
+'staber_kresult_pivotgrid::usecase__setSelected'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__result_setSelected', CHANNEL_RESULT),
+    newKw('bus__kresult_setSelected', BUSID_RESULT),
+    I_agent = 'builderweb',
+
+    ButtonNav = {
+        type: 'button',
+        label: {
+            icon: 'app',
+            d: 'Seleccionado'
+        },
+        events: [
+            {
+                type: 'click',
+                method: 'refresh_gui',
+                targetBusId: BUSID_RESULT,
+                p_exec: {
+                    type: "sequence",
+                    hasProcess: [
+                        {
+                            type: 'method', name: 'setSelected', busId: BUSID_RESULT
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+
+    Row_actions = {
+        fixed: true,
+        align: 'right',
+        actions: [ButtonNav]
+    },
+
+    IN = {
+        enabled: true,
+        hasAgent: I_agent,
+        hasDataset: 'dataset__test_5gl_server',
+        hasKw: 'testapp:contact',
+        schema: {
+            data: [
+                {
+                    label: { d: 'Nombre' },
+                    class: 'user',
+                    arc: 'contact:hasName',
+                    enabled: false,
+                    sorted: false,
+                    filter: false
+                },
+                {
+                    label: {
+                        d: 'Email'
+                    },
+                    arc: 'contact:hasEmail',
+                    filter: true,
+                    enabled: false
+                },
+                {
+                    label: {
+                        d: 'Edad'
+                    },
+                    width: '100px',
+                    arc: 'contact:hasAge',
+                    filter: true,
+                    inputtype: 'integer',
+                    enabled: false,
+                    range: 'integer'
+                }
+            ]
+        },
+        rowactions: Row_actions
+    },
+
+    Obj_class = {
+        type : 'kresult',
+        in : IN,
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT,
+        hasKw: kresult_test_setSelected,
+        hasDsca: kresult_test_setSelected_uiML,
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        evtPublish: [{topic: 'setNode', channel:CHANNEL_RESULT}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_, Obj_class, _, OBJ_out).
+
+'staber_kresult_pivotgrid::usecase__rowactions_and_multiselection'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),
+    newKw('bus__kresult', BUSID_RESULT),
+
+    'staber_kresult::schema::usecase__000'(_CTX, {busId: BUSID_RESULT}, _CTX, Schema),
+    newKw('bus', BUS_DETAIL),
+    newKw('channel', CHANNEL_DETAIL),
+    INDETAIL = {        
+        hasAgent: I_agent,
+        hasDataset: 'dataset__test_5gl_server',        
+        hasKw: '_.hasKw',
+        hasEvent: 'e_edit'
+    },
+	Obj_detail = {  
+        in : INDETAIL,
+        hasChannel: CHANNEL_DETAIL,
+        busId: BUS_DETAIL,
+        type : 'kdetail'        
+    },
+    Row_Actions = {
+        fixed: true,
+        icon: 'menu2',
+        align: 'left',
+        actions: [
+            {
+                label: {
+                    icon: 'pencil',
+                    d: 'Editar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        targetBusId: BUSID_RESULT,
+                        method:'openInBrowser',
+                        payload: Obj_detail
+                    }
+                ]
+            },
+            {
+                label: {
+                    icon: 'copy',
+                    d: 'Copiar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_RESULT,
+                        payload: {action: 'copiar'},
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                {type: 'function', name: 'kresult000:actionNotification', context:{ delegatedTo: 'builderweb' }}
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                label: {
+                    icon: 'paste',
+                    d: 'Pegar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_RESULT,
+                        payload: {action: 'pegar'},
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                {type: 'function', name: 'kresult000:actionNotification', context:{ delegatedTo: 'builderweb' }}
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+	IN = {
+        enabled: true,
+        hasAgent: I_agent,
+        hasDataset: 'dataset__test_5gl_server',
+        hasKw: 'testapp:contact',
+        schema: Schema,
+        multiselection: true,
+        rowTemplate: 'style=\"background-color: ##_.hasKw##\"//class=\"##_.hasKw##\"',
+        rowactions: Row_Actions,
+        limit: 5,
+        includedProperties: [
+            'hasIcon',
+            'contact:hasName',
+            'contact:hasEmail',
+            'contact:hasPhoneNumber',
+            'contact:hasAge',
+            'contact:hasBirthDate',
+            'contact:hasResidenceCountry'
+        ]
+    },
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,          
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT, 
+        hasKw: kresult_test_kmenuLeft_and_multiselection,
+        hasDsca: kresult_test_kmenuLeft_and_multiselection_uiML,
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        evtPublish: [{topic: 'setNode', channel:CHANNEL_RESULT}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kresult_pivotgrid::usecase__preselected_rows_and_multiselection'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    newKw('channel__preselectedRows_result', CHANNEL_RESULT),
+    newKw('bus__preselectedRows_kresult', BUSID_RESULT),
+
+    'staber_kresult::schema::usecase__000'(_CTX, {busId: BUSID_RESULT}, _CTX, Schema),
+	IN = {
+        enabled: true,
+        hasAgent: I_agent,
+        hasDataset: 'dataset__test_5gl_server',
+        hasKw: 'testapp:contact',
+        schema: Schema,
+        multiselection: true,
+        rowTemplate: 'style=\"background-color: ##_.hasKw##\"//class=\"##_.hasKw##\"',
+        preselectedKws: ['testapp_contacto_001', 'testapp_contacto_002'],
+        includedProperties: [
+            'hasIcon',
+            'contact:hasName',
+            'contact:hasEmail',
+            'contact:hasPhoneNumber',
+            'contact:hasAge',
+            'contact:hasBirthDate',
+            'contact:hasResidenceCountry'
+        ]
+    },
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,          
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT, 
+        hasKw: kresult_test_preselectedRows,
+        hasDsca: kresult_test_preselectedRows_uiML,
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        evtPublish: [{topic: 'setNode', channel:CHANNEL_RESULT}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+/* Ejemplo de Resultados en REM */   
+'staber_kresult_pivotgrid::usecase__001'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__semantic_test',
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),  
+
+    /* Opcionales */
+    'staber_kresult::schema::usecase__001'(_CTX, _OBJ_in, _CTX, Schema),
+    IP = [hasDsca, ownedBy, createdOn, lastModificationOn],
+    NP = [ownedBy],
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:document',
+        searchType: 'rem',
+        schema: Schema,
+        selectable: true,
+        includedProperties: IP,
+        navigableProperties: NP
+    },
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,
+        hasChannel: CHANNEL_RESULT,
+        hasKw: kresult_test_001,
+        hasDsca: kresult_test_001_uiML,
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+/* Ejemplo de resultados con rql */   
+'staber_kresult_pivotgrid::usecase__002'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__semantic_test',
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),      
+    
+    OVERRIDES = [            
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'testapp_kmgt::result::rc_gui_out::rql__pivotgrid_sust', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }        
+    ],
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:project',
+        selectable: true,        
+        searchType: 'rql'
+    },
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,
+        hasChannel: CHANNEL_RESULT,
+        overrides: OVERRIDES,
+        hasKw: kresult_test_002,
+        hasDsca: kresult_test_002_uiML,
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+/* Ejemplo de Resultados en SQL */   
+'staber_kresult_pivotgrid::usecase__003'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__kresult_sql_', BUSID_RPROC),
+    newKw('channel__kresult_sql_rproc', CHANNEL_RPROC),
+    newKw('bus__kresult_sql_', BUSID_RESULT_SQL),
+    concatConstants([BUSID_RESULT_SQL, '_result'], BUSID_PIVOT),
+
+    newKw('channel__kresult_sql_', CHANNEL_FILTERS_SQL),
+    newKw('busid_toolbar_', BUSID_KTOOLBAR),
+    newKw('channel_toolbar_', CHANNEL_KTOOLBAR),
+
+    CODE = 'SELECT NOMBRE, EMAIL, TELEFONO, EDAD, FECHANACIMIENTO, PATRIMONIO, TIENEMASTER from Contactos',
+
+    Toolbar = {
+        type: 'ktoolbar',
+        hasChannel: CHANNEL_KTOOLBAR,
+        busId: BUSID_KTOOLBAR,
+        in : {
+            hasTitle: 'Testeando consultas SQL (paginación, PK, seleccionados)',
+            hasTitleSize: 'h5',
+            actions: [
+                {
+                    type: 'button',                
+                    label: { icon: 'ray', d: 'Consulta sin resultados' },
+                    events: [
+                        {
+                            type: 'click',
+                            method: 'log',
+                            targetBusId: BUSID_KTOOLBAR,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    {
+                                        type: 'method', 
+                                        in: {  code: 'SELECT NOMBRE, EMAIL, EDAD from Contactos WHERE NOMBRE = \'NotExist\' ' },    
+                                        name: 'merge_in',
+                                        busId: BUSID_RESULT_SQL
+                                    },                                   
+                                    {
+                                        type: 'method',
+                                        name: 'refreshNode',
+                                        busId: BUSID_RESULT_SQL
+                                    }                                                       
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'button',                
+                    label: { icon: 'eye', d: 'Ver seleccionados (multiselección)' },
+                    events: [
+                        {
+                            type: 'click',
+                            method: 'log',
+                            targetBusId: BUSID_KTOOLBAR,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess:[ 
+                                    {  
+                                        type: 'method',                
+                                        name: 'getSelected', 
+                                        % busId: BUSID_RESULT_SQL 
+                                        % Hardcodeado BUSID PIVOT
+                                        busId: BUSID_PIVOT
+                                        
+                                    },
+                                    {
+                                        type: 'function',
+                                        name: 'showSelected',
+                                        context: {
+                                            delegatedTo: 'builderweb'
+                                        }
+                                    } 
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'button',                
+                    label: { icon: 'ray', d: 'Testeando escenario con tabla inexistente' },
+                    events: [
+                        {
+                            type: 'click',
+                            method: 'log',
+                            targetBusId: BUSID_KTOOLBAR,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    {
+                                        type: 'method', 
+                                        in: {  code: 'SELECT NOMBRE, EMAIL from NotExistTable'  },    
+                                        name: 'merge_in',
+                                        busId: BUSID_RESULT_SQL
+                                    },                                   
+                                    {
+                                        type: 'method',
+                                        name: 'refreshNode',
+                                        busId: BUSID_RESULT_SQL
+                                    }                                                       
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'button',                
+                    label: { icon: 'eye', d: 'Testeando consulta sin paginación' },
+                    events: [
+                        {
+                            type: 'click',
+                            method: 'log',
+                            targetBusId: BUSID_KTOOLBAR,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess:[ 
+                                    {
+                                        type: 'method', 
+                                        in: {  limit: 0 },    
+                                        name: 'merge_in',
+                                        busId: BUSID_RESULT_SQL
+                                    },                                   
+                                    {
+                                        type: 'method',
+                                        name: 'refreshNode',
+                                        busId: BUSID_RESULT_SQL
+                                    }   
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'actions',
+                    hasLayout: 'combo',
+                    hasLayoutData: {
+                        hasTitle: 'Pruebas con/sin PK',
+                        hasIcon: 'ray',
+                        hasTip: 'Pruebas con/sin PK'
+                    },
+                    actions: [
+                        {
+                            type: 'button',    
+                            appearance: 'text',            
+                            label: { 
+                                icon: 'ray', 
+                                tip: {
+                                    value: 'Testeando consulta con HASKW y configuración de Primary Key',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [
+                                {
+                                    type: 'click',
+                                    method: 'log',
+                                    targetBusId: BUSID_KTOOLBAR,
+                                    p_exec: {
+                                        type: 'sequence',
+                                        hasProcess: [
+                                            {
+                                                type: 'method', 
+                                                in: {  code: 'SELECT NOMBRE, EMAIL, EDAD, TELEFONO as HASKW from Contactos' },    
+                                                name: 'merge_in',
+                                                busId: BUSID_RESULT_SQL
+                                            },                                   
+                                            {
+                                                type: 'method',
+                                                name: 'refreshNode',
+                                                busId: BUSID_RESULT_SQL
+                                            }                                                       
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            type: 'button',
+                            appearance: 'text',                                            
+                            label: { 
+                                icon: 'ray', 
+                                tip: {
+                                    value: 'Testeando consulta con HASKW y SIN configuración de Primary Key',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [
+                                {
+                                    type: 'click',
+                                    method: 'log',
+                                    targetBusId: BUSID_KTOOLBAR,
+                                    p_exec: {
+                                        type: 'sequence',
+                                        hasProcess: [
+                                            {
+                                                type: 'method', 
+                                                in: {  
+                                                    code: 'SELECT NOMBRE, EMAIL, EDAD, TELEFONO as HASKW from Contactos',                                            
+                                                    dbPrimaryKey: 'null'
+                                                },    
+                                                name: 'merge_in',
+                                                busId: BUSID_RESULT_SQL
+                                            },                                   
+                                            {
+                                                type: 'method',
+                                                name: 'refreshNode',
+                                                busId: BUSID_RESULT_SQL
+                                            }                                                       
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            type: 'button',      
+                            appearance: 'text',                                      
+                            label: { 
+                                icon: 'ray', 
+                                tip: {
+                                    value: 'Testeando consulta SIN HASKW y SIN configuración de Primary Key',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [
+                                {
+                                    type: 'click',
+                                    method: 'log',
+                                    targetBusId: BUSID_KTOOLBAR,
+                                    p_exec: {
+                                        type: 'sequence',
+                                        hasProcess: [
+                                            {
+                                                type: 'method', 
+                                                in: {                                             
+                                                    dbPrimaryKey: 'undefined'
+                                                },    
+                                                name: 'merge_in',
+                                                busId: BUSID_RESULT_SQL
+                                            },                                   
+                                            {
+                                                type: 'method',
+                                                name: 'refreshNode',
+                                                busId: BUSID_RESULT_SQL
+                                            }                                                       
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    Schema_SQL = { 
+        data: [                   
+            {
+                label: {
+                    d: 'Nombre'
+                },
+                arc: 'NOMBRE'
+            },                                                                                                                                                 
+            {
+                label: {
+                    d: 'Email'
+                },
+                arc: 'EMAIL'
+            },                                                                         
+            {
+                label: {
+                    d: 'Teléfono'
+                },
+                arc: 'TELEFONO'
+            },                                                                         
+            {
+                label: {
+                    d: 'Edad'
+                },
+                arc: 'EDAD'
+            },
+            {
+                label: {
+                    d: 'Fecha de nacimiento'
+                },
+                arc: 'FECHANACIMIENTO',
+                inputtype: 'date'                
+            }
+        ]
+    },
+
+    IN = {
+        searchType: 'sql',
+        dbType: 'mysql',
+        dbConn: 'sqlite_contacts',
+        dbPrimaryKey: {
+            prefix: 'my_contact_db',
+            key: [
+                'NOMBRE',
+                'EDAD'
+            ]
+        },
+        code: CODE,
+        schema: Schema_SQL,        
+        multiselection: true,
+        % With limit 0 the query is without pagination
+        limit: 3,        
+        page: 0
+    },
+
+    Obj_filters_sql = {
+        type : 'kresult',
+        hasChannel: CHANNEL_FILTERS_SQL,
+        busId: BUSID_RESULT_SQL,
+        in : IN    
+    },
+
+    Gui_out = {
+        type: 'assembly',
+        children: [
+            Toolbar,   
+            Obj_filters_sql
+        ]
+     },
+
+    Obj_class = {
+        type: 'rprocess',
+        busId: BUSID_RPROC,
+        hasChannel: CHANNEL_RPROC,
+        hasKw: kresult_test_003,
+        hasDsca: kresult_test_003_uiML,
+        gui_out: Gui_out,
+        hasIcon: 'database1',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kresult::schema::kresult_test_013'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    Schema = [                   
+        {
+            label: {
+                d: 'Nombre'
+            },
+            arc: 'NOMBRE',  
+            control: {
+                type: 'label',
+                d: '_.NOMBRE'
+            },
+            filter: true,                                      
+            sorted: true
+        },                                                                         
+        {
+            label: {
+                d: 'Fecha de Alta'
+            },
+            arc: 'FECHA_ALTA',
+            inputtype: 'date',
+            range: date,
+            filter: true,
+            sorted: true   
+        },
+        {
+            label: {
+                d: 'Horas Semana'
+            },
+            arc: 'HORAS_SEMANA',
+            inputtype: 'float',
+            filter: false
+        }
+	],
+    OBJ_out = {data: Schema}.
+
+'staber_kresult::schema::kresult_test_014'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    Schema = [                   
+        {
+            label: {
+                d: 'Nombre'
+            },
+            arc: 'NOMBRE',  
+            control: {
+                type: 'label',
+                d: '_.NOMBRE'
+            },
+            filter: true,                                      
+            sorted: true
+        },                                                                         
+        {
+            label: {
+                d: 'Email'
+            },
+            arc: 'EMAIL',  
+            control: {
+                type: 'label',
+                d: '_.EMAIL'
+            },
+            filter: true,                                      
+            sorted: true
+        },                                                                         
+        {
+            label: {
+                d: 'Teléfono'
+            },
+            arc: 'TELEFONO',  
+            control: {
+                type: 'label',
+                d: '_.TELEFONO'
+            },
+            filter: true,                                      
+            sorted: true
+        },                                                                         
+        {
+            label: {
+                d: 'Edad'
+            },
+            arc: 'EDAD',
+            inputtype: 'integer',
+            filter: true
+        },
+        {
+            label: {
+                d: 'Fecha de nacimiento'
+            },
+            arc: 'FECHANACIMIENTO',
+            inputtype: 'date',
+            range: date,
+            filter: true,
+            sorted: true   
+        },
+        {
+            label: {
+                d: 'Patrimonio'
+            },
+            arc: 'PATRIMONIO',
+            inputtype: 'float',
+            filter: true
+        }
+	],
+    OBJ_out = {data: Schema}.
+
+'staber_kresult_pivotgrid::usecase__004'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__oOrder_test',
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),        
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'oOrder',
+        query: 'stmt(isRoot, HASKW, true)',
+        orderBy: 'ownedBy',
+        orderByType: 'desc',
+        selectable: true
+    },
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,
+        hasChannel: CHANNEL_RESULT,
+        hasKw: kresult_test_004,
+        hasDsca: kresult_test_004_uiML,
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kresult_pivotgrid::usecase__005'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__semantic_test',
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),        
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:Document',
+        query: 'stmt(type, HASKW, Class), member( Class,[\'ss:document\',\'ss:documentV\',\'ss:documentR\',\'ss:documentT\'])'
+    },
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,
+        hasChannel: CHANNEL_RESULT,
+        hasKw: kresult_test_005,
+        hasDsca: kresult_test_005_uiML,
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kresult_gallery::usecase__006'(_, _, _, OBJ_out):-
+    I_dataset = 'dataset__semantic_test',
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),      
+    
+    OVERRIDES = [            
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'testapp_kmgt::result::rc_gui_out::rql__pivotgrid_sust', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }        
+    ],
+    SCHEMA = [
+            {
+                label: {
+                    d: 'Kw'
+                },
+                arc: 'hasKw',
+                enabled: false,
+                sorted: true,
+                filter: true
+            }
+    ],    
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:project',
+        layoutType: 'kgallery',        
+        selectable: true,        
+        searchType: 'rql',
+        cols: 4,
+        backButton: true,
+        hasTemplate:{
+                'ss:project':{
+                        hasDsca:  '_.hasDsca',
+                        hasDscaIcon:  'project',
+                        hasIconClass: 'project'
+                },
+                'default':{
+                    hasDsca:  '_.hasDsca',
+                    hasIconClass: 'folder'
+                }          
+        },
+        schema: SCHEMA
+    },
+	Obj_class = {
+        type : 'kresult',
+        in : IN,
+        hasChannel: CHANNEL_RESULT,
+        overrides: OVERRIDES,
+        hasKw: kresult_test_006,
+        hasDsca: kresult_test_006_uiML,
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kresult_pivotgrid::usecase__007'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__kresult', BUSID_RESULT),
+    newKw('channel__result', CHANNEL_RESULT),
+    I_agent = 'builderweb',
+
+    IN = {
+        enabled: true,
+        hasAgent: I_agent,
+        hasDataset: 'Default',        
+        hasKw: 'testapp:contact'
+    },
+
+    Obj_class = {
+        type: 'kresult',
+        busId:BUSID_RESULT,
+        hasChannel: CHANNEL_RESULT,
+        hasKw: kresult_test_007,
+        in: IN,
+        do_exec: true,
+        overrides: [
+            {
+                type: 'getSchemaControls',
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        {
+                            type: 'function',
+                            name: 'contactosTableMgt::getSchemaControls',
+                            context: {
+                                delegatedTo: I_agent
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        hasDsca: kresult_test_007_uiML,
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        evtPublish: [{ topic: 'setNode', channel: CHANNEL_RESULT }],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_, Obj_class, _, OBJ_out).
+
+'staber_kresult_pivotgrid::usecase__012'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__semantic_test',
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),        
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'mmResource',
+        searchType: 'rem',
+        schema: {
+            data: [                   
+                {
+                    label: { d: 'Fichero' },
+                    arc: 'hasUrl',  
+                    filter: false,
+                    enabled: false
+                },
+                {
+                    label: { d: 'Documento' },
+                    arc: 'hasDoc', % propiedad que no existe en modelo, lo devuelve mapFunction, es del padre
+                    filter: {
+                        options: [ 'contains' ]
+                    },
+                    enabled: false
+                },
+                {
+                    label: { d: 'Creado en' },
+                    arc: 'createdOn',
+                    range: date,
+                    mask: 'DD/MM/YYYY HH:MM:SS',
+                    filter: false,
+                    enabled: false,
+                    sorted: true,
+                    order: 'asc'
+                },
+                {
+                    label: { d: 'Tipo fichero' },
+                    arc: 'hasMimeType',
+                    filter: true,
+                    enabled: false,
+                    filter: {
+                        control: {
+                        type: combobox,
+                        autocomplete: true,
+                        elements: [
+                            { label: { d: '' }, datavalue: ''},
+                            { label: { d: 'pdf', class: 'blue400-color' }, datavalue: 'application/pdf' },
+                            { label: { d: 'postscript', class: 'blue400-color' }, datavalue: 'application/postscript' },
+                            { label: { d: 'msword', class: 'blue400-color' }, datavalue: 'applicationmswordpdf' },
+                            { label: { d: 'ms-excel', class: 'yellow400-color' }, datavalue: 'application/ms-excel' },
+                            { label: { d: 'ms-powerpoint', class: 'yellow400-color' }, datavalue: 'application/ms-powerpoint' },
+                            { label: { d: 'xml', class: 'yellow400-color' }, datavalue: 'application/xml' },
+                            { label: { d: 'visio', class: 'yellow400-color' }, datavalue: 'application/vnd.visio' },
+                            { label: { d: 'mindmanager', class: 'purple400-color' }, datavalue: 'application/vnd.mindjet.mindmanager' },
+                            { label: { d: 'zip', class: 'purple400-color' }, datavalue: 'application/zip' },
+                            { label: { d: 'mpeg', class: 'purple400-color' }, datavalue: 'audio/mpeg' },
+                            { label: { d: 'bmp', class: 'purple400-color' }, datavalue: 'image/bmp' },
+                            { label: { d: 'tiff', class: 'pink400-color' }, datavalue: 'image/tiff' },
+                            { label: { d: 'jpeg', class: 'pink400-color' }, datavalue: 'image/jpeg' },
+                            { label: { d: 'gif', class: 'pink400-color' }, datavalue: 'image/gif' },
+                            { label: { d: 'png', class: 'pink400-color' }, datavalue: 'image/png' },
+                            { label: { d: 'css', class: 'orange400-color' }, datavalue: 'text/css' },
+                            { label: { d: 'html', class: 'orange400-color' }, datavalue: 'text/html' },
+                            { label: { d: 'plain', class: 'orange400-color' }, datavalue: 'text/plain' },
+                            { label: { d: 'rtf', class: 'orange400-color' }, datavalue: 'text/rtf' },
+                            { label: { d: 'xml', class: 'orange400-color' }, datavalue: 'text/xml' },
+                            { label: { d: 'repconText', class: 'grey400-color' }, datavalue: 'text/repconText' },
+                            { label: { d: 'x-msvideo', class: 'grey400-color' }, datavalue: 'video/x-msvideo' },
+                            { label: { d: 'x-shockwave-flash', class: 'red-color' }, datavalue: 'application/x-shockwave-flash' },
+                            { label: { d: 'x-flv', class: 'grey400-color' }, datavalue: 'video/x-flv' },
+                            { label: { d: 'MimeType', class: 'red-color' }, datavalue: 'mimeType' },
+                            { label: { d: 'Fichero test', class: 'red-color' }, datavalue: 'testFile' }
+                        ]
+                        }
+                    }
+                }
+            ]
+        },
+        query: 'stmt(type, HASKW, \'mmResource\')',
+        queryFunction: 'queryFunction__usecase__012',
+        mapFunction: 'mapFunction__usecase__012',
+        selectable: true
+    },
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,
+        hasChannel: CHANNEL_RESULT,
+        hasKw: kresult_test_012,
+        hasDsca: kresult_test_012_uiML,
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kresult_pivotgrid::usecase__009'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),
+    newKw('bus__kresult', BUSID_RESULT),
+    'staber_kresult::schema::usecase__009'(_CTX, {busId: BUSID_RESULT}, _CTX, Schema),
+	IN = {
+        enabled: false,
+        hasAgent: I_agent,
+        schema: Schema,
+        searchType: 'rql',
+        predicate: 'staber_kresult::predicate::usecase__009'
+    },
+	Obj_class = {
+        type : 'kresult',
+        in : IN, 
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT, 
+        hasKw: kresult_test_009,
+        hasDsca: kresult_test_009_uiML,
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        evtPublish: [{topic: 'setNode', channel:CHANNEL_RESULT}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kresult_pivotgrid::result_control_when_is_editable'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__result', BusIdResult),
+    newKw('channel__result', ChannelResult),
+
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+
+    Obj_toolbar = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'button',
+                classList: ['line-button'],
+                label: { d: 'Editar', icon: 'edit' },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BusIdResult,
+                        payload: { enabled: true },
+                        p_exec: { type: method, name: 'change_config', busId: BusIdResult }
+                    }
+                ]
+            },
+            {
+                type: 'button',
+                classList: ['line-button'],
+                label: { d: 'Cancelar', icon: 'cancel' },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BusIdResult,
+                        payload: { enabled: false },
+                        p_exec: { type: method, name: 'change_config', busId: BusIdResult }
+                    }
+                ]
+            }
+        ]
+    },
+
+    In_result = {
+        enabled: false,
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact'
+    },
+
+    Obj_kresult = {
+        type: 'kresult',
+        busId: BusIdResult,
+        hasChannel: ChannelResult,
+        do_exec: true,
+        in: In_result,
+        overrides: [
+            {
+                type: 'getSchemaControls',
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        {
+                            type: 'function',
+                            name: 'staber_kresult::schema::result_control_when_is_editable',
+                            context: { delegatedTo: I_agent }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+
+    Gui_out = {
+        type: 'assembly',
+        children: [
+            Obj_toolbar,
+            Obj_kresult
+        ]
+    },
+
+    Obj_class ={
+        type: 'rprocess',
+        hasKw: kresult_control_when_is_editable,
+        hasDsca: kresult_control_when_is_editable_uiML,
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: true,
+        hasNavbar: false,
+        gui_out: Gui_out
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+
+'staber_kresult_pivotgrid::usecase__011'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    newKw('bus__resultusecase__011', BUSID_RESULT),
+    newKw('channel__resultusecase__011', CHANNEL_RESULT),
+
+    DLG1 = {
+        type: 'rdlg',
+        busId: '_.dlg.busId',
+        in: {
+            close: false,
+            options: {
+                label: { d: 'Refescar fila' },
+                actions: [
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label: { d: 'common.btn.accept', i18n: 'd' },
+                        enabled: true,
+                        events: [{ type: 'click', method: 'accept', targetBusId: '_.dlg.busId' }]
+                    },
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label: { d: 'common.btn.cancel', i18n: 'd' },
+                        enabled: true,
+                        events: [{ type: 'click', method: 'cancel', targetBusId: '_.dlg.busId' }]
+                    }
+                ]
+            }
+        }
+    },
+
+    DLGDATA = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'label',
+                d: '¿Desea refrescar la fila?'
+            }
+        ]
+    },
+
+    IN = {
+        enabled: false,
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        schema: {
+            data: [
+                {
+                    label: { d: 'Nombre' },
+                    class: 'user',
+                    arc: 'contact:hasName',
+                    range: integer,
+                    enabled: false,
+                    filter: true,
+                    control: {
+                        type: 'label',
+                        d: '_.contact:hasName',
+                        actions: [
+                            {
+                                label: { icon: 'arrow-ccw' },
+                                collapse: false,
+                                events: [
+                                    {
+                                        type: 'click',
+                                        method: 'refreshGUIOut',
+                                        targetBusId: '$.busId',
+                                        p_exec: {
+                                            type: 'sequence',
+                                            hasProcess: [
+                                                {
+                                                    type: 'method',
+                                                    in: { dlg_data: DLGDATA, dlg: DLG1 },
+                                                    name: 'dialog_exec',
+                                                    busId: '$.busId'
+                                                },
+                                                {
+                                                    type: 'function',
+                                                    in: { busId: '$.busId' },
+                                                    name: 'staber_kresult_refresh_row_data',
+                                                    context: { delegatedTo: I_agent }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    label: { d: 'Email' },
+                    arc: 'contact:hasEmail',
+                    inputtype: 'mailto',
+                    range: integer,
+                    enabled: false,
+                    filter: true,
+                    control: {
+                        type: 'label',
+                        d: '_.contact:hasEmail',
+                        actions: [
+                            {
+                                label: { icon: 'arrow-ccw' },
+                                collapse: false,
+                                events: [
+                                    {
+                                        type: 'click',
+                                        method: 'refreshGUIOut',
+                                        targetBusId: '$.busId',
+                                        p_exec: {
+                                            type: 'sequence',
+                                            hasProcess: [
+                                                {
+                                                    type: 'method',
+                                                    in: { dlg_data: DLGDATA, dlg: DLG1 },
+                                                    name: 'dialog_exec',
+                                                    busId: '$.busId'
+                                                },
+                                                {
+                                                    type: 'function',
+                                                    in: { busId: '$.busId' },
+                                                    name: 'staber_kresult_refresh_row_data',
+                                                    context: { delegatedTo: I_agent }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    label: { d: 'Teléfono' },
+                    arc: 'contact:hasPhoneNumber',
+                    range: integer,
+                    inputtype: 'tel',
+                    enabled: false,
+                    filter: true,
+                    control: {
+                        type: 'label',
+                        d: '_.contact:hasPhoneNumber',
+                        actions: [
+                            {
+                                label: { icon: 'arrow-ccw' },
+                                collapse: false,
+                                events: [
+                                    {
+                                        type: 'click',
+                                        method: 'refreshGUIOut',
+                                        targetBusId: '$.busId',
+                                        p_exec: {
+                                            type: 'sequence',
+                                            hasProcess: [
+                                                {
+                                                    type: 'method',
+                                                    in: { dlg_data: DLGDATA, dlg: DLG1 },
+                                                    name: 'dialog_exec',
+                                                    busId: '$.busId'
+                                                },
+                                                {
+                                                    type: 'function',
+                                                    in: { busId: '$.busId' },
+                                                    name: 'staber_kresult_refresh_row_data',
+                                                    context: { delegatedTo: I_agent }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+
+    Obj_class = {
+        type : 'kresult',
+        in : IN,
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT,
+        hasKw: kresult_test_011,
+        hasDsca: kresult_test_011_uiML,
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        evtPublish: [{topic: 'setNode', channel:CHANNEL_RESULT}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kresult_pivotgrid::tipsontables'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),
+    newKw('bus__kresult', BUSID_RESULT),
+    Row_Actions = {
+        fixed: true,
+        icon: 'menu2',
+        align: 'left',
+        actions: [
+            {
+                label: {
+                    icon: 'pencil',
+                    d: 'Editar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_RESULT,
+                        payload: {action: 'editar'},
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                {type: 'function', name: 'kresult000:actionNotification', context:{ delegatedTo: 'builderweb' }}
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    Table_Schema =  { 
+        data:  [                   
+            {
+                label: {
+                    d: 'Nombre'
+                },
+                class: 'user',
+                arc: 'contact:hasName',
+                control: {
+                    type: 'label',
+                    class: 'user',
+                    d: '_.contact:hasName',
+                    tip: '_.contact:hasEmail'             
+                }
+            },
+            {
+                label: {
+                    d: 'Email'
+                },
+                arc: 'contact:hasEmail',
+                control: {
+                    type: 'label',
+                    d: '_.contact:hasEmail',
+                    tip: '_.contact:hasPhoneNumber'             
+                }
+            },
+            {
+                label: {
+                    d: 'Teléfono'
+                },
+                arc: 'contact:hasPhoneNumber'
+            }
+        ]
+    },
+    
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: 'dataset__test_5gl_server',
+        hasKw: 'testapp:contact',
+        schema: Table_Schema,
+        rowactions: Row_Actions,
+        includedProperties: [
+            'hasIcon',
+            'contact:hasName',
+            'contact:hasEmail',
+            'contact:hasPhoneNumber'
+        ]
+    },
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,          
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT, 
+        hasKw: kresult_test_tips,
+        hasDsca: kresult_test_tips_uiML,
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+% SCHEMAS
+'staber_kresult_pivotgrid::schema_range_differ_property'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    newKw('channel__result0', CHANNEL_RESULT0),
+    newKw('bus__kresult0', BUSID_RESULT0),
+    newKw('channel__result1', CHANNEL_RESULT1),
+    newKw('bus__kresult1', BUSID_RESULT1),
+
+    'staber_kresult::schema::schema_range_differ_property'(_CTX, _IN, _CTX, Schema0),
+	IN0 = {
+        enabled: true,
+        hasAgent: I_agent,
+        hasDataset: 'Default',
+        hasKw: 'testapp:contact',
+        schema: Schema0,
+        rowTemplate: 'style=\"background-color: ##_.hasKw##\"//class=\"##_.hasKw##\"',
+        includedProperties: [
+            'hasIcon',
+            'contact:hasName',
+            'contact:hasEmail',
+            'contact:hasPhoneNumber',
+            'contact:hasAge',
+            'contact:hasBirthDate',
+            'contact:hasResidenceCountry'
+        ]
+    },
+    'staber_kresult::schema::schema_range_equal_property'(_CTX, _IN, _CTX, Schema1),
+    IN1 = {
+        enabled: true,
+        hasAgent: I_agent,
+        hasDataset: 'Default',
+        hasKw: 'testapp:contact',
+        schema: Schema1,
+        rowTemplate: 'style=\"background-color: ##_.hasKw##\"//class=\"##_.hasKw##\"',
+        includedProperties: [
+            'hasIcon',
+            'contact:hasName',
+            'contact:hasEmail',
+            'contact:hasPhoneNumber',
+            'contact:hasAge',
+            'contact:hasBirthDate',
+            'contact:hasResidenceCountry'
+        ]
+    },
+    LABEL0 ={
+        type: label,
+        size: h3,
+        d: 'Tabla con rangos diferentes a la propiedad'
+    },
+	Obj_kresult0 = {
+        type : 'kresult',
+        in : IN0,
+        do_exec: true,
+        hasChannel: CHANNEL_RESULT0,
+        busId :BUSID_RESULT0
+    },
+    LABEL1 ={
+        type: label,
+        size: h3,
+        d: 'Tabla con rangos iguales'
+    },
+    Obj_kresult1 = {
+        type : 'kresult',
+        in : IN1,
+        do_exec: true,
+        hasChannel: CHANNEL_RESULT1,
+        busId :BUSID_RESULT1
+    },
+    Obj_assembly ={
+        type: assembly,
+        children:[LABEL0, Obj_kresult0, LABEL1, Obj_kresult1]
+    },
+    Obj_class ={
+        type: 'rprocess',
+        hasKw: kresult_different_ranges_in_schema,
+        hasDsca: kresult_different_ranges_in_schema_uiML,
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: true,
+        hasNavbar: false,
+        gui_out: Obj_assembly
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kresult::schema::result_control_when_is_editable'(Obj_ctx, Obj_in, Obj_ctx, Obj_out) :-
+    obj_fetch(in:enabled, Obj_in, IsEnabled),
+
+    Column_name = {
+        label: { d: 'Nombre' },
+        class: 'user',
+        arc: 'contact:hasName',
+        inputtype: 'string',
+        enabled: IsEnabled,
+        filter: true
+    },
+
+    Column_mail_0 = {
+        label: { d: 'Email' },
+        arc: 'contact:hasEmail',
+        inputtype: 'mailto',
+        enabled: IsEnabled,
+        filter: true
+    },
+
+    Column_ept = {
+        label: { d: '' },
+        width: '0px',
+        arc: type
+    },
+
+    ( IsEnabled ->
+        Obj_control = {
+            type: 'textarea'
+        },
+
+        obj_set(control, Column_mail_0, Obj_control, Column_mail_aux),
+        Column_mail = [Column_mail_aux, Column_ept]
+    ;
+        Column_mail = [Column_mail_0]
+    ),
+
+    append([[Column_name], Column_mail], Table_Schema),
+
+    Obj_out = { data: Table_Schema }.
+
+
+'staber_kresult::schema::schema_range_differ_property'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    Table_Schema = [                   
+        {
+            label: {
+                d: 'Nombre'
+            },
+            class: 'user',
+            arc: 'contact:hasName',
+            range: integer,
+            enabled: false,
+            filter: true
+        },
+        {
+            label: {
+                d: 'Email'
+            },
+            arc: 'contact:hasEmail',
+            inputtype: 'mailto',
+            range: integer,
+            enabled: false,
+            filter: true
+        },
+        {
+            label: {
+                d: 'Teléfono'
+            },
+            arc: 'contact:hasPhoneNumber',
+            range: integer,
+            inputtype: 'tel',
+            enabled: false,
+            filter: true
+        },
+        {
+            label: {
+                d: 'Edad'
+            },
+            width: '100px',
+            arc: 'contact:hasAge',
+            filter: true,
+            inputtype: 'integer',
+            enabled: false,
+            range: 'string'
+        },
+        {
+            label: {
+                d: 'Fecha de nacimiento'
+            },
+            arc: 'contact:hasBirthDate',
+            filter: true,
+            mask: 'DD/MM/YYYY',
+            inputtype: 'date',
+            enabled: false,
+            range: string
+        },
+        {
+            label: {
+                d: 'Pais'
+            },
+            arc: 'contact:hasResidenceCountry',
+            range: 'string',
+            enabled: false,
+            path: '_.contact:hasResidenceCountry.hasDsca'
+        }                        				                
+	],
+    OBJ_out = {data: Table_Schema }.
+
+'staber_kresult::schema::schema_range_equal_property'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    Table_Schema = [                   
+        {
+            label: {
+                d: 'Nombre'
+            },
+            class: 'user',
+            arc: 'contact:hasName',
+            enabled: false,
+            filter: true
+        },
+        {
+            label: {
+                d: 'Email'
+            },
+            arc: 'contact:hasEmail',
+            inputtype: 'mailto',
+            range: string,
+            enabled: false,
+            filter: true
+        },
+        {
+            label: {
+                d: 'Teléfono'
+            },
+            arc: 'contact:hasPhoneNumber',
+            range: string,
+            inputtype: 'tel',
+            enabled: false,
+            filter: true
+        },
+        {
+            label: {
+                d: 'Edad'
+            },
+            width: '100px',
+            arc: 'contact:hasAge',
+            filter: true,
+            inputtype: 'integer',
+            enabled: false,
+            range: integer
+        },
+        {
+            label: {
+                d: 'Fecha de nacimiento'
+            },
+            arc: 'contact:hasBirthDate',
+            filter: true,
+            mask: 'DD/MM/YYYY',
+            inputtype: 'date',
+            enabled: false,
+            range: date
+        },
+        {
+            label: {
+                d: 'Pais'
+            },
+            arc: 'contact:hasResidenceCountry',
+            range: 'country',
+            enabled: false,
+            filter: true,
+            path: '_.contact:hasResidenceCountry.hasDsca'
+        }                        				                
+	],
+    OBJ_out = {data: Table_Schema }.
+
+'staber_kresult_pivotgrid::editable_from_model'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),
+    newKw('bus__kresult', BUSID_RESULT),
+
+    'staber_kresult::schema::editable_from_model'(_CTX, {busId: BUSID_RESULT}, _CTX, Schema),
+    
+	IN = {
+        enabled: true,
+        hasAgent: I_agent,
+        hasDataset: 'Default',
+        hasKw: 'testapp:contact',
+        schema: Schema,
+        mapFunction: 'staber_kresult::collection::editable_from_model'
+    },
+	Obj_class = {  
+        type: 'kresult',
+        in: IN,          
+        hasChannel: CHANNEL_RESULT,
+        busId: BUSID_RESULT, 
+        hasKw: kresult_test_editable_from_model,
+        hasDsca: kresult_test_editable_from_model_uiML,
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        evtPublish: [{topic: 'setNode', channel:CHANNEL_RESULT}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kresult::schema::editable_from_model'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    Table_Schema = [                   
+        {
+            label: {
+                d: 'Nombre'
+            },
+            class: 'user',
+            arc: 'contact:hasName',
+            filter: true,
+            control:{
+                type: text
+            }
+        },
+        {
+            label: {
+                d: 'Email'
+            },
+            arc: 'contact:hasEmail',
+            filter: true,
+            control:{
+                type: text
+            }
+        },
+        {
+            label: {
+                d: 'Teléfono'
+            },
+            arc: 'contact:hasPhoneNumber',
+            filter: true,
+            enabled: false,
+            control:{
+                type: text
+            }
+        }                       				                
+	],
+    OBJ_out = {data: Table_Schema }.
+
+'staber_kresult::collection::editable_from_model'(_Obj_ctx, Obj_in, _, Obj_out):-
+    obj_fetch('result', Obj_in, Lresult),
+
+    ( Lresult \== [] ->
+        % obj_fetch('hasDataset', Obj_in, DS),
+        findall( HASKW, (
+            member(Xresult, Lresult),
+            ( Xresult = [HASKW,_] ->
+                true
+            ; [HASKW] = Xresult
+            )
+        ), Lkw),
+
+        findall( Obj,
+            (
+                member( I, Lkw),
+                stmt(type, I, 'testapp:contact'),
+                stmt('contact:hasName', I, Name),
+                stmt('contact:hasEmail', I, Email), 
+                stmt('contact:hasPhoneNumber', I, Phone),
+                Obj = {
+                    type: 'testapp:contact',
+                    hasKw: I,
+                    'contact:hasName': {
+                        cto: string,
+                        isEditable: false,
+                        to: Name
+                    },
+                    'contact:hasEmail': Email,
+                    'contact:hasPhoneNumber': Phone
+                }
+            ), Lcollection)
+    ;   Lcollection = []
+    ),
+
+    obj_fetch('count', Obj_in, Total),
+    obj_fetch('limit', Obj_in, Limit),
+    obj_fetch('page', Obj_in, Page),
+    Obj_out = {
+        'count': Total, 
+        'limit': Limit,
+        'page': Page,
+        'result': Lcollection
+    }.
+
+'staber_kresult::schema::usecase__000'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    Table_Schema = [                   
+        {
+            label: {
+                d: 'Nombre'
+            },
+            class: 'user',
+            arc: 'contact:hasName',
+            enabled: false,
+            filter: true,
+            mandatory: true
+        },
+        {
+            label: {
+                d: 'Email'
+            },
+            arc: 'contact:hasEmail',
+            filter: true,
+            enabled: false
+        },
+        {
+            label: {
+                d: 'Teléfono'
+            },
+            arc: 'contact:hasPhoneNumber',
+            filter: true,
+            enabled: false
+        },
+        {
+            label: {
+                d: 'Edad'
+            },
+            width: '100px',
+            arc: 'contact:hasAge',
+            filter: true,
+            inputtype: 'integer',
+            enabled: false,
+            range: 'integer'
+        },
+        {
+            label: {
+                d: 'Fecha de nacimiento'
+            },
+            arc: 'contact:hasBirthDate',
+            filter: true,
+            mask: 'DD/MM/YYYY',
+            enabled: false,
+            inputtype: 'date',
+            range: date
+        },
+        {
+            label: {
+                d: 'Pais'
+            },
+            arc: 'contact:hasResidenceCountry',
+            enabled: false,
+            range: 'country',
+            path: '_.contact:hasResidenceCountry.hasDsca'
+        }                        				                
+	],
+    OBJ_out = {data: Table_Schema }.
+
+'staber_kresult::schema::usecase__003'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    Schema = [                   
+        {
+            label: {
+                d: 'ID'
+            },
+            arc: 'ID',
+            filter: true,
+            sorted: true,
+            inputtype: 'integer'
+        },
+        {
+            label: {
+                d: 'Nombre'
+            },
+            arc: 'NOMBRE',  
+            control: {
+                type: 'label',
+                d: '_.NOMBRE'
+            },
+            filter: true,                                      
+            sorted: true
+        },                                                                         
+        {
+            label: {
+                d: 'Fecha de Alta'
+            },
+            arc: 'FECHA_ALTA',
+            inputtype: 'date',
+            range: date,
+            filter: true,
+            sorted: true   
+        }
+	],
+    OBJ_out = {data: Schema}.
+
+'staber_kresult::schema::usecase__001'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    Table_Schema = [                   
+        {
+            label: {
+                d: 'Descripción'
+            },
+            arc: 'hasDsca',  
+            template: '<div style=\'background-color: #2196F3; padding: 2px 10px; color: white; border-radius: 4px\'>##_.hasDsca## - ##_.hasKw##</div>',
+            filter: true,                                      
+            enabled: false,
+            sorted: true,
+            order: desc
+        },                                                                         
+        {
+            label: {
+                d: 'Creado por'
+            },
+            arc: 'ownedBy',                    
+            enabled: false,                    
+            control: {
+                type: 'label',
+                d: '_.ownedBy.hasDsca'             
+            },
+            filter: true,
+            sorted: true
+        },			
+        {
+            label: {
+                d: 'Creado en'
+            },
+            arc: 'createdOn',
+            mask: 'DD/MM/YYYY',
+            enabled: false,
+            range: date,
+            sorted: true            
+        },              				                
+        {
+            label: {
+                d: 'Última mod.'
+            },
+            arc: 'lastModificationOn',
+            mask: 'DD/MM/YYYY',
+            enabled: false,
+            inputtype: 'date',
+            range: date,
+            sorted: true,
+            filter: true
+        }           
+	],
+    OBJ_out = {data: Table_Schema }.
+
+'contactosTableMgt::getSchemaControls'(_OBJ_ctx, _OBJ_in, _OBJ_ctx, OBJ_out) :-
+    OBJ_out = {
+        data:[
+            {
+                label: {
+                    d: 'KW'
+                },
+                arc: 'hasKw',
+                selectable: true,
+                enabled: false,
+                sorted: true,
+                filter: true
+            },
+            {
+                label: {
+                    d: 'Edad'
+                },
+                arc: 'contact:hasAge',
+                filter: true,
+                inputtype: 'integer'
+            },
+            {
+                label: {
+                    d: 'Descripcion'
+                },
+                arc: 'hasDsca',
+                enabled: false,
+                sorted: true,
+                filter: true
+            }            
+        ]
+    }.
+
+'staber_kresult::schema::usecase__009'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    Table_Schema = [
+        {
+            label: {
+                d: 'Clave de idioma'
+            },
+            arc: 'SPRAS',
+            filter: true,                                      
+            sorted: true
+        },
+        {
+            label: {
+                d: 'Mandante'
+            },
+            arc: 'MANDT',
+            filter: true,                                      
+            sorted: true
+        },
+        {
+            label: {
+                d: 'Numero de región'
+            },
+            arc: 'BLAND',
+            filter: true,                                      
+            sorted: true
+        },
+        {
+            label: {
+                d: 'Denominación'
+            },
+            arc: 'BEZEI',
+            filter: true,                                      
+            sorted: true
+        },
+                {
+            label: {
+                d: 'Clave de país'
+            },
+            arc: 'LAND1',
+            filter: true,                                      
+            sorted: true
+        }                       				                
+	],
+    OBJ_out = {data: Table_Schema }.
+
+% Other predicates
+'staber_kresult_refresh_row_data'(Obj_ctx, Obj_in, Obj_ctx, Obj_out) :-
+    obj_fetch(hasKw, Obj_in, KwTableRow),
+    % obj_fetch(arc, Obj_in, Arc),
+    obj_fetch(data, Obj_in, Obj_data_0),
+    % obj_set(Arc, Obj_data_0, NewVal, Obj_data),
+    obj_fetch(busId, Obj_in, BusId),
+
+    Obj_out = {
+        result: [
+            {
+                hasRoot: KwTableRow,
+                busId: BusId,
+                format: 'obj',
+                data: {
+                    KwTableRow: Obj_data_0
+                }
+            }
+        ]
+    }.
+
+'staber_kresult::predicate::usecase__009'(Obj_ctx, Obj_in, _Obj_ctx, Lobj):-
+    obj_fetch('limit', Obj_in, Limit_),
+    numberToAtom(Limit_, Limit),
+
+    obj_fetch('page', Obj_in, Page_),
+    numberToAtom(Page_, Page),
+
+    staber_ras_execute_url(Url),
+    Obj_delegatedTo = {
+        implementedBy:'java',
+        module:'jar:file:runtime/bin/erc_integrationSAP_legacy.jar!/staber/FunctionReadTable',
+        url: Url
+    },
+
+    get_ctx_token( Obj_ctx, Token),
+    ( ground( Token) ->
+        Obj_context = {
+            'delegatedTo': Obj_delegatedTo,
+            'hasToken':Token
+        }
+    ;
+        Obj_context = {
+            'delegatedTo': Obj_delegatedTo
+        }
+    ),
+
+    OBJ_EXEC = {
+        type:'function',
+        name:'FunctionReadTable',
+        context: Obj_context,
+        in: {
+            connection: {
+                pooled: 'ABAP_AS_WITH_POOL',
+                host: '192.168.75.55',
+                client: '800',
+                user: 'SEMANTICDES',
+                pass: 'Semantic24',
+                language: 'ES',
+                instance: '00',
+                enableCheck: '1',
+                jcoTrace: '0',
+                cpicTrace: '0',
+                maxConnections: '5'
+            },
+            table: 'T005U',
+            limit: Limit,
+            page: Page,
+            filter: ['LAND1 = \'ES\''],
+            outType:'objectList'
+        }
+    },
+    staber_execute( OBJ_EXEC, OBJ_EXEC_OUT),
+    obj_get('result',OBJ_EXEC_OUT,Obj_res),
+    obj_get('DATA',Obj_res,Lobj).
+
+'staber_kresult::contact_ontology_tree'(_, _, _, OBJ_out):-
+    newKw('bus__kresult_tree_', BUSID_RESULT),
+    newKw('channel__result', CHANNEL_RESULT),
+    I_agent = 'builderweb',
+    I_dataset = 'dataset__test_5gl_server',
+    RESULT_OVERRIDES = [
+        {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function',  name: 'rc_gui_out:tree:testapp:contact', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ], 
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,     
+        selectable: false,   
+        hasKw: 'testapp:contact'
+    },
+    Obj_class = {
+        type: 'kresult',
+        busId:BUSID_RESULT,
+        hasChannel: CHANNEL_RESULT,
+        hasKw: kresult_contact__ontology_tree,
+        in: IN,
+        pagination: {
+            align: both,
+            showNode: true
+        },
+        hasDsca: kresult_contact__ontology_tree_uiML,
+        overrides: RESULT_OVERRIDES,
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_, Obj_class, _, OBJ_out).
+
+'staber_kresult::rql_treeformat_with_kmenu'(_OBJ_ctx, _OBJ_in, _OBJ_ctx, OBJ_out) :-
+    newKw('bus__kresult', BUSID_RESULT),
+    newKw('channel__result', CHANNEL_RESULT),
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    MENU_OVERRIDES = [          
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmenu::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }         
+    ],
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,     
+        selectable: true,   
+        includedProperties:['hasKw', 'hasDsca', 'menuAllowed'],
+        hasMenu: {
+            type: 'kmenu',
+            busId: 'kmenuPivot',
+            in: {
+                state: { visible: false },
+                floating: true
+            },
+            overrides: MENU_OVERRIDES,
+            evtSubscribe: [{ topic: 'setPayload', channel: CHANNEL_RESULT}]
+        },
+        hasKw: 'testapp:contact'
+    },
+    Obj_class = {
+        type: 'kresult',
+        busId:BUSID_RESULT,
+        hasChannel: CHANNEL_RESULT,
+        hasKw: kresult_test_008,
+        in: IN,
+        do_exec: true,
+        hasDsca: kresult_test_008_uiML,
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        evtPublish: [{ topic: 'setNode', channel: CHANNEL_RESULT }, { topic: 'setPayload', channel: CHANNEL_RESULT}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_, Obj_class, _, OBJ_out).
+
+'staber_kresult::rql_treeformat_with_kmenu_onTheLeft'(_OBJ_ctx, _OBJ_in, _OBJ_ctx, OBJ_out) :-
+    newKw('bus__kresult', BUSID_RESULT),
+    newKw('channel__result', CHANNEL_RESULT),
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    MENU_OVERRIDES = [          
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmenu::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }         
+    ],
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,     
+        selectable: true,
+        hasMenu: {
+            type: 'kmenu',
+            busId: 'kmenuPivot',
+            in: {
+                state: { visible: false },
+                floating: true,
+                align: 'left'
+            },
+            overrides: MENU_OVERRIDES,
+            evtSubscribe: [{ topic: 'setPayload', channel: CHANNEL_RESULT}]
+        },
+        includedProperties:['hasKw', 'hasDsca', 'menuAllowed'],
+        hasKw: 'testapp:contact'
+    },
+    Obj_class = {
+        type: 'kresult',
+        busId:BUSID_RESULT,
+        hasChannel: CHANNEL_RESULT,
+        hasKw: kresult_test_kmenu_onTheLeft,
+        in: IN,
+        do_exec: true,
+        hasDsca: kresult_test_kmenu_onTheLeft_uiML,
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        evtPublish: [{ topic: 'setNode', channel: CHANNEL_RESULT }, { topic: 'setPayload', channel: CHANNEL_RESULT}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_, Obj_class, _, OBJ_out).
+
+'queryFunction__usecase__012'(_OBJ_ctx, OBJ_in, QueryRem) :-
+    obj_fetch( schema, OBJ_in, Lschema),
+
+    ( ( member( Obj1, Lschema), 
+        obj_fetch( arc, Obj1, 'hasDoc'),
+        obj_fetch( filterStatus, Obj1, Objf1),
+        obj_fetch( operator, Objf1, contains),
+        obj_fetch( value, Objf1, V1)
+      ) ->
+      codes_append( ["stmt('hasDsca', Doc, DocDsca),like_ci('*",V1,"*',DocDsca),"], FilterCodes1)
+    ; FilterCodes1 = ""
+    ),
+
+    ( ( member( Obj3, Lschema), 
+        obj_fetch( arc, Obj3, 'hasMimeType'),
+        obj_fetch( filterStatus, Obj3, Objf3),
+        obj_fetch( operator, Objf3, equalsTo),
+        obj_fetch( value, Objf3, V3),
+        V3 \== ''
+      ) ->
+      codes_append( ["stmt('hasMimeType', HASKW, MimeType),member(MimeType, ['", V3,"']),"], FilterCodes2)
+    ; FilterCodes2 = ""
+    ),
+
+    ( ( member( Obj2, Lschema), 
+        obj_fetch( arc, Obj2, 'createdOn'),
+        obj_fetch( order, Obj2, Vorder),
+        memberchk( Vorder, ['asc', 'desc'])
+      ) ->
+      
+      OrderCodes1 = "stmt('createdOn', Doc, CreatedOn),",
+
+      ( Vorder == 'asc' ->
+        OutCodes1 = "distinct[HASKW,CreatedOn], order_by([asc(CreatedOn)]),"
+      ; OutCodes1 = "distinct[HASKW,CreatedOn], order_by([des(CreatedOn)])," % ojo que por un lado se indica "desc" para ordenar pero en rem es "des"
+      )
+      
+    ; OrderCodes1 = "",
+      OutCodes1 = "distinct[HASKW]," % en este caso el distinct no es necesario pero lo pongo a modo de ejemplo
+    ),
+
+    getActiveLang(Lang),
+
+    codes_append( [
+        "stmt(type, HASKW, 'mmResource'),",
+        "stmt('krp:hasMMResource', Doc, HASKW),", 
+        FilterCodes1,
+        FilterCodes2,
+        OrderCodes1,
+        OutCodes1,
+        "{lang(", Lang, ")}"
+    ], Codes),
+    atom_codes( QueryRem, Codes).
+
+'mapFunction__usecase__012'(Obj_ctx, Obj_in, Obj_ctx, Obj_out) :-
+    obj_fetch('result', Obj_in, Lresult),
+
+    ( Lresult \== [] ->
+        obj_fetch('hasDataset', Obj_in, DS),
+        findall( HASKW, (
+            member(Xresult, Lresult),
+            ( Xresult = [HASKW,_] ->
+                true
+            ; [HASKW] = Xresult
+            )
+        ), Lkw),
+        format_to_codes( "~q", [Lkw] , Lkw_c),
+
+        codes_append( [
+            "stmt(type, I, 'mmResource'), member(I, ", Lkw_c, "),",
+            "stmt('hasUrl', I, Url),",
+            "stmt('krp:hasMMResource', Doc, I), ",
+            "stmt('hasDsca', Doc, DocDsca),",
+            "stmt('createdOn', Doc, CreatedOn),",
+            "stmt('hasMimeType', I, MimeType),",
+            "[I, Url, Doc, DocDsca, CreatedOn, default(MimeType, '')]"
+        ], Codes),
+        atom_codes( Query, Codes),
+        get_ctx_token(Obj_ctx, Token),
+
+        executeStaberRemoteRemQuery( 'localRAS', DS, Query, Token, Lrem),
+
+        findall( Obj,
+            (
+                member( [I, Url, Doc, DocDsca, CreatedOn, MimeType], Lrem),
+
+                Obj = {
+                    type: 'mmResource',
+                    hasKw: I,
+                    hasKwDoc: Doc,
+                    'hasUrl': Url,
+                    'hasDoc': DocDsca,
+                    'createdOn': CreatedOn,
+                    'hasMimeType': MimeType
+                }
+            ), Lcollection)
+
+    ;   Lcollection = []
+    ),
+
+    obj_fetch('count', Obj_in, Total),
+    obj_fetch('limit', Obj_in, Limit),
+    obj_fetch('page', Obj_in, Page),
+    Obj_out = {
+        'count': Total, 
+        'limit': Limit,
+        'page': Page,
+        'result': Lcollection
+    }.
+
+'kresult000:actionNotification'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_get(data, Obj_in, Data),
+    obj_get(action, Obj_in, Action),
+    obj_get('contact:hasName', Data, Name),
+    wAddInfoMsgML('Aviso', 'Se ha intentado, <b>?a{1}</b>, el usuario <b>?a{2}</b>', [Action,Name],{showTime:3}),
+    Obj_out = Obj_in.
+
+% GUI_OUT
+'staber_kresult::rc_gui_out::usecase__003'(CTX, OBJ_in, CTX, OBJ_out):-    
+    obj_get(in:hasChannel, OBJ_in,  Channel),    
+    obj_get(in:busId, OBJ_in,  BusId),
+    !,    
+    'staber_kresult::schema::usecase__003'(CTX, OBJ_in, CTX, OBJ_schema),
+    CODE0 = "SELECT ID, NOMBRE, FECHA_ALTA from recursos",
+    obj_get(schema, OBJ_schema,  Schema),
+    IN0 = {
+        '?KWCLASS': 'test',
+        limit: 30,
+        rootElement: true,        
+        getCount: true,
+        persistence:'remote',
+        schemaHeader: true,        
+        code: CODE0,
+        schema : Schema
+    },
+    concatAtoms([BusId,'__table'], BusIdPivot),  
+     OBJ_out = {    
+            type : 'kpivotgrid',
+            do_exec: true, 
+            busId: BusIdPivot,        
+            in : IN0,
+            resizable: true,
+            selectable: true,
+            proc: {
+                type: 'sequence',
+                hasProcess: [
+                      {type: 'method', in: {dbType:'mysql', dbConn:'semantic_id'}, name: 'getConnection', module: 'SqlServices' },
+                      {type: 'method', in: {type: '?KWCLASS'}, name: 'execSQL', module: 'SqlServices' }
+                ]
+            },
+            evtPublish: [{ topic: 'setNode', channel: Channel}]
+    }.
+
+'staber_kresult_pivotgrid::external_row_add'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),
+    newKw('bus__kresult', BUSID_RESULT),
+
+    'staber_kresult::schema::external_row_add'(_CTX, {busId: BUSID_RESULT}, _CTX, Schema),
+    Row_Actions = {
+        fixed: true,
+        icon: 'menu2',
+        align: 'right',
+        actions: [
+            {
+                label: {
+                    icon: 'pencil',
+                    d: 'Editar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_RESULT,
+                        payload: {action: 'editar'},
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                {type: 'function', name: 'kresult000:actionNotification', context:{ delegatedTo: 'builderweb' }}
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                label: {
+                    icon: 'copy',
+                    d: 'Copiar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_RESULT,
+                        payload: {action: 'copiar'},
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                {type: 'function', name: 'kresult000:actionNotification', context:{ delegatedTo: 'builderweb' }}
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                label: {
+                    icon: 'paste',
+                    d: 'Pegar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_RESULT,
+                        payload: {action: 'pegar'},
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                {type: 'function', name: 'kresult000:actionNotification', context:{ delegatedTo: 'builderweb' }}
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+	IN = {
+        enabled: true,
+        hasAgent: I_agent,
+        hasDataset: 'Default',
+        hasKw: 'testapp:contact',
+        schema: Schema,
+        rowTemplate: 'style=\"background-color: ##_.hasKw##\"//class=\"##_.hasKw##\"',
+        rowactions: Row_Actions,
+        includedProperties: [
+            'hasIcon',
+            'contact:hasName',
+            'contact:hasEmail'
+        ]
+    },
+	Obj_kresult = {  
+        type : 'kresult',
+        in : IN,          
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT
+    },
+    Obj_class = {
+        type: rprocess,
+        hasKw: kresult_test__external_row_add,
+        hasDsca: 'kresult_test__external_row_add_uiML',
+        hasIcon: 'add',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: true,
+        gui_out: {
+            type: assembly,
+            children: [
+                {
+                    type: button,
+                    label: {
+                        icon: add
+                    },
+                    events: [
+                        {
+                            type: click,
+                            targetBusId: BUSID_RESULT,
+                            method: exec,
+                            payload: {scrollTop: '100%'  },
+                            p_exec: {
+                                type: sequence,
+                                hasProcess: [
+                                    { type: function, name: external_action_add_contact, context: { delegatedTo: builderweb } }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                Obj_kresult
+            ]
+        },
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+external_action_add_contact(_CTX, Obj_in, _CTX, Obj_in):-
+newKw('contact__', ContactKw),
+% concatAtoms(['/repcon/f_get/', FilePath, Url_result], Url_out),
+concatAtoms(['mmResource__',ContactKw], MM),
+concatAtoms([ContactKw, '@example.com'], Email),
+mmResource +$ MM d [(es, '')]
+    p [ hasUrl ¬> url $ 'user.png',
+        hasLocalFile ¬> url $ 'user.png',
+        remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+],
+solve_mmResource_url(MM, Icon),
+'testapp:contact' +$$ ContactKw d [(es, 'Contacto autogenerado'), (en, 'Autogenerated Contact')]
+    p [ 
+        hasIcon ¬> url$ Icon,
+        hasImage ¬> url$ Icon,
+        'contact:hasName' ¬> string $ ContactKw,
+        'contact:hasEmail' ¬> string $ Email
+    ].
+
+'staber_kresult::schema::external_row_add'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    Table_Schema = [                   
+        {
+            label: {
+                d: 'Nombre'
+            },
+            class: 'user',
+            arc: 'contact:hasName',
+            filter: true
+        },
+        {
+            label: {
+                d: 'Email'
+            },
+            arc: 'contact:hasEmail',
+            filter: true,
+            enabled: false
+        }                      				                
+	],
+    OBJ_out = {data: Table_Schema }.
+
+'staber_kresult_pivotgrid::external_refresh'(_, _OBJ_in, _, OBJ_out):-
+    newKw('bus__',BUS_KRESULT),
+    prepareQueryFromCombo(_, {value: 'testapp_contacto_001'}, _, QueryObj),
+    obj_get(value, QueryObj, Query),
+    Obj_pivot = {
+        type: 'kresult',
+        busId: BUS_KRESULT,
+        do_exec: true,
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'Default',
+            hasKw: 'testapp:contact',
+            includedProperties: [
+                'contact:hasEmail',
+                'contact:hasAge',
+                'contact:hasName',
+                'hasIcon'
+            ],
+            query: Query,
+            schema: {
+                data: [
+                    {
+                        label: {
+                            d: 'Nombre'
+                        },
+                        arc: 'contact:hasName',
+                        class: 'user',
+                        enabled: false
+                    },     
+                    {
+                        label: {
+                            d: 'Edad'
+                        },
+                        arc: 'contact:hasAge',                                        
+                        enabled: false
+                    },
+                    {
+                        label: {
+                            d: 'Email'
+                        },
+                        arc: 'contact:hasEmail',                                        
+                        enabled: false
+                    }
+                ]
+            }
+        }
+    },
+    Obj_combo = {
+        type: combobox,
+        elements:[
+            { label: { d: 'Ana García' }, datavalue: 'testapp_contacto_001' },
+            { label: { d: 'Juan Martínez' }, datavalue: 'testapp_contacto_002' },
+            { label: { d: 'María Rodríguez' }, datavalue: 'testapp_contacto_003' },
+            { label: { d: 'Carlos López' }, datavalue: 'testapp_contacto_004' },
+            { label: { d: 'Laura Hernández' }, datavalue: 'testapp_contacto_005' }
+        ],
+        events:[{
+            type: change,
+            method: set_pv_exec,
+            targetBusId: BUS_KRESULT,
+            payload: {},
+            p_exec:{
+                type: sequence,
+                hasProcess:[
+                    { type: function, name: prepareQueryFromCombo, context:{delegatedTo: builderweb}}
+                ]
+            }
+        }]
+    },
+    OBJ_Main={
+        type:'rprocess',
+        hasKw: kresult_external_set_pv_exec,
+        hasDsca: kresult_external_set_pv_exec_uiML,
+        hasIcon: 'zoom-search',
+        do_exec: true,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true,
+        gui_out: {
+            type: assembly,
+            children: [
+                {
+                    type: 'assembly',
+                    children:[Obj_combo, Obj_pivot]
+                }
+            ]
+        }
+    },
+
+    create_rprocess(_,OBJ_Main,_,OBJ_out).
+
+showSelected(Obj_ctx, Obj_in, Obj_ctx, Obj_out):-
+    obj_fetch(hasKw, Obj_in, KwLst),
+    length(KwLst, N),
+    wAddInfoMsgML('Aviso', 'Se han seleccionado, <b>?a{1}</b> registros', [N], {showTime:10}),
+    Obj_out = Obj_in.
+
+
+'staber_kresult::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kresult,
+        hasDsca: folder__repositorioTests_kresult_uiML,
+        hasIcon: 'grid',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            kresult_test_000,
+            kresult_test_choose_006,
+            kresult_test_kmenuLeft_and_multiselection,
+            kresult_test_preselectedRows,
+            kresult_test_001,
+            kresult_test_002,
+            kresult_test_003,
+            kresult_test_004,
+            kresult_test_005,
+            kresult_test_006,
+            kresult_test_007,
+            kresult_test_008,
+            % kresult_test_009,
+            kresult_test_010,
+            kresult_test_011,
+            kresult_test_kmenu_onTheLeft,
+            kresult_different_ranges_in_schema,
+            kresult_control_when_is_editable,
+            kresult_test_010,
+            kresult_test_setSelected,
+            kresult_test_editable_from_model,
+            kresult_test_tips,
+            kresult_test__external_row_add,
+            kresult_external_set_pv_exec
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).

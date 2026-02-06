@@ -1,0 +1,124 @@
+﻿/**
+@descr	rc_test_5gl_server_model <br>
+		rc_test_5gl_server_model
+@author XXX
+@date	20XX_XX_XX
+**/
+
+rc_class('rc_test_5gl_server_model'):-
+	class +$ 'rc_test_5gl_server_model'  d ( 'es', 'rc_test_5gl_server_model' )
+		sc [ 'rComponent' ],
+
+    %% Agentes para gestion de recursos
+
+    %% Definición de instancia de dataset para testeos
+    dataset *$ dataset__test_5gl_server d [('es', 'Dataset modulo test_5gl_server')]
+        p [
+            hasUrl ¬> url $ dataset__test_5gl_server,
+            dsOpenMode ¬> datasetOpenMode $ sharedSG
+        ],
+    
+    %% Definición de perfil de permisos para invitado
+    permissionProfile *$ permissionProfile__guest d [(es, 'Permisos de invitado')]
+		p [allowedUser ª 0 ¬> user *$ 'user__guest'
+	],
+
+    permissionProfile *$ permissionProfile__repositorioTests_KRP d [(es, 'Permisos de desarrollador')]
+		p [
+            allowedUser ª 0 ¬> user *$ 'user__dev'
+	],
+    
+    agent *$ agent__deltaserver_test
+        p [useProtocol ¬> string $ 'deltaserver',
+           useUrl ¬> string $ 'http://localhost:18080'
+        ],           
+    agent *$ agent__fileserver_test
+        p [ useProtocol ¬> string $ 'fileserver',
+            useUrl ¬> string $ 'http://localhost:18080'
+        ],
+    agent *$ agent__filesystem_test
+        p [useProtocol ¬> string $ 'filesystem',
+           useUrl ¬> string $ 'http://localhost:18080'
+        ],
+    agent *$ agent__filesvn_test
+        p [useProtocol ¬> string $ 'filesystem',
+           useUrl ¬> string $ 'http://localhost:18080',
+           useUser ¬> string $ 'iga',
+           usePassword ¬> string $ 'iga'
+        ],
+    
+    urlSpec *$ urlSpec__filesystem_dfs_testapp d [('es', 'URL para Filesystem Paso')]
+        p [ resourcePath  ¬> string $ '//semanticnt.local/dfs/Paso/testapp/',
+            delegatedTo   ¬> agent $ agent__filesystem_test
+        ],
+    urlSpec *$ urlSpec__fileserver_testapp d [('es', 'URL para fileserver')]
+        p [ resourcePath  ¬> string $ 'repository/data/test_5gl_server/',
+            delegatedTo   ¬> agent $ agent__fileserver_test
+        ],
+    urlSpec *$ urlSpec__deltaserver_testapp d [('es', 'URL para deltaserver')]
+        p [ resourcePath  ¬> string $ 'local_file_repository/data/test_5gl_server/',
+            delegatedTo   ¬> agent $ agent__deltaserver_test
+        ],
+
+% datasets Intantiations. Temporary, should disappear after domain test are fully integrated in staber_testapp_server
+    dataset *$ dataset__oOrder_test 
+        p [
+            hasUrl ¬> url $ dataset__oOrder_test
+        ],
+    dataset *$ dataset__semantic_test 
+        p [
+            hasUrl ¬> url $ dataset__semantic_test
+        ],
+    dataset *$ dataset__ssa_test 
+        p [
+            hasUrl ¬> url $ dataset__ssa_test
+        ],
+    dataset *$ dataset__ss_master_test 
+        p [
+            hasUrl ¬> url $ dataset__ss_master_test
+        ],
+    dataset *$ dataset__erc_test 
+        p [
+            hasUrl ¬> url $ dataset__erc_test
+        ],
+    dataset *$ dataset__erc_ofita_product_v0_builderWeb_test 
+        p [
+            hasUrl ¬> url $ dataset__erc_ofita_product_v0_builderWeb_test
+        ],
+    dataset *$ dataset__ssdocu_test 
+        p [
+            hasUrl ¬> url $ dataset__ssdocu_test
+        ].
+    
+
+
+test_data_toFile(Node, File):-
+    test_data_export(Node, 'Default', 'rson', Out),
+    toFile( json_ppd(Out, [terms(true)]), File).
+
+test_data_export(Node, Ds, Format, Out):-
+  
+    Seq =  {
+        'type': 'function',
+        'name': 'subgraphExport',
+        'context':{
+            'delegatedTo': {
+            'implementedBy': 'C',
+            'module': 'repconAPI'
+            }
+        },
+        'in': {
+            'subgraph': {
+            'dataset': Ds,
+            'root' : Node,
+            'stmtFilter': 'ALL',
+            'reifiedFilter': 'ALL',
+            'navigationFilter': 'ALL'
+            },
+            'outputConfig': {
+            'format': Format
+            }
+        }
+    },
+    staber_execute( Seq, Seq_out),
+    obj_get( result, Seq_out, Out).

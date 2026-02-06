@@ -1,0 +1,917 @@
+﻿/**
+@descr	staber_kdetail <br>
+		staber_kdetail
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kdetail') :-
+	class +$ 'staber_kdetail' d ( es,'Patrón rproc para kdetail') sc function,
+    % configuración básica
+    'staber_kdetail::usecase__000'(_, _, _, _),   
+    'staber_kdetail::usecase__001'(_, _, _, _),   
+    'staber_kdetail::usecase__002'(_, _, _, _),   
+    'staber_kdetail::usecase__003'(_, _, _, _),
+    'staber_kdetail::usecase__004'(_, _, _, _),
+    'staber_kdetail::usecase__005'(_, _, _, _),
+    'staber_kdetail::formulario_contactos_simple'(_, _, _, _),
+    'staber_kdetail::show_icons_uiux'(_, _, _, _),
+    'staber_kdetail::formulario_contactos_agrupaciones'(_, _, _, _),
+    'staber_kdetail::formulario_tabla_contactos'(_, _, _, _),
+    'staber_kdetail::change_aggrupation_mode'(_, _, _, _),
+    'staber_kdetail::aggrupation_control_override'(_, _, _, _),
+    'staber_kdetail::zoom_from_provider_to_contact_dataset'(_, _, _, _),
+    'staber_kdetail::folders'(_, _, _, _).
+    
+'staber_kdetail::usecase__000'(_, _, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+
+    newKw('channel__detail__', CHANNEL_DETAIL),
+    newKw('bus__detail__', BUS_DETAIL),
+
+    newKw('bus__detail__action__', BUS_ID_ACTION),
+    newKw('channel__detail__action__', CHANNEL_ACTION),
+    OBJ_DLG_DATA = {
+        type: 'kresult',
+        do_exec: true,
+        busId: BUS_ID_ACTION,
+        hasChannel: CHANNEL_ACTION,
+        in: {
+            hasDataset: I_dataset,
+            selectable: true,
+            hasAgent: I_agent,
+            hasKw: 'testapp:contact'
+        }
+    },
+    OBJ_DLG = {
+        type: 'rdlg',
+        busId: '$.dlg.busId',
+        in: {            
+            options: {
+                label: {
+                    d: 'Esto es un ejemplo de diálogo exec en acción extra'
+                },
+                actions: [{
+                    type: 'r-button',
+                    classList: ['line-button'],
+                    text: 'deleteDlg.confirm',
+                    i18n: 'text',
+                    events: [{
+                        type: 'click',
+                        method: 'accept',
+                        targetBusId: '$.dlg.busId'
+                    }]
+                },
+                {
+                  type: 'r-button',
+                    classList: ['line-button'],
+                    text: 'deleteDlg.cancel',
+                    i18n: 'text',
+                    events: [{
+                        type: 'click',
+                        method: 'cancel',
+                        targetBusId: '$.dlg.busId'
+                    }]
+                }]
+            }
+        }
+    },
+    Before_Transition= {
+        p_exec: {
+            type: 'sequence',
+            hasProcess: [
+                {
+                    type: 'function',                 
+                    name: 'staber_test_fake_call',
+                    context: {
+                        delegatedTo: I_agent
+                    }
+                }
+            ]
+        }
+    },
+    Extra_Actions ={
+        state_edit:[
+            {
+                type: 'r-button',
+                icon: 'print',
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events:[{
+                    type: 'click',
+                    method: 'refresh_gui',
+                    targetBusId: BUS_DETAIL                    
+                }]
+            },
+            {
+                type: 'r-button',
+                icon: 'print',
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events:[{
+                    type: 'click',
+                    method: 'dialog_add',
+                    targetBusId: BUS_DETAIL,
+                    payload: {
+                        type: 'kresult',
+                        busId: 'bus__extraaction_dialog',
+                        hasChannel: 'channel__extraaction_dialog',
+                        in: {
+                            selectable: true,
+                            hasAgent: I_agent,
+                            hasDataset: I_dataset,
+                            hasKw: 'testapp:contact'
+                        }
+                    }
+                }]
+            },
+            {
+                type: 'r-button',
+                icon: 'bell',
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_DETAIL,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'method',
+                                    in: { dlg_data: OBJ_DLG_DATA, dlg: OBJ_DLG},
+                                    name: 'dialog_exec',
+                                    busId: BUS_DETAIL    
+                                },
+                                {
+                                    type: 'function',
+                                    in: { hasKw: 'testapp:contact'},
+                                    name: 'staber_test_fake_call',
+                                    context: {
+                                        delegatedTo: '$.hasAgent'
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]            
+            },
+            {
+                type: 'r-button',
+                icon: 'navigate',
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events: [
+                    {
+                        type: 'click',
+                        method: 'refresh_gui',
+                        targetBusId: BUS_DETAIL,
+                        payload:{
+                            has_dataset: '_.hasDataset',
+                            hasrepDataset: '$.hasDataset',
+                            hasrepinDataset: '$.in.hasDataset'
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'function',      
+                                    in: { hasKw: 'testapp:contact',
+                                        has_dataset: '_.hasDataset',
+                                        hasrepDataset: '$.hasDataset',
+                                        hasrepinDataset: '$.in.hasDataset' 
+                                    },                            
+                                    name: 'staber_test_fake_call',
+                                    context: {
+                                        delegatedTo: '$.hasAgent'
+                                    }
+                                },
+                                {
+                                    type: 'method',
+                                    name: 'merge_in',
+                                    busId: BUS_DETAIL
+                                },    
+                                {
+                                    type: 'method',                                    
+                                    name: 'refreshNode',
+                                    busId: BUS_DETAIL
+                                }     
+                            ]
+                        }
+                    }
+                ]            
+            }
+        ],
+        state_noedit:[
+            {
+                type: 'r-button',
+                icon: 'print',
+                enabled: false,
+                classList:[
+                    "text-button"
+                ]
+            }
+        ]
+    },
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasDlg: true,
+        hasKw: 'testapp_contacto_001',
+        hasKwc: 'testapp:contact',
+        hasEvent: 'e_init',
+        applyRules: false,
+        showAllProperties: true,
+        extraAction: Extra_Actions,
+        beforeTransition: Before_Transition
+    },
+	Obj_class = {  
+        in : IN,
+        type : 'kdetail',
+        hasDlg: true,
+        hasKw: kdetail_test_000,
+        hasDsca: kdetail_test_000_uiML,
+        hasIcon: 'pencil',
+        hasChannel: CHANNEL_DETAIL,
+        busId: BUS_DETAIL,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[
+            permissionProfile__repositorioTests_KRP
+        ],
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+'staber_kdetail::usecase__001'(_, _, _, OBJ_out) :-
+    I_dataset = 'dataset__ss_master_test',
+    I_agent = 'builderweb',
+
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'company',
+        hasEvent: 'e_new'
+    },
+	Obj_class = {  
+        in : IN,
+        type : 'kdetail',
+        hasKw: kdetail_test_001,
+        hasDsca: kdetail_test_001_uiML,
+        hasIcon: 'pencil',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[
+            permissionProfile__repositorioTests_KRP
+        ],
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+/* Ejemplo de kdetail  con máquina de estados sobrecargada*/    
+'staber_kdetail::usecase__002'(_, _, _, OBJ_out) :-
+    I_dataset = 'dataset__semantic_test',
+    I_agent = 'builderweb',
+    
+    newKw('channel__detail__', CHANNEL_DETAIL),
+    newKw('bus__detail__', BUS_DETAIL),
+
+    'kdetail_state_machine'(O_sm),
+    
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:document_47643821619430883',
+        hasKwc: 'ss:document',
+        hasEvent: 'e_edit',
+        applyRules: true,
+        navigationFilter: all
+    },
+	Obj_class = {  
+        in : IN,
+        type : 'kdetail',
+        hasChannel: CHANNEL_DETAIL,
+        busId: BUS_DETAIL,
+        hasStateMachine: O_sm,
+        hasKw: kdetail_test_002,
+        hasDsca: kdetail_test_002_uiML,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[
+            permissionProfile__repositorioTests_KRP
+        ],
+        hasIcon: 'pencil',
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+'staber_kdetail::usecase__003'(_, _, _, OBJ_out) :-
+    I_dataset = 'dataset__ss_master_test',
+    I_agent = 'builderweb',
+
+    newKw('channel__detail__', CHANNEL_DETAIL), 
+    newKw('bus__detail__', BUS_DETAIL),
+
+    getContactAgrupationComplexLayout(Obj_Agrupations),
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'contact_38192101654676437',
+        hasKwc: 'contact',
+        hasEvent: 'e_edit',
+        hasAggrupation: Obj_Agrupations
+    },
+	Obj_class = {  
+        in : IN,
+        type : 'kdetail',
+        hasChannel: CHANNEL_DETAIL,
+        busId: BUS_DETAIL,
+        hasKw: kdetail_test_003,
+        hasDsca: kdetail_test_003_uiML,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[
+            permissionProfile__repositorioTests_KRP
+        ],
+        hasIcon: 'pencil',
+        hasDlg: true,
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kdetail::usecase__004'(_, _, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+
+    newKw('channel__detail__', CHANNEL_DETAIL), 
+    newKw('bus__detail__', BUS_DETAIL),
+    
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_001',
+        hasKwc: 'testapp:contact',
+        compulsoryNewKwDlg: true,
+        showAllProperties: true,
+        hasEvent: 'e_init'
+    },   
+    Obj_class = {
+        in: IN,
+        type: 'kdetail',
+        hasDlg: true,
+        hasChannel: CHANNEL_DETAIL,
+        busId: BUS_DETAIL,
+        hasKw: kdetail_test_004,
+        hasDsca: kdetail_test_004_uiML,
+        hasIcon: 'pencil',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kdetail::usecase__005'(_, _, _, OBJ_proc) :-
+    newKw('channel__table_behaviour', CHANNEL_RPROC),  
+    newKw('busid__table_behaviour', BUS_RPROC),
+
+    newKw('channel__table_behaviour_arrow', CHANNEL_DETAIL_ARROW),  
+    newKw('busid__table_behaviour_arrow', BUS__DETAIL_ARROW),
+
+    newKw('channel__table_behaviour_tab', CHANNEL_DETAIL_TAB),  
+    newKw('busid__table_behaviour_tab', BUS__DETAIL_TAB),
+
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+
+	IN_ARROWS = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,       
+        hasKw: 'testapp_contacto_001',
+        hasKwc: 'testapp:contact',
+        hasEvent: 'e_edit',
+        enabled: true
+    },
+
+	Obj_detail_arrows = {  
+        type : 'kdetail',
+        in : IN_ARROWS,
+        busId: BUS__DETAIL_TAB,
+        hasChannel: CHANNEL_DETAIL_TAB,        
+        hasDlg: true,
+        hasIcon: 'pencil'
+    },
+
+    IN_TAB = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_001',
+        hasKwc: 'testapp:contact',
+        hasEvent: 'e_edit',
+        keyNavigation: tab,
+        enabled: true
+    },
+
+    Obj_detail_tab = {                
+        type : 'kdetail',
+        busId: BUS__DETAIL_ARROW,
+        hasChannel: CHANNEL_DETAIL_ARROW,
+        in : IN_TAB,
+        hasDlg: true,
+        hasIcon: 'pencil'
+    },
+
+    Obj_container = {
+        type: 'assembly',
+        classList: [            
+            'r-separator',
+            'b-group'
+        ],
+        children:[
+            {
+                type: 'assembly',
+                width: 50,
+                label: {
+                     d: 'Tablas con el comportamiento por defecto en celdas como EXCEL (arrows)'
+                },  
+                children:[Obj_detail_arrows]
+            },    
+            {
+                type: 'assembly',
+                width: 50,
+                label: {
+                     d: 'Tablas con el comportamiento por defecto en celdas con desplazamiento con tabulador'
+                },  
+                children:[Obj_detail_tab]
+            }
+        ]
+    },
+
+    OBJ_proc = {        
+        type : 'rprocess',
+        busId: BUS_RPROC,
+        hasChannel: CHANNEL_RPROC,
+        hasKw: kdetail_test_005,
+        hasDsca: kdetail_test_005_uiML,
+        hasIcon: 'pencil',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_container,
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_proc,_,_).
+
+'staber_kdetail::formulario_contactos_simple'(_, _, _, OBJ_out):-
+    I_agent = 'builderweb',
+    I_dataset = 'dataset__test_5gl_server',
+    % I_dataset = 'Default',
+    newKw('bus__kdetail_formulario_simple_', BUSID),
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        hasCKDIStatusFrom: ckdiStatusD,
+        navigationFilter: 'all',
+        hasEvent: 'e_view',
+        allowNavigation: false
+    },  
+    OBJ_form = {
+        type: 'kdetail',
+        in: IN,
+        busId: BUSID,
+        do_exec: true,
+        hasKw: kdetail_formulario_contactos_simple,
+        hasDsca: kdetail_formulario_contactos_simple_uiML,
+        hasIcon: 'user',
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        hasDlg: true,
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kdetail::show_icons_uiux'(_, _, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+
+    newKw('bus__kdetail_show_icons_', BUSIDICONS),
+    newKw('channel__kdetail_show_icons_', CHANNELICONS),  
+    newKw('bus__kdetail_no_show_icons_', BUSIDNOICONS),
+    newKw('channel__kdetail_no_show_icons_', CHANNELNOICONS),  
+
+    newKw('bus__kform_show_icons_', BUSIDFORMICONS),
+    newKw('channel__kform_show_icons_', CHANNELFORMICONS),  
+
+    OBJ_icons = {
+        type: 'assembly',
+        id: 'assembly_label',
+        classList: [
+            'z-1',
+            'white-bg'
+        ],
+        children: [
+            {
+                type: 'assembly',
+                id: 'assembly_kdetail_with_icons',
+                label: {
+                     d: 'Formulario autómatico con iconos (KDETAIL por defecto)'
+                },
+                width: 33,
+                children: [
+                    {
+                        type : 'kdetail',
+                        hasChannel: BUSIDICONS,
+                        busId: CHANNELICONS,
+                        in : {        
+                            hasAgent: I_agent,
+                            hasDataset: I_dataset,
+                            hasKw: 'testapp_contacto_001',
+                            hasKwc: 'testapp:contact',
+                            hasEvent: 'e_view',
+                            applyRules: false,
+                            showAllProperties: false,
+                            navigationFilter: 'lite'
+                        }
+                    }
+                ]
+            },
+            {
+                type: 'assembly',
+                id: 'assembly_kdetail_without_icons',
+                label: {
+                      d: 'Formulario autómatico sin iconos'
+                },
+                width: 33,
+                children: [
+                    {
+                        type : 'kdetail',
+                        hasChannel: BUSIDNOICONS,
+                        busId: CHANNELNOICONS,
+                        in : {        
+                            hasAgent: I_agent,
+                            hasDataset: I_dataset,
+                            hasKw: 'testapp_contacto_001',
+                            hasKwc: 'testapp:contact',
+                            hasEvent: 'e_view',
+                            applyRules: false,
+                            showAllProperties: false,
+                            navigationFilter: 'lite',
+                            stylesVars: {
+                                showIcons: false
+                            }  
+                            % hasStyle: {
+                            %     showIcons: false
+                            % }   
+                        }
+                    }
+                ]
+            },
+            {
+                type: 'assembly',
+                id: 'assembly_kform_with_icons',
+                label: {
+                    d: 'Formulario autómatico con iconos (KFORM por defecto)'
+                },
+                width: 33,
+                scroll: 'main',
+                children: [
+                     {
+                        type: 'kform',
+                        in: {
+                            hasAgent: I_agent,
+                            hasDataset: I_dataset,
+                            hasKw: 'testapp_contacto_001',
+                            hasCKDIStatusFrom: ckdiStatusD,
+                            hasCKDIStatusArc: ckdiStatusD,
+                            hasCKDIStatusTo: ckdiStatusD,
+                            enabled: false,
+                            navigationFilter: 'all',
+                            allowNavigation: false,
+                            showAllProperties: true
+                        },
+                        proc:  {
+                            type: 'sequence',
+                            hasProcess: [
+                                {  
+                                    type: 'function', 
+                                    in: { options: {getSchema: true, showIcons: true}}, 
+                                    name :'get_formInfo', 
+                                    context: {delegatedTo: 'builderweb'}
+                                },                                   
+                                {  
+                                    type: 'method',
+                                    name: 'import',
+                                    module: 'Dataset' 
+                                }
+                            ]
+                        },
+                        busId: BUSIDFORMICONS,
+                        hasChannel: CHANNELFORMICONS,
+                        do_exec: true,               
+                        evtSubscribe: [{topic: 'exec', channel: CHANNELFORMICONS}]
+                        
+                    }
+                ]
+            }                           
+        ]
+    },
+
+    OBJ_rproc = {
+        type:'rprocess',
+        hasKw: kdetail_show_icons_uiux,
+        hasDsca: kdetail_show_icons_uiux_uiML,
+        hasIcon: 'user',
+        do_exec: true,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true,
+        gui_out: OBJ_icons
+    },
+
+    create_rprocess(_,OBJ_rproc,_,OBJ_out).
+
+'staber_kdetail::formulario_contactos_agrupaciones'(_, _, _, OBJ_out):-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('bus__kdetail_form_aggrupations_', BUSID),
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        hasCKDIStatusFrom: ckdiStatusD,
+        hasAggrupationLegacy: true,
+        hasEvent: 'e_view',
+        navigationFilter: 'all'
+    },
+
+    OBJ_form = {
+        type: 'kdetail',
+        in: IN,
+        busId: BUSID,
+        do_exec: true,
+        hasDlg: true,
+        hasKw: kdetail_formulario_contactos_agrupaciones_api,
+        hasDsca: kdetail_formulario_contactos_agrupaciones_api_uiML,
+        hasIcon: 'group',
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kdetail::formulario_tabla_contactos'(_, _, _, OBJ_out):-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('bus__kdetail_form_aggrupations_', BUSID),
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        hasEvent: 'e_view',
+        display: 'table'
+    },
+
+    OBJ_form = {
+        type: 'kdetail',
+        in: IN,
+        busId: BUSID,
+        hasKw: kdetail_formulario_tabla_contactos,
+        hasDsca: kdetail_formulario_tabla_contactos_uiML,
+        hasIcon: 'group',
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kdetail::change_aggrupation_mode'(_, _, _, OBJ_out):-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('bus__kdetail_aggrupations_mode_change', BUSID),
+    'kdetail::change_aggrupation_mode::getExtraActions'(BUSID, false, ExtraActions),
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        hasCKDIStatusFrom: ckdiStatusD,
+        navigationFilter: 'all',
+        extraAction: ExtraActions
+    },
+
+    OBJ_form = {
+        type: 'kdetail',
+        in: IN,
+        busId: BUSID,
+        do_exec: true,
+        hasKw: kdetail_formulario_contactos_agrupaciones_mode_change,
+        hasDsca: kdetail_formulario_contactos_agrupaciones_mode_change_uiML,
+        hasIcon: 'group',
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+% Work in progress
+'staber_kdetail::aggrupation_control_override'(_, _, _, OBJ_out):-
+    I_agent    = 'builderweb',
+
+    newKw('channel_mainrprocess_', CHANNEL_MAIN),
+    newKw('busid_mainrprocess_', BUSID_MAIN),
+
+    newKw('channel_form_controls_override', CHANNEL_FORM),
+    newKw('busid_form_controls_override_', BUSID_FORM),
+
+  	IN = {        
+        hasAgent: I_agent,
+        hasConfiguration: 'configuration__testapp',
+        hasKw: 'testapp_contacto_004',
+        hasEvent: 'e_init',
+        applyRules: false,
+        showAllProperties: true,
+        hasAggrupationLegacy: true
+    },
+
+    Obj_form = {
+        type : 'kdetail',
+        hasChannel: BUSID_FORM,
+        busId: CHANNEL_FORM,
+        in: IN,     
+        hasDlg: true          
+    },
+
+    OBJ_Main = {
+        type:'rprocess',
+        hasChannel: CHANNEL_MAIN,
+        busId: BUSID_MAIN,    
+        hasKw: kdetail__form_controls_override,
+        hasDsca: 'Formulario con agrupaciones con controles sobre cargados',
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false,
+        gui_out: {
+            type: 'assembly',
+            children: [Obj_form]
+        }
+    },
+    create_rprocess(_,OBJ_Main,_,OBJ_out).
+
+'kdetail::change_aggrupation_mode'(_, Obj_in, _, Obj_out):-
+    obj_fetch(hasAggrupationLegacy, Obj_in, Aggrupation, false),
+    obj_fetch(busId, Obj_in, BusId),
+    (Aggrupation ->
+        NewAggrupation = false
+    ;   NewAggrupation = true
+    ),
+    'kdetail::change_aggrupation_mode::getExtraActions'(BusId, NewAggrupation, ExtraActions),
+    Obj_out = {
+        properties: [
+            {
+                value: ExtraActions,
+                property: extraAction
+            },
+            {
+                value: NewAggrupation,
+                property: hasAggrupationLegacy
+            }
+        ]
+    }.
+
+'kdetail::change_aggrupation_mode::getExtraActions'(BusId, NewAggrupation, ExtraActions):-
+    (NewAggrupation ->
+        Icon = task,
+        Tip = uiML_kdetail_change_aggrupation_mode_to_automatic_form
+    ;   Icon = app,
+        Tip = uiML_kdetail_change_aggrupation_mode_to_aggrupation_form
+    ),
+    ExtraActions = {
+        state_edit: [
+            {
+                type: 'r-button',
+                icon: Icon,
+                tip: Tip,
+                i18n: tip,
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events:[{
+                    type: 'click',
+                    method: 'set_propertyValue',
+                    targetBusId: BusId,
+                    payload: {hasAggrupationLegacy: '$.in.hasAggrupationLegacy', busId: BusId},
+                    p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'function',                         
+                                    name: 'kdetail::change_aggrupation_mode',
+                                    context: {
+                                        delegatedTo: '$.hasAgent'
+                                    }
+                                }
+                            ]
+                        }
+                }]
+            }
+        ],
+        state_noedit:[
+            {
+                type: 'r-button',
+                icon: Icon,
+                tip: Tip,
+                i18n: tip,
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events:[{
+                    type: 'click',
+                    method: 'set_propertyValue',
+                    targetBusId: BusId,
+                    payload: {hasAggrupationLegacy: '$.in.hasAggrupationLegacy', busId: BusId},
+                    p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'function',                         
+                                    name: 'kdetail::change_aggrupation_mode',
+                                    context: {
+                                        delegatedTo: '$.hasAgent'
+                                    }
+                                }
+                            ]
+                        }
+                }]
+            }
+        ]
+    }.
+
+'staber_kdetail::zoom_from_provider_to_contact_dataset'(_, _, _, OBJ_out):-
+
+    OBJ_rproc = {
+        type : 'kdetail',
+        hasKw: 'kdetail__zoom_from_provider_to_contact_dataset',
+        hasChannel: 'busid_form_controls_override',
+        busId: 'channel_form_controls_override',
+        hasIcon: 'user',
+        hasDsca: 'Formulario de busquedas de zooms en diferentes datasets',
+        in : {
+            hasAgent: 'builderweb',
+            hasConfiguration: 'configuration__provider',
+            % hasKw: 'testapp_provider_001',       
+            hasKwc: 'testapp:contact',     
+            hasEvent: 'e_new',
+            showAllProperties: true
+        },
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest]
+    },
+
+    create_rprocess(_,OBJ_rproc,_, OBJ_out).
+
+'staber_kdetail::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kdetail,
+        hasDsca: folder__repositorioTests_kdetail_uiML,
+        hasIcon: 'pencil',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[
+            permissionProfile__repositorioTests_KRP
+        ],
+        hasERCPart:[
+            kdetail_test_000,
+            kdetail_test_001,
+            kdetail_test_002,
+            kdetail_test_003,
+            kdetail_test_004,
+            kdetail_test_005,
+            kdetail__myProfile,
+            kdetail_formulario_contactos_agrupaciones_api,
+            % kdetail__form_controls_override,
+            kdetail_formulario_contactos_agrupaciones_mode_change,
+            kdetail__zoom_from_provider_to_contact_dataset
+        ]
+	},
+	create_rprocess(_,Conf_folder,_,_).
+
+

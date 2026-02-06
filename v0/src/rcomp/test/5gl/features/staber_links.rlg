@@ -1,0 +1,188 @@
+﻿/**staber_k
+@descr	staber_links <br>
+		staber_links
+@author gbl
+@date	2024_07_10
+**/
+rc_class('staber_links') :-
+	class +$ 'staber_links' d ( es,'Funcionalidad de links') sc function,
+    'staber_links::links_in_rowactions'(_, _, _, _),
+    'staber_links::links_in_kmgt'(_, _, _, _),
+    'staber_links::folders'(_, _, _, _).
+
+'staber_links::links_in_rowactions'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'dataset__test_5gl_server',
+    newKw('channel__result', CHANNEL_RESULT),
+    newKw('bus__kresult', BUSID_RESULT),
+    newKw('bus', BUS_DETAIL),
+    newKw('channel', CHANNEL_DETAIL),
+    INDETAIL = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasDsca : 'Contactos: {_.hasDsca}',
+        hasKw: '_.hasKw',
+        hasEvent: 'e_edit'
+    },
+	Obj_detail = {  
+        in : INDETAIL,
+        hasChannel: CHANNEL_DETAIL,
+        busId: BUS_DETAIL,
+        type : 'kdetail'        
+    },
+    'staber_kresult::schema::usecase__000'(_CTX, {busId: BUSID_RESULT}, _CTX, Schema),
+    Row_Actions = {
+        fixed: true,
+        icon: 'menu2',
+        align: 'right',
+        actions: [
+            {
+                label: {
+                    icon: 'send',
+                    d: 'Editar',
+                    tip:'Abrir en otra ventana'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        targetBusId: BUSID_RESULT,
+                        method:'openInBrowser',
+                        payload: Obj_detail
+                    }
+                ]
+            }            
+        ]
+    },
+	IN = {
+        enabled: true,
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        schema: Schema,
+        rowTemplate: 'style=\"background-color: ##_.hasKw##\"//class=\"##_.hasKw##\"',
+        rowactions: Row_Actions,
+        includedProperties: [
+            'hasIcon',
+            'contact:hasName',
+            'contact:hasEmail',
+            'contact:hasPhoneNumber',
+            'contact:hasAge',
+            'contact:hasBirthDate',
+            'contact:hasResidenceCountry'
+        ]
+    },
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,          
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT, 
+        hasKw: staber_links_test_001,
+        hasDsca: [('es', 'Tabla de contactos con link')],
+        hasTxt:  "Tabla de contactos con <b>link</b> en una acción para  abrir la ficha en otra ventana del navegador",
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        evtPublish: [{topic: 'setNode', channel:CHANNEL_RESULT}],
+        isSession: true,
+        hasNavbar: false
+    },  
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_links::links_in_kmgt'(_, _OBJ_in, _, OBJ_out) :-
+   % obj_get(hasNavbar, OBJ_in, Navbar, true),
+    Session = true,
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('kmgt_test_000_', BusId),   
+    ACTIONS = [
+		{
+			label:{
+				icon: 'send'
+			},
+			collapse:false,
+			events:[{
+				type:'click',
+				method:'openInBrowser',
+				targetBusId : BusId
+			}]
+		}
+	],
+	IN = {
+        hasTitle: 'Contactos modelo de Tests',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',        
+        selectable: true,
+        collapsible: {
+            floating: true
+        },                
+        hasArea: {
+            detail: {
+                navigationFilter: 'all',
+                showAllProperties: false,
+                stylesVars:{
+                    cols: 2,
+                    width: '75%'
+                }
+            },
+            result: {                
+                includedProperties:['hasIcon','contact:hasName', 'contact:hasEmail'],
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            class: 'user',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+            },
+            search: {
+                fieldsToSearchFromSchema: true,
+                isCollapsible: true
+            }
+        }
+    },       
+    OBJ_proc = {
+        type: 'kmgt',
+        busId: BusId,
+        in: IN,
+        hasKw: staber_links_test_002,
+        hasDsca: 'Ejemplo de KMGT con link a otra ventana',
+        hasTxt: "Este ejemplo abre una sesión de KMGT con el link a otra ventana",
+        hasIcon: 'document',
+        isRoot: false,
+        isSession: Session,
+        actions: ACTIONS,
+        hasNavbar: true,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_proc,_,OBJ_out).
+
+'staber_links::folders'(_, _, _, _):-
+    Title = 'Apertura de Componentes en otras ventanas (links)',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_links,
+        hasDsca: Title,
+        hasIcon: 'send',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            staber_links_test_001,
+            staber_links_test_002
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

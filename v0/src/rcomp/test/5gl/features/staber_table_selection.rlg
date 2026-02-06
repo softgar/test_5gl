@@ -1,0 +1,351 @@
+﻿/**staber_k
+@descr	staber_table_selection <br>
+		staber_table_selection
+@author gbl
+@date	2025_06_12
+**/
+rc_class('staber_table_selection') :-
+	class +$ 'staber_table_selection' d ( es,'Funcionalidad de Selección en tabla') sc function,
+    'staber_table_selection::basic_pivotgrid_both_selections'(_, _, _, _),
+    'staber_table_selection::basic_kresult_both_selections'(_, _, _, _),
+    'staber_table_selection::folders'(_, _, _, _).
+
+'staber_table_selection::basic_pivotgrid_both_selections'(_, OBJ_in, _, OBJ_out) :-
+    newKw(canal__,CHANNEL_KPIVOTGRID_DEFAULT),
+    obj_get(channel, OBJ_in, CHANNEL_KPIVOTGRID, CHANNEL_KPIVOTGRID_DEFAULT),
+    newKw('bus__',BUS_PIVOT),
+    Obj_pivot = {
+        type: 'kpivotgrid',
+        busId: BUS_PIVOT,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                {
+                    type: 'method',
+                    name: 'schemaToQuery',
+                    module: 'QueryFilterService'
+                },
+                {
+                    type: 'function',
+                    name: 'remql',
+                    context: {
+                        delegatedTo: 'builderweb'
+                    }
+                }
+            ]
+        },
+        do_exec: true,
+        autoRows: true,
+        selectable: true,
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'Default',
+            hasKw: 'testapp:contact',
+            schema: [
+                {
+                    label: {
+                        d: 'Nombre'
+                    },
+                    arc: 'contact:hasName',
+                    enabled: false,
+                    selectable: true,
+                    control: {
+                        type: 'text',
+                        enabled: false,
+                        events:[
+                            {
+                                type: 'click',
+                                method: 'nav',
+                                targetBusId: BUS_PIVOT,
+                                payload: {
+                                    hasTag: 'contactTable',
+                                    in: { hasDataset: 'dataset__test_5gl_server' },
+                                    navOptions: { isSession: true }
+                                }
+                            }
+                        ]
+                    }
+                    
+                },     
+                {
+                    label: {
+                        d: 'Tags'
+                    },
+                    arc: 'contact:hasTag',                                        
+                    enabled: false,
+                    control:{
+                         type: 'taglist'
+                    }
+                },   
+                {
+                    label: {
+                        d: 'Edad'
+                    },
+                    arc: 'contact:hasAge',
+                    filter: true,
+                    inputtype: 'integer',
+                    enabled: false
+                },                     
+                {
+                    label: {
+                        d: 'Fecha nacimiento'
+                    },
+                    arc: 'contact:hasBirthDate',
+                    mask: 'DD/MM/YY',
+                    enabled: false,
+                    inputtype: 'date',
+                    range: date
+                },
+                {
+                    label: {
+                        d: 'Vida laboral'
+                    },
+                    arc: 'contact:hasProfessionalProfile'
+                },
+                {
+                    label: {
+                        d: 'Tiene Pais'
+                    },
+                    arc: 'contact:hasResidenceCountry',
+                    range: 'country',
+                    enabled: true,
+                    control: {
+                        type: 'combobox',
+                        events:  [
+                            {
+                                type: 'change',
+                                method: 'refreshGUIOut',
+                                targetBusId: BUS_PIVOT
+                            }                            
+                        ]
+                    }
+                },
+                {
+                    label: {
+                        d: 'Tiene Master'
+                    },
+                    arc: 'contact:hasMaster',
+                    control: {
+                        type: 'checkbox'
+                    },
+                    enabled: false
+                }
+            ],
+            searchType: 'rem',
+            persistence: 'remote',
+            hasChannel: CHANNEL_KPIVOTGRID,
+            selectable: true,
+            enabled: true,
+            limit: 20,
+            cols: 4,
+            hasTemplate: false,
+            backButton: true,
+            multiselection: true,
+            page: 0,
+            inlineCount: true,
+            orderByOneColumn: true,
+            pagination: true,
+            rootElement: true,
+            expanded: false,
+            schemaHeader: true,
+            resizable: true,
+            hasIncludedProperties: [
+                'contact:hasTag',
+                'contact:hasName',
+                'contact:hasResidenceCountry',
+                'contact:hasVisitedCountry',
+                'contact:hasAge',
+                'contact:hasBirthDate',
+                'contact:hasProfessionalProfile',
+                'contact:hasMaster',
+                'contact:hasIdPhoto',
+                'hasUrl'
+            ],
+            hasNavigableProperties: ['contact:hasIdPhoto']
+        },
+        events:[
+            {
+                type: 'selection',
+                method: 'nav',
+                targetBusId: BUS_PIVOT,
+                payload: {
+                    hasTag: 'contactTable',
+                    in: { hasDataset: 'dataset__test_5gl_server' },
+                    navOptions: { isSession: true }
+                }
+            }
+        ]
+    },
+
+    OBJ_Main=
+    {
+        type:'assembly',
+        hasKw: 'staber_table_selection_pivotrid_both_selections',
+        hasDsca: 'staber_table_selection_pivotrid_both_selections_UIML',
+        hasIcon: 'grid',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true,
+        children: [
+            {
+                type: 'assembly',
+                children:[Obj_pivot]
+            }
+        ]
+    },
+
+    create_rprocess(_,OBJ_Main,_,OBJ_out).
+
+'staber_table_selection::basic_kresult_both_selections'(_, _, _, OBJ_out) :-
+    newKw('bus__',BUS_KRESULT),
+    Obj_kresult = {
+        type: 'kresult',
+        busId: BUS_KRESULT,
+        do_exec: true,
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'Default',
+            hasKw: 'testapp:contact',
+            schema: { data:[
+                {
+                    label: {
+                        d: 'Nombre'
+                    },
+                    arc: 'contact:hasName',
+                    enabled: false,
+                    control: {
+                        type: 'text'
+                    }
+                },     
+                {
+                    label: {
+                        d: 'Tags'
+                    },
+                    arc: 'contact:hasTag',                                        
+                    enabled: false,
+                    control:{
+                         type: 'taglist'
+                    }
+                },   
+                {
+                    label: {
+                        d: 'Edad'
+                    },
+                    arc: 'contact:hasAge',
+                    filter: true,
+                    inputtype: 'integer',
+                    enabled: false
+                },                     
+                {
+                    label: {
+                        d: 'Fecha nacimiento'
+                    },
+                    arc: 'contact:hasBirthDate',
+                    mask: 'DD/MM/YY',
+                    enabled: false,
+                    inputtype: 'date',
+                    range: date
+                },
+                {
+                    label: {
+                        d: 'Vida laboral'
+                    },
+                    arc: 'contact:hasProfessionalProfile'
+                },
+                {
+                    label: {
+                        d: 'Tiene Pais'
+                    },
+                    arc: 'contact:hasResidenceCountry',
+                    range: 'country',
+                    enabled: true,
+                    control: {
+                        type: 'combobox',
+                        events:  [
+                            {
+                                type: 'change',
+                                method: 'refreshGUIOut',
+                                targetBusId: '$.busId'
+                            }                            
+                        ]
+                    }
+                },
+                {
+                    label: {
+                        d: 'Tiene Master'
+                    },
+                    arc: 'contact:hasMaster',
+                    control: {
+                        type: 'checkbox'
+                    },
+                    enabled: false
+                }
+            ]},
+            searchType: 'rem',
+            persistence: 'remote',
+            selectable: true,
+            enabled: true,
+            limit: 20,
+            cols: 4,
+            multiselection: true,
+            page: 0,
+            inlineCount: true,
+            orderByOneColumn: true,
+            pagination: true,
+            rootElement: true,
+            expanded: false,
+            schemaHeader: true,
+            resizable: true,
+            hasIncludedProperties: [
+                'contact:hasTag',
+                'contact:hasName',
+                'contact:hasResidenceCountry',
+                'contact:hasVisitedCountry',
+                'contact:hasAge',
+                'contact:hasBirthDate',
+                'contact:hasProfessionalProfile',
+                'contact:hasMaster',
+                'contact:hasIdPhoto',
+                'hasUrl'
+            ],
+            hasNavigableProperties: ['contact:hasIdPhoto']
+        },
+        events:[
+            {
+                type: 'selection',
+                method: 'nav',
+                targetBusId: BUS_KRESULT,
+                payload: {
+                    hasTag: 'contactTable',
+                    in: { hasDataset: 'dataset__test_5gl_server' },
+                    navOptions: { isSession: true }
+                }
+            }
+        ],
+        hasKw: 'staber_table_selection_kresult_both_selections',
+        hasDsca: 'staber_table_selection_kresult_both_selections_UIML',
+        hasIcon: 'list',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,Obj_kresult,_,OBJ_out).
+
+
+'staber_table_selection::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__funcionalities_table_selection,
+        hasDsca: 'folder__funcionalities_table_selection_UIML',
+        hasIcon: 'app',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            staber_table_selection_pivotrid_both_selections,
+            staber_table_selection_kresult_both_selections
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

@@ -1,0 +1,2469 @@
+﻿
+/**
+@descr	rc_test_schema_contacto <br>
+		rc_test_schema_contacto
+@author XXX
+@date	20XX_XX_XX
+**/
+
+/**
+
+************************************************
+** ATENCIÓN: SI SE REALIZAN CAMBIOS EN MODELO **
+************************************************
+
+Los cambios que se realicen en los modelos definidos en este archivo solo se ven reflejados en Default.
+Los ejemplos que vayan contra dataset__test_5gl_server no se actualizan automáticamente.
+Para ello, se debe sincronizar el dataset__test_5gl_server y hacer un checkin.
+
+El proceso sincroniza el contenido que haya en Default en ese momento a dataset_testapp así qué es importante hacer esto
+con Default sin modificar. 
+
+1.- Debe existir la instancia de dataset y en la consola de repcon ejecutamos lo siguiente:
+    openDataset('dataset__test_5gl_server'),
+    sync_dataset('Default', 'dataset__test_5gl_server', 'thing')
+2.- Nos aseguramos de que el dataset__test_5gl_server tiene los cambios,
+    se puede usar un ppd o un r_stmt desde la consola o ejecutar los test.
+3.- bld dataset-checkin s_testapp/v0. Y solo subimos el dataset__test_5gl_server.
+
+**/
+rc_class('rc_test_schema_contacto'):-     
+    'rc_test_schema_multilang',
+    'rc_test_schema_clases_auxiliares_gui',
+    'rc_test_schema_contacto_classes',
+    'rc_test_schema_contacto_ii',
+    'rc_test_schema_contacto_uiux',
+    'rc_test_schema_proveedor'.
+    
+
+'rc_test_schema_multilang':-
+    /*Ejemplos de instancias multiIidioma que terminan en i18n por lo tanto se pueden referenciar como 
+        label: {            
+            d: 'KW',
+            i18n: 'd'
+    */
+     uiML *$ 'contact:hasVacationCountry_ui' d [(es, 'Pais de vacaciones'), (en, 'Vacation Country')].
+
+'rc_test_schema_clases_auxiliares_gui':-
+
+    %% Modelo para ejemplo kform 15
+    'staber_kform::model::usecase__15',
+
+    %% Clase de ejemplo para busquedas avanzadas
+
+    class +$ 'testapp:advSearch'
+        d [(es, 'clase de busquedas para testeo' ),(en, 'Search class for testing')]
+        p [
+            schemaInst ¬> true
+        ],
+
+    %%%%%% Definición de la clase para ejemplos de comportamiento con fileupload %%%%%%
+    'rc_test_model_fileinputest'.
+
+'rc_test_schema_contacto_classes':-
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%% Definición Clase Contacto %%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    class +$ 'testapp:contact'
+        d [(es, 'Contacto: Clase para testeo' ),(en, 'Contact: class for testing')]
+        p [
+            schemaInst ¬> true,
+            hasIcon ¬> 'user'
+            
+    ],
+
+    class +$ 'testapp:contact_aggrupations_collapsible'
+        sc ['testapp:contact']
+        d [(es, 'Subclase de contacto para testeo de agrupaciones con colapsables' ),(en, 'Contact subclass for testing collapsible clusters')]
+        p [
+            schemaInst ¬> true
+    ],
+
+    class +$ 'testapp:contact_aggrupations_tab'
+        sc ['testapp:contact']
+        d [(es, 'Subclase de contacto para testeo de agrupaciones con colapsables' ),(en, 'Contact subclass for testing collapsible clusters')]
+        p [
+            schemaInst ¬> true
+    ],
+
+    class +$ 'testapp:contact_aggrupations_collapsibletab'
+        sc ['testapp:contact']
+        d [(es, 'Subclase de contacto para testeo de agrupaciones con pesatañas colapsables' ),(en, 'Contact subclass for testing collapsible tabs clusters')]
+        p [
+            schemaInst ¬> true
+    ],
+
+    class +$ 'testapp:contact_aggrupations_mix'
+        sc ['testapp:contact']
+        d [(es, 'Subclase de contacto para testeo de agrupaciones con areas de diferente tipo' ),(en, 'Contact subclass for testing collapsible tabs clusters')]
+        p [
+            schemaInst ¬> true
+    ],
+
+    class +$ 'testapp:contact_aggrupations_pivot'
+        sc ['testapp:contact']
+        d [(es, 'Subclase de contacto para testeo de agrupaciones con sobrecargas en controles' ),(en, 'Contact subclass for testing groupings with overloads in controls')]
+        p [
+            schemaInst ¬> true
+    ],
+
+    class +$ 'testapp:contactPermission'
+        d [(es, 'Permiso de contactos' ),(en, 'Contact permission')]
+        p [
+            schemaInst ¬> true
+    ],
+
+    property +$ 'contactPermission:hasContact'
+        d [( es, 'Contactos que tienen el permiso' ),  ( en, 'Contacts with permission' )]
+        p [
+            domain  ¬> 'testapp:contactPermission',
+            range   ¬> 'testapp:contact',
+            cardMax ¬> nMax,
+            hasInhType ¬> inhCopy
+    ],
+    property +$ 'contact:hasPermission'
+        d [( es, 'Tiene Permisos' ),  ( en, 'Has permissions' )]
+        p [
+            domain  ¬> 'testapp:contact' º 16,
+            range   ¬> 'testapp:contactPermission',
+            cardMax ¬> nMax,
+            hasInhType ¬> inhCopy
+    ],
+    property +$ 'contact:hasTag'
+        d [( es, 'Tag' ),  ( en, 'Tag' )]
+        p [
+            domain  ¬> 'testapp:contact' º 8,            
+            range   ¬> clob,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    
+    property +$ 'contact:hasName'
+        d [( es, 'Nombre' ),  ( en, 'Name' )]
+        p [
+            domain  ¬> 'testapp:contact' º 10,
+            domain ¬> 'testapp:advSearch' º 10,
+            range   ¬> string,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'contact:hasEmail'
+        d [( es, 'Email' ),  ( en, 'Email' )]
+        p [
+            domain  ¬> 'testapp:contact' º 15,
+            range   ¬> string,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy,
+            hasWWWControl ¬> 'mailto'
+    ],
+    property +$ 'contact:hasPhoneNumber'
+        d [( es, 'Teléfono' ),  ( en, 'Phone' )]
+        p [
+            domain  ¬> 'testapp:contact' º 17,
+            range   ¬> string,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'contact:hasIdNumber'
+        d [( es, 'DNI' ),  ( en, 'ID Number' )]
+        p [
+            domain  ¬> 'testapp:contact' º 18,
+            range   ¬> string,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'contact:hasIdPhoto'
+        d [( es, 'Foto de Carnet' ),  ( en, 'ID Photo' )]
+        p [
+            domain  ¬> 'testapp:contact' º 20,
+            range   ¬> mmResource,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'contact:hasFileAttachment'
+        d [( es, 'Documentos aportados' ),  ( en, 'Attached documents' )]
+        p [
+            domain  ¬> 'testapp:contact' º 30,
+            range   ¬> mmResource,
+            cardMax ¬> nMax,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'contact:hasAge'
+        d [( es, 'Edad' ),  ( en, 'Age' )]
+        p [
+            domain  ¬> 'testapp:contact' º 40,
+            domain ¬> 'testapp:advSearch' º 40,
+            range   ¬> integer,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy,
+            hasIcon ¬> 'back-in-time'
+    ],
+    property +$ 'contact:hasHeritage'
+        d [( es, 'Patrimonio' ),  ( en, 'Heritage' )]
+        p [
+            domain  ¬> 'testapp:contact' º 41,
+            range   ¬> float,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'contact:hasBirthDate'
+        d [( es, 'Fecha de nacimiento' ),  ( en, 'Birth date' )]
+        p [
+            domain  ¬> 'testapp:contact' º 50,
+            domain ¬> 'testapp:advSearch' º 50,
+            range   ¬> date,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'testapp:hasCity'
+        d [( es, 'Población' ),  ( en, 'Town' )]
+        p [
+            domain  ¬> 'testapp:contact' º 55,
+            range   ¬> string,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    % Card 1
+    property +$ 'contact:hasResidenceCountry'
+        d [( es, 'País de residencia' ),  ( en, 'Country of residence' )]
+        p [
+            domain  ¬> 'testapp:contact' º 60,
+            domain ¬> 'testapp:advSearch' º 60,
+            range   ¬> 'country',
+            cardMin ¬> 1,
+            cardMax ¬> 1,
+            allowCreation ¬> true,
+            allowOptions ¬> true,
+            hasInhType ¬> inhNoCopy,
+            doNotNavigateToChildren ¬> true
+    ],
+    property +$ 'contact:hasBirthCountry'
+        d [( es, 'País de nacimiento' ),  ( en, 'Country of birth' )]
+        p [
+            domain  ¬> 'testapp:contact' º 61,
+            range   ¬> 'country',
+            cardMin ¬> 1,
+            cardMax ¬> 1,
+            allowCreation ¬> true,
+            allowOptions ¬> false,
+            hasInhType ¬> inhCopy
+    ],
+    property +$ 'contact:hasFathersCountry'
+        d [( es, 'País de nacimiento del padre' ),  ( en, 'Fathers country of birth' )]
+        p [
+            domain  ¬> 'testapp:contact' º 62,
+            range   ¬> 'country',
+            cardMin ¬> 1,
+            cardMax ¬> 1,
+            allowCreation ¬> false,
+            allowOptions ¬> false,
+            hasInhType ¬> inhCopy
+    ],
+    property +$ 'contact:hasMothersCountry'
+        d [( es, 'País de nacimiento de la madre' ),  ( en, 'Mothers country of birth' )]
+        p [
+            domain  ¬> 'testapp:contact' º 63,
+            range   ¬> 'country',
+            cardMin ¬> 1,
+            cardMax ¬> 1,
+            allowCreation ¬> false,
+            allowOptions ¬> true,
+            hasInhType ¬> inhCopy
+    ],
+    % Card N 
+    property +$ 'contact:hasVacationCountry'
+        d [( es, 'País de vacaciones' ),  ( en, 'Vacation country' )]
+        p [
+            domain  ¬> 'testapp:contact' º 64,
+            range   ¬> 'country',
+            cardMin ¬> 1,
+            cardMax ¬> 5,
+            allowCreation ¬> true,
+            allowOptions ¬> false,
+            hasInhType ¬> inhCopy
+    ],    
+    property +$ 'contact:hasVisitedCountry'
+        d [( es, 'Países visitados' ),  ( en, 'Countries visited' )]
+        p [
+            domain  ¬> 'testapp:contact' º 65,
+            range   ¬> 'country',
+            cardMin ¬> 1,
+            cardMax ¬> nMax,
+            allowCreation ¬> false,
+            allowOptions ¬> false,
+            hasInhType ¬> inhCopy
+    ],
+    property +$ 'contact:hasRangeStringCardN'
+        d [( es, 'Ejemplo cardN (String)' ),  ( en, 'Example cardN (String)' )]
+        p [
+            domain  ¬> 'testapp:contact' º 70,
+            range   ¬> 'string',
+            cardMin ¬> 1,
+            cardMax ¬> nMax,
+            allowCreation ¬> false,
+            allowOptions ¬> false,
+            hasInhType ¬> inhCopy
+    ],
+
+    Ccategory = {
+        arc: 'countryCategory',
+        label:{
+            d: 'Descripción Categoria'
+        }        
+    },
+    json_write(Ccategory, CcategoryCode),     
+    stmtEdition +$ 'testapp:stmtEditionPreferredCountry' 
+        p [
+            stmtIncluded ª 0  ¬> 'codigoISO',
+            stmtIncluded ª 1  ¬> 'hasDsca',            
+            stmtIncluded ª 7  ¬> clob $ CcategoryCode
+    ],
+    property +$ 'contact:hasPreferredCountry'
+        d [( es, 'Países preferidos' ),  ( en, 'Preferred countries' )]
+        p [
+            domain  ¬> 'testapp:contact' º 66,
+            range   ¬> 'country',
+            cardMin ¬> 1,
+            cardMax ¬> nMax,
+            allowCreation ¬> true,
+            allowOptions ¬> false,
+            hasStmtEdition ¬> 'testapp:stmtEditionPreferredCountry',
+            hasInhType ¬> inhCopy
+    ],    
+    
+    property +$ 'contact:hasProfessionalProfile'
+        d [( es, 'Vida laboral' ),  ( en, 'Professional profile' )]
+        p [
+            domain  ¬> 'testapp:contact' º 70,
+            range   ¬> clobML,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy,
+            hasNumberLines ¬> 3
+    ],
+    property +$ 'contact:hasAboutme'
+        d [( es, 'Sobre mi' ),  ( en, 'About me' )]
+        p [
+            domain  ¬> 'testapp:contact' º 74,
+            range   ¬> clob,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy,
+            hasNumberLines ¬> 2
+    ],
+    property +$ 'contact:hasLanguages'
+        d [( es, 'Mis lenguajes' ),  ( en, 'My Languages' )]
+        p [
+            domain  ¬> 'testapp:contact' º 75,
+            range   ¬> stringML,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'contact:hasPassword'
+        d [( es, 'Contraseña' ),  ( en, 'Password' )]
+        p [
+            domain  ¬> 'testapp:contact' º 80,
+            range   ¬> string,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy,
+            hasWWWControl ¬> 'password'
+    ],
+    property +$ 'contact:hasMaster'
+        d [( es, 'Ha cursado Master' ),  ( en, 'Has a Master\'s degree' )]
+        p [
+            domain  ¬> 'testapp:contact' º 90,
+            range   ¬> boolean,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy,
+            hasIcon ¬> 'info'
+    ],
+    property +$ 'selectableRow'
+        d [( es, 'Es seleccionable' ),  ( en, 'Is selectable' )]
+        p [
+            domain  ¬> 'testapp:contact' º 100,
+            range   ¬> boolean,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'contact:hasBackgroundColor'
+        d [( es, 'Color de fondo' ),  ( en, 'Background color' )]
+        p [
+            domain  ¬> 'testapp:contact' º 110,
+            range   ¬> string,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'menuAllowed'
+        d [( es, 'Puede tener kmenu' ),  ( en, 'Can have kmenu' )]
+        p [
+            domain  ¬> 'testapp:contact' º 120,
+            range   ¬> boolean,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+
+    property +$ hasTxt_cn d [( es, 'Resumen'),( en, 'Summary')]
+    p [ domain ¬> 'testapp:contact',
+        range ¬> clobML,        
+        hasInhType ¬> inhNoCopy,
+        cardMin ¬> 0,
+        cardMax ¬> 100
+    ],   
+    property +$ hasTxt_c1 d [( es, 'Resumen'),( en, 'Summary')]
+    p [ domain ¬> 'testapp:contact',
+        range ¬> clobML,        
+        hasInhType ¬> inhNoCopy,
+        cardMin ¬> 1,
+        cardMax ¬> 1
+      ],
+
+    %%%%%% Definición de instancia para configuración de stmtedition de contactos %%%%%%
+    %% Ayudas 
+    % Card 1
+    addHelp( 'testapp:contact', 'contact:hasFathersCountry',
+        es,
+        [ title( 'Propiedad card 1 - rango clase'),
+        'Kw: "contact:hasFathersCountry"</br>Dsca: Pais de Nacimiento del padre</br><b>Modelo de la Propiedad a representar</b></br>range   ¬> country,</br>cardMin ¬> 1,</br>cardMax ¬> 1,</br>allowCreation ¬> false, </br>allowOptions ¬> false</br><a href="http://repconsvn.semanticnt.local:9000/artifacts_doc/builder40/v2/public/index.html#/subgraph__builder40/kitembp/rform_model_control.md" target="_blank>Mas Info</a>'
+    ]),
+    addHelp( 'testapp:contact', 'contact:hasMothersCountry',
+        es,
+        [ title( 'Propiedad card 1 - rango clase'),
+        'Kw: "contact:hasMothersCountry"</br>Dsca: Pais de Nacimiento de la madre</br> <b>Modelo de la Propiedad a representar</b></br>range   ¬> country,</br>cardMin ¬> 1,</br>cardMax ¬> 1,</br>allowCreation ¬> false, </br>allowOptions ¬> true</br><a href="http://repconsvn.semanticnt.local:9000/artifacts_doc/builder40/v2/public/index.html#/subgraph__builder40/kitembp/rform_model_control.md"  target="_blank>Mas Info</a>'
+    ]),
+    addHelp( 'testapp:contact', 'contact:hasBirthCountry',
+        es,
+        [ title( 'Propiedad card 1 - rango clase'),
+        'Kw: "contact:hasBirthCountry"</br>Dsca: Pais de Nacimiento</br></br><b>Modelo de la Propiedad a representar</b></br>range   ¬> country,</br>cardMin ¬> 1,</br>cardMax ¬> 1,</br>allowCreation ¬> true, </br>allowOptions ¬> false</br></br><a href="http://repconsvn.semanticnt.local:9000/artifacts_doc/builder40/v2/public/index.html#/subgraph__builder40/kitembp/rform_model_control.md" target="_blank">Mas Info</a>'
+    ]),
+    addHelp( 'testapp:contact', 'contact:hasResidenceCountry',
+        es,
+        [ title( 'Propiedad card 1 - rango clase'),
+        'Kw: "contact:hasResidenceCountry"</br>Dsca: Pais de Residencia</br> <b>Modelo de la Propiedad a representar</b></br>range   ¬> country,</br>cardMin ¬> 1,</br>cardMax ¬> 1,</br>allowCreation ¬> true,</br>allowOptions ¬> true</br><a href="http://repconsvn.semanticnt.local:9000/artifacts_doc/builder40/v2/public/index.html#/subgraph__builder40/kitembp/rform_model_control.md" target="_blank>Mas Info</a>'
+    ]),
+    % Card N
+    addHelp( 'testapp:contact', 'contact:hasVacationCountry',
+        es,
+        [ title( 'Propiedad card  > 1 - rango clase'),
+        'Kw: "contact:hasVacationCountry"</br>Dsca: Pais de vacaciones</br> <b>Modelo de la Propiedad a representar</b></br>range   ¬> country,</br>cardMin ¬> 1,</br>cardMax ¬> nMax,</br>allowCreation ¬> true, </br>allowOptions ¬> false</br><a href="http://repconsvn.semanticnt.local:9000/artifacts_doc/builder40/v2/public/index.html#/subgraph__builder40/kitembp/rform_model_control.md" target="_blank>Mas Info</a>'
+    ]),
+    addHelp( 'testapp:contact', 'contact:hasVisitedCountry',
+        es,
+        [ title( 'Propiedad card > 1 - rango clase'),
+        'Kw: \'contact:hasPreferhasVisitedCountryredCountry\'</br>Dsca: Paises visitados</br> <b>Modelo de la Propiedad a representar</b></br>range   ¬> country,</br>cardMin ¬> 1,</br>cardMax ¬> nMax,</br>allowCreation ¬> false, </br>allowOptions ¬> true</br><a href=\'http://repconsvn.semanticnt.local:9000/artifacts_doc/builder40/v2/public/index.html#/subgraph__builder40/kitembp/rform_model_control.md\' target="_blank>Mas Info</a>'
+    ]),
+    addHelp( 'testapp:contact', 'contact:hasPreferredCountry',
+        es,
+        [ title( 'Propiedad card > 1 - rango clase'),
+        'Kw: \'contact:hasPreferredCountry\'</br>Dsca: Paises preferidos</br> <b>Modelo de la Propiedad a representar</b></br>range   ¬> country,</br>cardMin ¬> 1,</br>cardMax ¬> nMax,</br>allowCreation ¬> true, </br>allowOptions ¬> false, hasWWWControl ¬> stmtEdition_contact:hasPreferredCountry</br><a href=\'http://repconsvn.semanticnt.local:9000/artifacts_doc/builder40/v2/public/index.html#/subgraph__builder40/kitembp/rform_model_control.md\' target="_blank>Mas Info</a>'
+    ]),
+
+    % Boolean
+    addHelp( 'testapp:contact', 'contact:hasMaster',
+        es,
+        [ title( 'Propiedad booleana'),
+        'Esto es una propiedad true/false que se muestra con un toggle'
+    ]),
+
+    %% Ayudas en listas de opciones
+    addHelp( 'testapp:contact',  'contact:hasMothersCountry', 'country_es', es,
+        [    
+            title( 'Ayuda en lista de opciones'),
+            'Texto de opciones',
+            %image( 'data/images/lapicesColores.jpeg')
+            url( 'http://www.semantic-systems.es')
+        ]
+    ),
+    addHelp( 'testapp:contact',  'contact:hasMothersCountry', 'country_ai', es,
+        [    
+            title( 'Ayuda en lista de opciones'),
+            'Texto de opciones',
+            %image( 'data/images/lapicesColores.jpeg')
+            url( 'http://www.semantic-systems.es')
+        ]
+    ),
+
+    PASSWORD = {
+        arc: 'contact:hasPassword',
+        label:{
+            d: 'Password del Contacto'
+        },
+        type: 'text',
+        inputtype: 'password'
+    },
+    json_write(PASSWORD, PW),
+    stmtEdition +$ 'testapp:stmtEditionContacts' 
+        p [
+            stmtIncluded ª 0  ¬> 'contact:hasName',
+            stmtIncluded ª 1  ¬> 'contact:hasIdPhoto',
+            stmtIncluded ª 2  ¬> 'contact:hasAge',
+            stmtIncluded ª 3  ¬> 'contact:hasBirthDate',
+            stmtIncluded ª 4  ¬> 'contact:hasResidenceCountry',
+            stmtIncluded ª 5  ¬> 'contact:hasVisitedCountry',
+            stmtIncluded ª 6  ¬> 'contact:hasProfessionalProfile',
+            stmtIncluded ª 7  ¬> clob $ PW
+    ],
+
+    property +$ 'testapp:hasContact'
+        d [(es, 'Contactos'), (en, 'Contacts')]
+        p [
+            domain ¬> 'testapp:fileInputTest',
+            range ¬> 'testapp:contact',
+            cardMax ¬> 8,
+            hasInhType ¬> inhNoCopy,
+            allowCreation ¬> true,
+            hasStmtEdition ¬> 'testapp:stmtEditionContacts',
+            hasNumberLines ¬> 3
+    ],
+    property +$ 'testapp:hasMultipleContacts'
+        d [(es, 'Contactos con fileupload Multiple'), (en, 'Contacts with multifile fileupload')]
+        p [
+            domain ¬> 'testapp:fileInputTest',
+            range ¬> 'testapp:contact',
+            cardMax ¬> 8,
+            hasInhType ¬> inhNoCopy,
+            hasNumberLines ¬> 3
+    ],
+
+    definePathGUIGroupProperties( path_paisTieneCiudad, ['contact:hasResidenceCountry'], Path_paisTieneCiudad),
+    Lst_props_stmtEditionContactosMultiple = [
+        'contact:hasName',
+        prop( path_paisTieneCiudad, 'testapp:hasCity'),
+        'contact:hasFileAttachment',
+        'contact:hasAge',
+        'contact:hasBirthDate',
+        'contact:hasResidenceCountry',
+        'contact:hasVisitedCountry',
+        'contact:hasProfessionalProfile',
+        'contact:hasPassword'
+    ],
+    Lst_paths_stmtEditionContactosMultiple = [ Path_paisTieneCiudad ],
+    createStmtEdition( 'testapp:stmtEditionMultipleContacts', Lst_props_stmtEditionContactosMultiple, Lst_paths_stmtEditionContactosMultiple),
+    defineStmtEdition( 'testapp:stmtEditionMultipleContacts', 'testapp:hasMultipleContacts'),
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%% Definición Clase ContactAddress %%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    class +$ 'testapp:province'
+    d [(es, 'Provincia' ),(en, 'State/Province')]
+    p [
+        schemaInst ¬> true
+    ],
+    
+    class +$ 'testapp:contactAddress'
+        d [(es, 'Dirección' ),(en, 'Adress')]
+        p [
+            schemaInst ¬> true
+        ],
+    
+   
+    property +$ 'contactAddress:hasAddressLine' d [(es, 'Calle' ),(en, 'Address line')]
+       p [ 
+            domain ¬> 'testapp:contactAddress',
+            range	¬> string            
+     ],
+   
+     property +$ 'contactAddress:hasPostalCode' d [(es, 'Código Postal' ),(en, 'ZIP/Postal Code')]
+       p [ 
+            domain ¬> 'testapp:contactAddress',
+            range	¬> integer            
+       ],
+
+    property +$ 'contactAddress:hasCity' d [(es, 'Poblacion' ),(en, 'City')]
+       p [ 
+            domain ¬> 'testapp:contactAddress',
+            range	¬> string            
+       ],
+
+    
+
+    property +$ 'contactAddress:hasProvince' d [(es, 'Provincia' ),(en, 'State/Province')]
+       p [ 
+            domain ¬> 'testapp:contactAddress',
+            range  ¬> 'testapp:province',
+            allowOptions ¬> true,
+            allowCreation ¬> false            
+       ],
+
+     %%%%%% Definición de instancia para configuración de stmtedition de contactos %%%%%%        
+
+     CLOB_POBLACION = {
+            arc: 'contactAddress:hasCity',
+            label: {
+                d: 'Mi Ciudad'
+            },
+            sorted: true,
+            filter: {
+                buttons:false
+            },
+            inputtype: string            
+        },
+     CLOB_PROVINCIA = {
+            arc: 'contactAddress:hasProvince',
+            label: {        
+                tip: 'Mi Provincia',
+                d: 'Mi Provincia'
+            },
+            sorted: true          
+        },
+    CLOB_POSTAL_CODE = {
+            arc: 'contactAddress:hasPostalCode',
+            sorted: true,
+            label: {
+                d: 'Mi Código Postal'
+            },
+            filter: {
+                buttons:false
+            },
+            inputtype: integer  
+        },
+    CLOB_HASKW = {
+        arc: hasKw,
+        label: {
+            d: 'hasKw en clob'
+        },
+        width: '200px'
+    },
+    json_write(CLOB_POBLACION, CLOB_POBLACION_C),
+    json_write(CLOB_PROVINCIA, CLOB_PROVINCIA_C),
+    json_write(CLOB_POSTAL_CODE, CLOB_POSTAL_CODE_C),
+    json_write(CLOB_HASKW, CLOB_HASKW_C),
+    stmtEdition +$ 'testapp:stmtEditionContactAddress' 
+            p [
+                stmtIncluded ª 0  ¬> 'contactAddress:hasAddressLine',
+                stmtIncluded ª 1  ¬> clob $ CLOB_POSTAL_CODE_C,
+                stmtIncluded ª 2  ¬> clob $ CLOB_POBLACION_C,
+                stmtIncluded ª 3  ¬> clob $ CLOB_PROVINCIA_C,
+                stmtIncluded ª 4  ¬> 'stmtOrda',
+                stmtIncluded ª 5  ¬> string $ 'hasKw',
+                stmtIncluded ª 6  ¬> clob $ CLOB_HASKW_C
+        ],
+    property +$ 'contact:hasAddress' d [(es, 'Dirección' ),(en, 'Address')]
+       p [ 
+            domain ¬> 'testapp:contact'  º 50, 
+            range	¬> 'testapp:contactAddress',
+            cardMax ¬> nMax, 
+            hasStmtEdition ¬> 'testapp:stmtEditionContactAddress',
+            allowCreation ¬> true
+       ].
+
+
+solve_mmResource_url(MM, Url_out):-
+    stmt(hasUrl, MM, Url),
+    ((Url == 'url') ->
+        Url_result = 'user.png'
+    ;
+        Url_result = Url
+    ),
+    stmt(remoteURL, MM, UrlSpec),
+    stmt(resourcePath, UrlSpec, FilePath),
+    !,
+    concatAtoms(['/repcon/f_get/', FilePath, Url_result], Url_out)
+    .
+
+'rc_test_schema_contacto_ii':-
+
+    'rc_test_schema_contacto_ii_aux',
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%% Definición Instancias Contactos %%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    % La propiedad hasIcon y hasImage permiten tener acceso directa al icono desde algunos componentes,
+    % kpivotgrid, kform
+    solve_mmResource_url(mmResource__testapp_contacto_001, Icon1),
+
+    TAG1 = {elements: [
+        { tag :'dsca',
+          label: {d :'ana.garcia@example.com'}
+        },
+        {
+          tag: 'range',
+          label: {d: '12345678A'}
+        }        
+    ]},
+    json_write(TAG1, TAG1_c),
+
+    'testapp:contact' *$$ testapp_contacto_001 d [(es, 'Contacto 001'), (en, 'Contact 001')]
+        p [
+            hasIcon ¬> url$ Icon1,
+            hasImage ¬> url$ Icon1,
+            'contact:hasTag' ¬> clob $ TAG1_c,
+            'contact:hasName' ¬> string $ 'Ana García',       
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_001,            
+            'contact:hasEmail' ¬> string $ 'ana.garcia@example.com',
+            'contact:hasIdNumber' ¬> string $ '12345678A', 
+            'contact:hasPhoneNumber' ¬> string $ '+34 94 587 68 52',
+            'contact:hasAge' ¬> integer $ 19,
+            'contact:hasHeritage' ¬> float $ 122.000,
+            'contact:hasBirthDate' ¬> 1119650400000,
+            'contact:hasFileAttachment' ª 0 ¬> mmResource__testapp_contacto_001_1,
+            % 'contact:hasProfessionalProfile' ¬> "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas 'Letraset', las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.",
+            % 'contact:hasProfessionalProfile' ¬> "{\"propiedad\": \"valor\"}",
+            'contact:hasProfessionalProfile' ¬> "Empecé mi carrera como `diseñadora gráfica` en una pequeña agencia de publicidad, donde creé campañas para **marcas locales**. Después de cinco años, me uní a una multinacional y me especialicé en branding y marketing digital. *Ahora dirijo mi propio estudio creativo*, colaborando con empresas emergentes y proyectos culturales.",
+            'contact:hasAboutme' ¬> "Soy una persona curiosa y apasionada por aprender cosas nuevas cada día. Me encanta explorar ideas, probar nuevos desafíos y encontrar formas creativas de mejorar lo que hago. Disfruto el buen café, las conversaciones interesantes y los pequeños detalles que hacen la diferencia. Siempre busco el equilibrio entre la planificación y la improvisación, porque creo que la vida es mejor cuando hay espacio para sorpresas.",
+            % 'contact:hasAboutme' ¬> "gs( 0, ac3m $ AC3M ¬ hasItemCode ¬> 'ac3m_') if not (AC3M ¬¬ hasVariantType ¬> variantStandard).",
+            % 'contact:hasAboutme' ¬> "{\"propiedad\": \"valor\"}",
+            'contact:hasPassword' ¬> 'mipassword',
+            'contact:hasMaster' ¬> true,
+            'contact:hasResidenceCountry' ¬> country,
+            'contact:hasPreferredCountry' ª 0 ¬> country_es,
+            'contact:hasPreferredCountry' ª 1 ¬> country_pt,
+            'contact:hasBackgroundColor' ¬> 'f3efda',
+            'contact:hasPermission' ª 0 ¬> contactPermission__contacto_001,
+            'contact:hasPermission' ª 1 ¬> contactPermission__contacto_002
+    ],
+    solve_mmResource_url(mmResource__testapp_contacto_002, Icon2),
+     TAG2 = {elements: [
+        { 
+            tag :'dsca',
+            label: {d :'juan.martinez@example.com'}
+        },
+        {
+            tag: 'range',
+            class: 'mmResource'
+        }        
+    ]},
+    json_write(TAG2, TAG2_c),
+    'testapp:contact' *$$ testapp_contacto_002 d [(es, 'Contacto 002'), (en, 'Contact 002')]
+        p [
+            hasIcon ¬> url$ Icon2,
+            hasImage ¬> url$ Icon2,
+            'contact:hasTag' ¬> clob $ TAG2_c,
+            'contact:hasName' ¬> string $ 'Juan Martínez',
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_002,
+            'contact:hasEmail' ¬> string $ 'juan.martinez@example.com',
+            'contact:hasIdNumber' ¬> string $ '23456789B', 
+            'contact:hasPhoneNumber' ¬> string $ '+34 91 257 48 36',
+            'contact:hasAge' ¬> integer $ 29,
+            'contact:hasBirthDate' ¬> 698713200000,
+            'contact:hasResidenceCountry' ¬> country_es,
+            'contact:hasFileAttachment' ª 0 ¬> mmResource__testapp_contacto_002_1,
+            % 'contact:hasLanguages' ¬> 'Español',
+            % 'contact:hasLanguages' ¬> '"{\"lang\": \"Español\"}"',
+            'contact:hasLanguages' ¬> 'Esto es una prueba de `markdonw` con **negrita** y *cursiva*',
+            'contact:hasVisitedCountry' ¬> country_es,
+            'contact:hasBackgroundColor' ¬> 'ceffee',            
+            'contact:hasPermission' ª 0 ¬> contactPermission__contacto_002
+    ],
+    setStmt('contact:hasLanguages', testapp_contacto_002, stringML, 'Portuguese', 'pt'),
+    solve_mmResource_url(mmResource__testapp_contacto_003, Icon3),
+    TAG3 = {elements: [
+        { tag :'dsca',
+          label: {d :'maria.rodriguez@example.com'}
+        },
+        {
+          tag: 'range',
+          class: 'string'
+        }        
+    ]},
+    json_write(TAG3, TAG3_c),
+    'testapp:contact' *$$ testapp_contacto_003 d [(es, 'Contacto 003'), (en, 'Contact 003')]
+        p [
+            hasIcon ¬> url$ Icon3,
+            hasImage ¬> url$ Icon3,
+            'contact:hasTag' ¬> clob $ TAG3_c,
+            'contact:hasName' ¬> string $ 'María Rodríguez',
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_003,
+            'contact:hasEmail' ¬> string $ 'maria.rodriguez@example.com',
+            'contact:hasIdNumber' ¬> string $ '34567891C', 
+            'contact:hasPhoneNumber' ¬> string $ '+34 94 412 58 47',
+            'contact:hasAge' ¬> integer $ 39,
+            'contact:hasBirthDate' ¬> 474332400000,
+            'contact:hasFileAttachment' ª 0 ¬> mmResource__testapp_contacto_003_1,
+            'contact:hasResidenceCountry' ¬> country_es,
+            'contact:hasBackgroundColor' ¬> 'f8eece'
+    ],
+    solve_mmResource_url(mmResource__testapp_contacto_004, Icon4),
+    TAG4 = {elements: [
+        { tag :'dsca',
+          label: {d :'maria.rodriguez@example.com'}
+        },
+        {          
+          label: { d: 'Tag contacto 4'}
+        },
+        {          
+          label: { d: 'Tag con actions'},
+          onclick: 'alert(this)',
+          actions: [
+            {
+                label:{
+                    icon: 'search'
+                }
+            }
+          ]
+        }                
+    ]},
+    json_write(TAG4, TAG4_c),
+    'testapp:contact' *$$ testapp_contacto_004 d [(es, 'Contacto 004'), (en, 'Contact 004')]
+        p [
+            hasIcon ¬> url$ Icon4,
+            hasImage ¬> url$ Icon4,
+            'contact:hasTag' ¬> clob $ TAG4_c,
+            'contact:hasName' ¬> string $ 'Carlos López',
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_004,
+            'contact:hasEmail' ¬> string $ 'carlos.lopez@example.com',
+            'contact:hasIdNumber' ¬> string $ '45678912D', 
+            'contact:hasPhoneNumber' ¬> string $ '+34 92 218 46 58',
+            'contact:hasAge' ¬> integer $ 49,
+            'contact:hasBirthDate' ¬> 166572000000,
+            'contact:hasResidenceCountry' ¬> country_fr,
+            'contact:hasFileAttachment' ª 0 ¬> mmResource__testapp_contacto_004_1,
+            'contact:hasAboutme' ¬> "I am able to handle multiple tasks on a daily basis.",
+            'contact:hasBackgroundColor' ¬> 'cefffc'
+    ],
+    solve_mmResource_url(mmResource__testapp_contacto_005, Icon5),
+    'testapp:contact' *$ testapp_contacto_005 d [(es, 'Contacto 005'), (en, 'Contact 005')]
+        p [
+             hasIcon ¬> url$ Icon5,
+             hasImage ¬> url$ Icon5,
+            'contact:hasName' ¬> string $ 'Laura Hernández',
+            'contact:hasResidenceCountry' ¬> country_es,
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_005,
+            'contact:hasEmail' ¬> string $ 'laura.hernandez@example.com',
+            'contact:hasIdNumber' ¬> string $ '56789123E', 
+            'contact:hasPhoneNumber' ¬> string $ '+34 94 698 52 13',
+            'contact:hasFathersCountry' ¬> country_at,
+            'contact:hasMothersCountry' ¬> country_es,                                              
+            'contact:hasAge' ¬> integer $ 39,
+            'contact:hasBirthDate' ¬> 492472800000,            
+            'contact:hasFileAttachment' ª 0 ¬> mmResource__testapp_contacto_005_1,
+            'contact:hasFileAttachment' ª 1 ¬> mmResource__testapp_contacto_005_2,                        
+            'hasTxt_c1' ¬> "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas 'Letraset', las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.",            
+            'hasTxt_cn' ¬> "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas 'Letraset', las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.",            
+            'contact:hasPassword' ¬> 'mipassword',
+            'contact:hasBackgroundColor' ¬> 'f3e5da'
+    ],
+    solve_mmResource_url(mmResource__testapp_contacto_006, Icon6),
+    'testapp:contact_aggrupations_tab' *$$ testapp_contacto_006 d [(es, 'Contacto 006'), (en, 'Contact 006')]
+        p [
+            hasIcon ¬> url$ Icon6,
+            hasImage ¬> url$ Icon6,
+            'contact:hasName' ¬> string $ 'Javier Pérez',
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_006,
+            'contact:hasEmail' ¬> string $ 'javier.perez@example.com',
+            'contact:hasIdNumber' ¬> string $ '67891234F', 
+            'contact:hasFathersCountry' ¬> country_es,
+            'contact:hasMothersCountry' ¬> country_at,                                              
+            'contact:hasPhoneNumber' ¬> string $ '+34 95 569 21 15',
+            'contact:hasAge' ¬> integer $ 49,
+            'contact:hasBirthDate' ¬> 186188400000,
+            'contact:hasResidenceCountry' ¬> country_pt,
+            'contact:hasBirthCountry' ¬> country_es,
+            'contact:hasFileAttachment' ª 0 ¬> mmResource__testapp_contacto_006_1,
+            'contact:hasAboutme' ¬> "I use a creative approach to problem solving.",
+            'contact:hasBackgroundColor' ¬> 'cef0ff'
+    ],
+    solve_mmResource_url(mmResource__testapp_contacto_007, Icon7),
+    'testapp:contact_aggrupations_collapsible' *$$ testapp_contacto_007 d [(es, 'Contacto 007'), (en, 'Contact 007')]
+    p [        
+         hasIcon ¬> url$ Icon7,
+         hasImage ¬> url$ Icon7,
+        'contact:hasName' ¬> string $ 'Marta Sánchez',   
+        'contact:hasEmail' ¬> string $ 'marta.sanchez@example.com',
+        'contact:hasIdNumber' ¬> string $ '78912345G', 
+        'contact:hasPhoneNumber' ¬> string $ '+34 94 422 69 82',      
+        'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_007,
+        'contact:hasAge' ¬> integer $ 19,
+        'contact:hasFathersCountry' ¬> country_es,
+        'contact:hasMothersCountry' ¬> country_at,                                              
+        'contact:hasBirthDate' ¬> 1108335600000,
+        'contact:hasFileAttachment' ª 0 ¬> mmResource__testapp_contacto_007_1,
+        'contact:hasProfessionalProfile' ¬> "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas 'Letraset', las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.",
+        'contact:hasLanguages' ¬> 'English',
+        'contact:hasPassword' ¬> 'mipassword',
+        'contact:hasAddress' ¬> 'testapp:direccion__1__contacto_007',
+        'contact:hasResidenceCountry' ¬> country_es,
+        'selectableRow' ¬> false,
+        'menuAllowed' ¬> false,
+        'contact:hasPreferredCountry' ª 0 ¬> country_es,
+        'contact:hasPreferredCountry' ª 1 ¬> country_pt,
+        'contact:hasBirthCountry' ¬> country_es,
+        'contact:hasBackgroundColor' ¬> 'f3dada'
+        % 'contact:hasVacationCountry' ¬> country_es
+    ],
+    solve_mmResource_url(mmResource__testapp_contacto_008, Icon8),
+    'testapp:contact_aggrupations_collapsibletab' *$$ testapp_contacto_008 d [(es, 'Contacto 008'), (en, 'Contact 008')]
+        p [ 
+            hasIcon ¬> url$ Icon8,
+            hasImage ¬> url$ Icon8,
+            'contact:hasName' ¬> string $ 'David González',
+            'contact:hasEmail' ¬> string $ 'david.gonzalez@example.com',
+            'contact:hasIdNumber' ¬> string $ '89123456H',
+            'contact:hasPhoneNumber' ¬> string $ '+34 94 469 86 79',
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_008,
+            'contact:hasAge' ¬> integer $ 19,
+            'contact:hasBirthDate' ¬> 1133391600000,
+            'contact:hasFathersCountry' ¬> country_es,
+            'contact:hasMothersCountry' ¬> country_at,                                  
+            'contact:hasFileAttachment' ª 0 ¬> mmResource__testapp_contacto_008_1,
+            'contact:hasResidenceCountry' ¬> country_pl,
+            'selectableRow' ¬> false,
+            'menuAllowed' ¬> false,
+            'contact:hasAddress' ª 0 ¬> 'testapp:contactAddress' $'testapp:direccion__1__contacto_008',
+            'contact:hasAddress' ª 1 ¬> 'testapp:contactAddress' $'testapp:direccion__2__contacto_008',       
+            'contact:hasAddress' ª 2 ¬> 'testapp:contactAddress' $'testapp:direccion__3__contacto_008',       
+            'contact:hasAddress' ª 3 ¬> 'testapp:contactAddress' $'testapp:direccion__4__contacto_008',       
+            'contact:hasAddress' ª 4 ¬> 'testapp:contactAddress' $'testapp:direccion__5__contacto_008',       
+            'contact:hasAddress' ª 5 ¬> 'testapp:contactAddress' $'testapp:direccion__6__contacto_008',       
+            'contact:hasAddress' ª 6 ¬> 'testapp:contactAddress' $'testapp:direccion__7__contacto_008',       
+            'contact:hasAddress' ª 7 ¬> 'testapp:contactAddress' $'testapp:direccion__8__contacto_008',       
+            'contact:hasAddress' ª 8 ¬> 'testapp:contactAddress' $'testapp:direccion__9__contacto_008',       
+            'contact:hasAddress' ª 9 ¬> 'testapp:contactAddress' $'testapp:direccion__10__contacto_008',
+            'contact:hasBackgroundColor' ¬> 'cee5ff'
+    ],
+    'testapp:contact_aggrupations_mix' *$$ testapp_contacto_010 d [(es, 'Contacto 010'), (en, 'Contact 010')]
+        p [ 
+            hasIcon ¬> url$ Icon8,
+            hasImage ¬> url$ Icon8,
+            'contact:hasName' ¬> string $ 'Unai Simón',
+            'contact:hasEmail' ¬> string $ 'unai.simon@example.com',
+            'contact:hasIdNumber' ¬> string $ '89123456H',
+            'contact:hasPhoneNumber' ¬> string $ '+34 94 469 86 79',
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_010,            
+            'contact:hasAge' ¬> integer $ 19,
+            % Card 1
+            'contact:hasFathersCountry' ¬> country_al,
+            'contact:hasMothersCountry' ¬> country_at,                      
+            'contact:hasBirthCountry' ¬> country_aw,            
+            'contact:hasResidenceCountry' ¬> country_az,
+            % Card nMax
+            'contact:hasVacationCountry' ª 0 ¬> country_ao,
+            'contact:hasVacationCountry'ª 1  ¬> country_ao,
+            'contact:hasVisitedCountry' ª 0  ¬> country_es,  
+            'contact:hasVisitedCountry' ª 1 ¬> country_ao,  
+            'contact:hasRangeStringCardN' ª 0 ¬> string $'Uno',
+            'contact:hasRangeStringCardN' ª 1 ¬> string $'Dos',
+            % Card nMax stmtEdition
+            'contact:hasPreferredCountry' ª 0 ¬> country_es,
+            'contact:hasPreferredCountry' ª 1 ¬> country_pt,
+            % Card nMax stmtEdition
+            'contact:hasAddress' ª 0 ¬> 'testapp:contactAddress' $'testapp:direccion__1__contacto_008',
+            'contact:hasAddress' ª 1 ¬> 'testapp:contactAddress' $'testapp:direccion__2__contacto_008',       
+            'contact:hasAddress' ª 2 ¬> 'testapp:contactAddress' $'testapp:direccion__3__contacto_008',       
+            'contact:hasAddress' ª 3 ¬> 'testapp:contactAddress' $'testapp:direccion__4__contacto_008',       
+            'contact:hasAddress' ª 4 ¬> 'testapp:contactAddress' $'testapp:direccion__5__contacto_008',       
+            'contact:hasAddress' ª 5 ¬> 'testapp:contactAddress' $'testapp:direccion__6__contacto_008',       
+            'contact:hasAddress' ª 6 ¬> 'testapp:contactAddress' $'testapp:direccion__7__contacto_008',       
+            'contact:hasAddress' ª 7 ¬> 'testapp:contactAddress' $'testapp:direccion__8__contacto_008',       
+            'contact:hasAddress' ª 8 ¬> 'testapp:contactAddress' $'testapp:direccion__9__contacto_008',       
+            'contact:hasAddress' ª 9 ¬> 'testapp:contactAddress' $'testapp:direccion__10__contacto_008',
+
+            'contact:hasBirthDate' ¬> 1133391600000,            
+            'selectableRow' ¬> false,
+            'menuAllowed' ¬> false,
+            
+            'contact:hasBackgroundColor' ¬> 'cee5ff'
+    ],
+   'testapp:contact_aggrupations_pivot' *$$ testapp_contacto_011 d [(es, 'Contacto 011'), (en, 'Contact 011')]
+        p [ 
+            hasIcon ¬> url$ Icon8,
+            hasImage ¬> url$ Icon8,
+            'contact:hasName' ¬> string $ 'Aitor Iru',
+            'contact:hasEmail' ¬> string $ 'aitor.iru@example.com',
+            'contact:hasIdNumber' ¬> string $ '89123456H',
+            'contact:hasPhoneNumber' ¬> string $ '+34 94 469 86 79',
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_010,            
+            'contact:hasAge' ¬> integer $ 19,
+            % Card 1
+            'contact:hasFathersCountry' ¬> country_al,
+            'contact:hasMothersCountry' ¬> country_at,                      
+            'contact:hasBirthCountry' ¬> country_es,            
+            'contact:hasResidenceCountry' ¬> country_az,
+            % Card nMax
+             'contact:hasVacationCountry' ª 0 ¬> country_ao,
+            'contact:hasVacationCountry'ª 1  ¬> country_ao,
+            'contact:hasVisitedCountry' ª 0  ¬> country_es,  
+            'contact:hasVisitedCountry' ª 1 ¬> country_ao,  
+            'contact:hasRangeStringCardN' ª 0 ¬> string $'Uno',
+            'contact:hasRangeStringCardN' ª 1 ¬> string $'Dos',
+            % Card nMax stmtEdition
+            'contact:hasPreferredCountry' ª 0 ¬> country_es,
+            'contact:hasPreferredCountry' ª 1 ¬> country_pt,
+            % Card nMax stmtEdition
+            'contact:hasAddress' ª 0 ¬> 'testapp:contactAddress' $'testapp:direccion__1__contacto_008',
+            'contact:hasAddress' ª 1 ¬> 'testapp:contactAddress' $'testapp:direccion__2__contacto_008',       
+            'contact:hasAddress' ª 2 ¬> 'testapp:contactAddress' $'testapp:direccion__3__contacto_008',       
+            'contact:hasAddress' ª 3 ¬> 'testapp:contactAddress' $'testapp:direccion__4__contacto_008',       
+            'contact:hasAddress' ª 4 ¬> 'testapp:contactAddress' $'testapp:direccion__5__contacto_008',       
+            'contact:hasAddress' ª 5 ¬> 'testapp:contactAddress' $'testapp:direccion__6__contacto_008',       
+            'contact:hasAddress' ª 6 ¬> 'testapp:contactAddress' $'testapp:direccion__7__contacto_008',       
+            'contact:hasAddress' ª 7 ¬> 'testapp:contactAddress' $'testapp:direccion__8__contacto_008',       
+            'contact:hasAddress' ª 8 ¬> 'testapp:contactAddress' $'testapp:direccion__9__contacto_008',       
+            'contact:hasAddress' ª 9 ¬> 'testapp:contactAddress' $'testapp:direccion__10__contacto_008',
+
+            'contact:hasBirthDate' ¬> 1133391600000,            
+            'selectableRow' ¬> false,
+            'menuAllowed' ¬> false,
+            
+            'contact:hasBackgroundColor' ¬> 'cee5ff'
+    ],
+    % TODO Esta sería instancia auxiliar, pero tiene dependencia con instancias de contactos
+    'testapp:fileInputTest' +$ 'rform_fileInputTest_001'
+            d [(es, 'Instancia para test de fileInput'), (en, 'Instance for fileinput test')]
+            p [ 
+                'testapp:hasIcon' ¬> 'repository/testapp/rform_001/icon.png',
+                'testapp:hasImage' ¬> 'repository/testapp/rform_001/test.jpg',
+                % Filesystem             
+                'testapp:hasFilesystemFile' ¬> mmResource__testapp_rform_001,
+                'testapp:hasFilesystemMultiFile' ª 0 ¬> mmResource__testapp_rform_002,
+                'testapp:hasFilesystemMultiFile' ª 1 ¬> mmResource__testapp_rform_003,
+                % Fileserver
+                'testapp:hasFileserverFile' ¬> mmResource__testapp_rform_004,
+                %'testapp:hasFileserverMultiFile' ª 0 ¬> mmResource__testapp_rform_003,
+                'testapp:hasFileserverMultiFile' ª 0 ¬> mmResource__testapp_rform_005,
+                % Deltaserver
+                'testapp:hasDeltaserverFile' ¬> mmResource__testapp_rform_006,
+                'testapp:hasDeltaserverMultiFile' ª 0 ¬> mmResource__testapp_rform_007,
+                'testapp:hasDeltaserverMultiFile' ª 1 ¬> mmResource__testapp_rform_008,                
+                'testapp:hasContact' ª 0 ¬> testapp_contacto_001,
+                'testapp:hasContact' ª 1 ¬> testapp_contacto_002,
+                'testapp:hasContact' ª 2 ¬> testapp_contacto_003,
+                'testapp:hasContact' ª 3 ¬> testapp_contacto_004,
+                'testapp:hasMultipleContacts' ª 0 ¬> testapp_contacto_005,
+                'testapp:hasMultipleContacts' ª 1 ¬> testapp_contacto_006
+    ],
+    
+    addHelp( 'testapp:contact', 'contact:hasPassword',
+        es,
+        [ title( 'Recomendaciones de contraseña'),
+        '<p>De un mínimo de 8 caractéres, y que contenga algún número o mayúscula. Evitar fechas y demás datos personales conocidos.</p>'
+    ]).
+
+'rc_test_schema_contacto_ii_aux':-
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%% Definición Instancias Auxiliares %%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    'testapp:contactPermission' +$ contactPermission__contacto_001 d[(es, 'Permiso de contacto 001'), (en, 'Contact 001 permission')]
+        p [
+            'contactPermission:hasContact' ª 0 ¬> 'testapp:contact' *$ testapp_contacto_001
+        ],
+    
+    'testapp:contactPermission' +$ contactPermission__contacto_002 d[(es, 'Permiso de contacto 002'), (en, 'Contact 002 permission')]
+        p [
+            'contactPermission:hasContact' ª 0 ¬> 'testapp:contact' *$ testapp_contacto_001,
+            'contactPermission:hasContact' ª 1 ¬> 'testapp:contact' *$ testapp_contacto_002
+        ],
+
+    mmResource +$ mmResource__testapp_contacto_001 d [(es, '')]
+        p [ hasUrl ¬> url $ 'avatar1 +.png',
+            hasLocalFile ¬> url $ 'avatar1 +.png',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_002 d [(es, '')]
+        p [ hasUrl ¬> url $ 'avatar2.png',
+            hasLocalFile ¬> url $ 'avatar2.png',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_003 d [(es, '')]
+        p [ hasUrl ¬> url $ 'avatar3.png',
+            hasLocalFile ¬> url $ 'avatar3.png',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_004 d [(es, '')]
+        p [ 
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_005 d [(es, '')]
+        p [ hasUrl ¬> url $ 'avatar1.png',
+            hasLocalFile ¬> url $ 'avatar1.png',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_006 d [(es, '')]
+        p [ hasUrl ¬> url $ 'avatar4.png',
+            hasLocalFile ¬> url $ 'avatar4.png',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_007 d [(es, '')]
+        p [ 
+            % hasUrl ¬> url $ 'avatar4.png',
+            % hasLocalFile ¬> url $ 'avatar4.png',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_008 d [(es, '')]
+        p [ 
+            % hasUrl ¬> url $ 'avatar4.png',
+            % hasLocalFile ¬> url $ 'avatar4.png',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_010 d [(es, '')]
+        p [ 
+             hasUrl ¬> url $ 'avatar4.png',
+             hasLocalFile ¬> url $ 'avatar4.png',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+
+    mmResource +$ mmResource__testapp_contacto_001_1 d [(es, '')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_002_1 d [(es, '')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_003_1 d [(es, '')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_004_1 d [(es, '')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_005_1 d [(es, '')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_005_2 d [(es, '')]
+        p [ hasUrl ¬> url $ 'avatar4.png',
+            hasLocalFile ¬> url $ 'avatar4.png',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_006_1 d [(es, '')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_007_1 d [(es, '')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_contacto_008_1 d [(es, '')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+
+    'testapp:province' +$ 'testapp:city__bizkaia' d [(es, 'Bizkaia'),(en, 'Bizkaia')],
+    'testapp:province' +$ 'testapp:city__guipuzkoa' d [(es, 'Gipuzkoa'),(en, 'Guipuzkoa')],
+    'testapp:province' +$ 'testapp:city__alava' d [(es, 'Álava'),(en, 'Alava')],
+
+    'testapp:contactAddress' +$$ 'testapp:direccion__1__contacto_007'
+        d [(es, 'Dirección 1')]
+        p [ hasIDI ¬> 'DIR1_7',
+            'contactAddress:hasAddressLine'        ¬> string $ 'Calle Rue percebe 18',
+            'contactAddress:hasPostalCode' ¬> 48300,
+            'contactAddress:hasCity'    ¬> 'Gernika',
+            'contactAddress:hasProvince'    ¬> 'testapp:province' $ 'testapp:city__bizkaia'
+       ],
+
+    'testapp:contactAddress' +$$ 'testapp:direccion__1__contacto_008'
+        d [(es, 'Dirección 1')]        
+        p [ hasIDI ¬> 'DIR1_8',
+            'contactAddress:hasAddressLine'        ¬> string $ 'Calle Rue percebe 18',
+            'contactAddress:hasPostalCode' ¬> 48300,
+            'contactAddress:hasCity'    ¬> 'Gernika',
+            'contactAddress:hasProvince'    ¬> 'testapp:province' $ 'testapp:city__bizkaia'
+       ],
+    
+    'testapp:contactAddress' +$$ 'testapp:direccion__2__contacto_008'
+        d [(es, 'Dirección 2')]
+        p [ hasIDI ¬> 'DIR2_8',
+            'contactAddress:hasAddressLine'        ¬> string $ 'Calle Dirección 2',
+            'contactAddress:hasPostalCode' ¬> 98988,
+            'contactAddress:hasCity'    ¬> 'Población Dirección 2',
+            'contactAddress:hasProvince'    ¬> 'testapp:province' $ 'testapp:city__alava'
+       ],
+    'testapp:contactAddress' +$$ 'testapp:direccion__3__contacto_008'
+        d [(es, 'Dirección 3')]
+        p [ hasIDI ¬> 'DIR3_8',
+            'contactAddress:hasAddressLine'        ¬> string $ 'Calle Dirección 3',
+            'contactAddress:hasPostalCode' ¬> 76767,
+            'contactAddress:hasCity'    ¬> 'Población Dirección 3',
+            'contactAddress:hasProvince'    ¬> 'testapp:province' $ 'testapp:city__guipuzkoa'
+       ],
+    'testapp:contactAddress' +$$ 'testapp:direccion__4__contacto_008'
+        d [(es, 'Dirección 4')]
+        p [ hasIDI ¬> 'DIR4_8',
+            'contactAddress:hasAddressLine'        ¬> string $ 'Calle Dirección 4',
+            'contactAddress:hasPostalCode' ¬> 898987,
+            'contactAddress:hasCity'    ¬> 'Población direccion 4',
+            'contactAddress:hasProvince'    ¬> 'testapp:province' $ 'testapp:city__alava'
+       ],
+    'testapp:contactAddress' +$$ 'testapp:direccion__5__contacto_008'
+        d [(es, 'Dirección 5')]
+        p [ hasIDI ¬> 'DIR5_8',
+            'contactAddress:hasAddressLine'        ¬> string $ 'Calle Dirección 5',
+            'contactAddress:hasPostalCode' ¬> 90989,
+            'contactAddress:hasCity'    ¬> 'Población Dirección 5',
+            'contactAddress:hasProvince'    ¬> 'testapp:province' $ 'testapp:city__bizkaia'
+       ],
+    'testapp:contactAddress' +$$ 'testapp:direccion__6__contacto_008'
+        d [(es, 'Dirección 6')]
+        p [ hasIDI ¬> 'DIR6_8',
+            'contactAddress:hasAddressLine'        ¬> string $ 'Calle Dirección 6',
+            'contactAddress:hasPostalCode' ¬> 67898,
+            'contactAddress:hasCity'    ¬> 'Población Dirección 6',
+            'contactAddress:hasProvince'    ¬> 'testapp:province' $ 'testapp:city__guipuzkoa'
+       ],
+    
+    'testapp:contactAddress' +$$ 'testapp:direccion__7__contacto_008'
+        d [(es, 'Dirección 7')]
+        p [ hasIDI ¬> 'DIR7_8',
+            'contactAddress:hasAddressLine'        ¬> string $ 'Calle Dirección 7',
+            'contactAddress:hasPostalCode' ¬> 78989,
+            'contactAddress:hasCity'    ¬> 'Población Dirección 7',
+            'contactAddress:hasProvince'    ¬> 'testapp:province' $ 'testapp:city__alava'
+       ],
+    
+    'testapp:contactAddress' +$$ 'testapp:direccion__8__contacto_008'
+        d [(es, 'Dirección 8')]
+        p [ hasIDI ¬> 'DIR8_8',
+            'contactAddress:hasAddressLine'        ¬> string $ 'Calle Dirección 8',
+            'contactAddress:hasPostalCode' ¬> 88767,
+            'contactAddress:hasCity'    ¬> 'Población Dirección 8',
+            'contactAddress:hasProvince'    ¬> 'testapp:province' $ 'testapp:city__guipuzkoa'
+       ],
+
+    'testapp:contactAddress' +$$ 'testapp:direccion__9__contacto_008'
+        d [(es, 'Dirección 9')]
+        p [ hasIDI ¬> 'DIR9_8',
+            'contactAddress:hasAddressLine'        ¬> string $ 'Calle Dirección 9',
+            'contactAddress:hasPostalCode' ¬> 98765,
+            'contactAddress:hasCity'    ¬> 'Población Dirección 9',
+            'contactAddress:hasProvince'    ¬> 'testapp:province' $ 'testapp:city__bizkaia'
+       ],
+
+    'testapp:contactAddress' +$$ 'testapp:direccion__10__contacto_008'
+        d [(es, 'Dirección 10')]
+        p [ hasIDI ¬> 'DIR10_8',
+            'contactAddress:hasAddressLine'        ¬> string $ 'Calle Dirección 10',
+            'contactAddress:hasPostalCode' ¬> 10909,
+            'contactAddress:hasCity'    ¬> 'Población Dirección 10',
+            'contactAddress:hasProvince'    ¬> 'testapp:province' $ 'testapp:city__guipuzkoa'
+       ].
+
+    % addInfo( user, hasLoginId,
+    %     es,
+    %     [ '<p>Cadena de caracteres única con la que se identifica al usuario en el sistema.</p>']).
+
+    /*
+    stmt( Rid1, 'contact:hasResidenceCountryOrigen', rform_fileInputTest_001, _, _, _, _, _),
+    setStmt( isEditable, Rid1, false),
+    stmt( Rid2, 'contact:hasResidenceCountryFiscal1', rform_fileInputTest_001, _, _, _, _, _),
+    setStmt( isEditable, Rid2, false),
+    % Test para probar los tips dynamic
+    stmt( Rid, 'contact:hasName', testapp_contacto_001, _, _, _, _, _),
+    setStmt( isEditable, Rid, false).
+    % 'contact:hasName' ¬¬ isEditable := false.
+*/
+
+'staber_kform::model::usecase__15':-
+
+    class +$ 'testapp:message'
+         d [(es, 'Mesnsaje' ),(en, 'Message')],
+    
+    property +$ 'testapp:hasTxt'
+            d [( es, 'Texto' ),  ( en, 'Message Line' )]
+            p [
+                domain  ¬> 'testapp:message',
+                range   ¬> string,                
+                hasInhType ¬> inhNoCopy
+        ],    
+    class +$ 'testapp:chat' 
+        d [(es, 'Chat' ),(en, 'Chat')],
+
+    stmtEdition +$ 'testapp:stmtEditionHasField' 
+        p [
+            stmtIncluded ª 0  ¬> 'testapp:hasTxt'
+        ],
+
+    property +$ 'testapp:hasField1'
+            d [( es, 'Campo 1' ),  ( en, 'Field 1' )]
+            p [
+                domain  ¬> 'testapp:chat',
+                range   ¬> 'testapp:message',                
+                cardMax ¬> nMax,
+                allowCreation ¬> true,
+                hasStmtEdition ¬> 'testapp:stmtEditionHasField',
+                hasNumberLines ¬> 10,
+                hasInhType ¬> inhNoCopy
+        ],    
+    property +$ 'testapp:hasField2'
+            d [( es, 'Campo 2' ),  ( en, 'Field 2' )]
+            p [
+                domain  ¬> 'testapp:chat',
+                range   ¬> 'testapp:message',                
+                cardMax ¬> nMax,
+                allowCreation ¬> true,
+                hasStmtEdition ¬> 'testapp:stmtEditionHasField',
+                hasNumberLines ¬> 10,
+                hasInhType ¬> inhNoCopy
+        ],
+
+    %% Instancia para ejemplo
+
+    'testapp:message' +$ 'testapp:message__15_1'
+    p [
+            'testapp:hasTxt'  ¬> string $ 'Ejemplo Campo1'
+    ],
+          
+    'testapp:message' +$ 'testapp:message__15_2'
+    p [
+            'testapp:hasTxt'  ¬> string $ 'Ejemplo CAmpo2'
+    ],
+    
+    'testapp:chat' +$ 'testapp:chat__15'
+        p [     
+            'testapp:hasField1' ¬> 'testapp:message__15_1',
+            'testapp:hasField2' ¬> 'testapp:message__15_2'
+    ].
+
+'rc_test_model_fileinputest':-
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%% Definición Clase fileInputTest %%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    
+    class +$ 'testapp:fileInputTest'
+        d [(es, 'Clase para testeo de comportamientos Fileinput' ),(en, 'Class for fileipnut test')]
+        p [
+            schemaInst ¬> true
+        ],
+
+    /* Comportamientos fileInput */
+     property +$ 'testapp:hasIcon'
+            d [( es, 'Icono' ),  ( en, 'Icon' )]
+            p [
+                domain  ¬> 'testapp:fileInputTest',
+                range   ¬> url,
+                cardMax ¬> 1,
+                hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'testapp:hasImage'
+        d [( es, 'Imagen' ),  ( en, 'Image' )]
+        p [
+            domain  ¬> 'testapp:fileInputTest',
+            range   ¬> url,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    %Propiedades filesystem
+    property +$ 'testapp:hasFilesystemFile'
+        d [( es, 'Archivo en Filesystem' ),  ( en, 'File in Filesystem' )]
+        p [
+            domain  ¬> 'testapp:fileInputTest',
+            range   ¬> mmResource,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'testapp:hasFilesystemMultiFile'
+        d [( es, 'MultiFile en Filesystem' ),  ( en, 'Multifile in Filesystem' )]
+        p [
+            domain  ¬> 'testapp:fileInputTest',
+            range   ¬> mmResource,
+            cardMax ¬> 4,
+            hasInhType ¬> inhNoCopy
+    ],
+    %Propiedades fileserver
+    property +$ 'testapp:hasFileserverFile'
+        d [( es, 'Archivo en Fileserver' ),  ( en, 'File in Fileserver' )]
+        p [
+            domain  ¬> 'testapp:fileInputTest',
+            range   ¬> mmResource,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'testapp:hasFileserverMultiFile'
+        d [( es, 'Multifile en Fileserver' ),  ( en, 'Multifile in Fileserver' )]
+        p [
+            domain  ¬> 'testapp:fileInputTest',
+            range   ¬> mmResource,
+            cardMax ¬> 5,
+            hasInhType ¬> inhNoCopy
+    ],
+    %Propiedades deltaserver
+    property +$ 'testapp:hasDeltaserverFile'
+        d [( es, 'Archivo en Deltaserver' ),  ( en, 'File in Deltaserver' )]
+        p [
+            domain  ¬> 'testapp:fileInputTest',
+            range   ¬> mmResource,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+    property +$ 'testapp:hasDeltaserverMultiFile'
+        d [( es, 'Multifile en Deltaserver' ),  ( en, 'Multifile in Deltaserver' )]
+        p [
+            domain  ¬> 'testapp:fileInputTest',
+            range   ¬> mmResource,
+            cardMax ¬> 5,
+            hasInhType ¬> inhNoCopy
+    ],
+    % MMResources Filesystem
+    mmResource +$ mmResource__testapp_rform_001 d [(es, 'File Test Filesystem')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__filesystem_dfs_testapp'
+    ],
+    mmResource +$ mmResource__testapp_rform_002 d [(es, 'Multifile Test Filesystem')]
+        p [ hasUrl ¬> url $ 'rform_001/excel_file.xlsm',
+            hasLocalFile ¬> url $ 'excel_file.xlsm',
+            remoteURL ¬> urlSpec $ 'urlSpec__filesystem_dfs_testapp'
+    ],
+
+    mmResource +$ mmResource__testapp_rform_003 d [(es, 'File Test Filesystem')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__filesystem_dfs_testapp'
+    ],
+    
+    mmResource +$ mmResource__testapp_rform_filesystem_001 d [(es, 'Ejemplo test filesystem')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__filesystem_dfs_testapp'
+    ],
+
+    % MMResources fileserver
+    mmResource +$ mmResource__testapp_rform_004 d [(es, 'File Test Fileserver')]
+        p [ 
+            % hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            % hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_rform_005 d [(es, 'Multifile Test Fileserver')]
+        p [ hasUrl ¬> url $ 'rform_001/excel_file.xlsm',
+            hasLocalFile ¬> url $ 'excel_file.xlsm',
+            remoteURL ¬> urlSpec $ 'urlSpec__fileserver_testapp'
+    ],
+
+    % MMResources deltaserver
+    mmResource +$ mmResource__testapp_rform_006 d [(es, 'File Test Deltaserver')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__deltaserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_rform_007 d [(es, 'Multifile Test Deltaserver')]
+        p [ hasUrl ¬> url $ 'rform_001/excel_file.xlsx',
+            hasLocalFile ¬> url $ 'excel_file.xlsx',
+            remoteURL ¬> urlSpec $ 'urlSpec__deltaserver_testapp'
+    ],
+    mmResource +$ mmResource__testapp_rform_008 d [(es, 'Multifile Test Deltaserver')]
+        p [ hasUrl ¬> url $ 'rform_001/doc_file.docx',
+            hasLocalFile ¬> url $ 'doc_file.docx',
+            remoteURL ¬> urlSpec $ 'urlSpec__deltaserver_testapp'
+    ].
+
+'rc_test_schema_contacto_uiux':-
+    'staber_uiux::generate_aggrupation',
+    'define_canvas_exampleTemplate'.
+
+
+'staber_uiux::generate_aggrupation':-
+
+    Lst_props_basicInformation = [
+        'contact:hasName',
+        'contact:hasAge',
+        'contact:hasBirthDate',
+        'contact:hasPassword',
+        'contact:hasEmail'
+    ],
+    
+
+    Lst_props_CV = [
+        'contact:hasProfessionalProfile',
+        'contact:hasMaster'
+    ],
+
+    definePathGUIGroupProperties( path_tienePaisResort, ['contact:hasBirthCountry'], Path_tienePaisResort),
+    Lst_props_pais = [
+        'contact:hasResidenceCountry',
+        prop( path_tienePaisResort, 'country', 'countryCategory')
+    ],
+
+    Lst_props_doc = [
+        'contact:hasIdPhoto',
+        'contact:hasFileAttachment'
+    ],
+
+    Lst_props_pivot = [
+        {
+            arc: 'contact:hasName',
+            type: 'textarea'            
+        },
+        {
+            arc: 'contact:hasPreferredCountry',
+            type : 'kresult',
+            in : {
+                hasAgent: '$.in.hasAgent',
+                hasDataset: '_.in.hasDataset',
+                % query: 'stmt(\'contact:hasPreferredCountry\', {$.scope.query.from}, HASKW)'
+                % hasAgent: 'builderweb',
+                % hasDataset: 'Default',                            
+                query: 'stmt(\'contact:hasPreferredCountry\', testapp_contacto_011, HASKW)',
+                searchType: 'rem',
+                enabled: '_.in.enabled'
+            },
+            hasChannel: 'channel_result_preferredcountry',
+            busId: 'busid_result_preferredcountry'
+        }
+    ],
+
+    _Lst_props_stmtEdit_tienePais = [
+        'codigoISO',
+        'hasDsca',
+        'countryCategory'
+    ],
+   
+    %createStmtEdition('stmtEdition_contact:hasPreferredCountry', Lst_props_stmtEdit_tienePais),
+    %defineStmtEdition('stmtEdition_contact:hasPreferredCountry','contact:hasPreferredCountry'),
+    Lst_props_testappcontactAll5 = ['contact:hasPreferredCountry'],   
+ 
+    defineGUIGroupProperties( 'propertyGUIGroup_testapp:contact_basicInformation', 'Información Básica', Lst_props_basicInformation, []),
+    defineGUIGroupProperties( 'propertyGUIGroup_testapp:contact_cv', 'CV', Lst_props_CV, []),    
+    defineGUIGroupProperties( 'propertyGUIGroup_testapp:contact_pais', '', Lst_props_pais, [Path_tienePaisResort]),
+    defineGUIGroupProperties( 'propertyGUIGroup_testapp:contact_pais', 'Paises visitados', Lst_props_pais, [Path_tienePaisResort]),
+    defineGUIGroupProperties( 'propertyGUIGroup_testapp:contact_doc', 'Documentos adjuntos', Lst_props_doc, []),        
+    defineGUIGroupProperties( 'propertyGUIGroup_testapp:contact_paises', 'Tabla de paises', Lst_props_testappcontactAll5, []),
+    
+    defineGUIGroupProperties( 'propertyGUIGroup_testapp:overridepivot', 'Sobrecarga con pivot', Lst_props_pivot, []),
+    
+    defineClassGUIGroup(
+        'testapp:contact',
+        [
+            ( 'guiGroupClass_testapp:contact_basicInformation', 'propertyGUIGroup_testapp:contact_basicInformation', closed, 2, 'assembly'),
+            ( 'guiGroupClass_testapp:contact_cv', 'propertyGUIGroup_testapp:contact_cv', closed, 1, 'assembly'),
+            ( 'guiGroupClass_testapp:contact_pais', 'propertyGUIGroup_testapp:contact_pais', closed, 1, 'assembly'),
+            ( 'guiGroupClass_testapp:contact_doc', 'propertyGUIGroup_testapp:contact_doc', closed, 2, 'assembly'),
+            ( 'guiGroupClass_testapp:contact_paises', 'propertyGUIGroup_testapp:contact_paises', closed, 1, 'assembly')
+        ]
+    ),
+    defineClassGUIGroup(
+        'testapp:contact_aggrupations_collapsible',
+        [
+            ( 'guiGroupClass_testapp:contact_collapsible_basicInformation', 'propertyGUIGroup_testapp:contact_basicInformation', closed, 2, 'collapsible'),
+            ( 'guiGroupClass_testapp:contact_collapsible_cv', 'propertyGUIGroup_testapp:contact_cv', closed, 1, 'collapsible'),
+            ( 'guiGroupClass_testapp:contact_collapsible_pais', 'propertyGUIGroup_testapp:contact_pais', closed, 1, 'collapsible'),
+            ( 'guiGroupClass_testapp:contact_collapsible_doc', 'propertyGUIGroup_testapp:contact_doc', closed, 2, 'collapsible'),
+            ( 'guiGroupClass_testapp:contact_collapsible_paises', 'propertyGUIGroup_testapp:contact_paises', closed, 1, 'collapsible')
+        ]
+    ),
+    defineClassGUIGroup(
+        'testapp:contact_aggrupations_tab',
+        [
+            ( 'guiGroupClass_testapp:contact_tab_basicInformation', 'propertyGUIGroup_testapp:contact_basicInformation', closed, 2, 'tab'),
+            ( 'guiGroupClass_testapp:contact_tab_cv', 'propertyGUIGroup_testapp:contact_cv', closed, 1, 'tab'),
+            ( 'guiGroupClass_testapp:contact_tab_pais', 'propertyGUIGroup_testapp:contact_pais', closed, 1, 'tab'),
+            ( 'guiGroupClass_testapp:contact_tab_doc', 'propertyGUIGroup_testapp:contact_doc', closed, 2, 'tab'),
+            ( 'guiGroupClass_testapp:contact_tab_paises', 'propertyGUIGroup_testapp:contact_paises', closed, 1, 'tab')
+        ]
+    ),
+    % ToDo The grouping is defined with TAB until the definition is released in radcore_model
+    defineClassGUIGroup(
+        'testapp:contact_aggrupations_collapsibletab',
+        [
+            ( 'guiGroupClass_testapp:contact_collapsibleTab_basicInformation', 'propertyGUIGroup_testapp:contact_basicInformation', closed, 2, 'collapsibleTab'),
+            ( 'guiGroupClass_testapp:contact_collapsibleTab_cv', 'propertyGUIGroup_testapp:contact_cv', closed, 2, 'collapsibleTab'),
+            ( 'guiGroupClass_testapp:contact_collapsibleTab_pais', 'propertyGUIGroup_testapp:contact_pais', closed, 2, 'collapsibleTab'),
+            ( 'guiGroupClass_testapp:contact_collapsibleTab_doc', 'propertyGUIGroup_testapp:contact_doc', closed, 2, 'collapsibleTab'),
+            ( 'guiGroupClass_testapp:contact_collapsibleTab_paises', 'propertyGUIGroup_testapp:contact_paises', closed, 2, 'collapsibleTab')
+        ]
+    ),
+    defineClassGUIGroup(
+        'testapp:contact_aggrupations_mix',
+        [
+            ( 'guiGroupClass_testapp:contact_mix_basicInformation', 'propertyGUIGroup_testapp:contact_basicInformation', closed, 1, 'assembly'),
+            ( 'guiGroupClass_testapp:contact_mix_doc', 'propertyGUIGroup_testapp:contact_doc', closed, 1, 'collapsibleTab'),
+            ( 'guiGroupClass_testapp:contact_mix_paises', 'propertyGUIGroup_testapp:contact_paises', open, 1, 'collapsibleTab'),
+            ( 'guiGroupClass_testapp:contact_mix_cv', 'propertyGUIGroup_testapp:contact_cv', closed, 1, 'collapsible'),
+            ( 'guiGroupClass_testapp:contact_mix_pais', 'propertyGUIGroup_testapp:contact_pais', closed, 1, 'collapsible')
+        ]
+    ),
+    defineClassGUIGroup(
+        'testapp:contact_aggrupations_pivot',
+        [
+            ( 'guiGroupClass_testapp:contact_pivot_basicInformation', 'propertyGUIGroup_testapp:overridepivot', closed, 2, 'assembly')
+        ]
+    ).
+
+define_canvasGuiGroup( KwGuiGroup, LControles):-
+    propertyGroup +$ KwGuiGroup d[(es, 'agrupacion para canvas'),(en, 'aggrupation for canvas')],
+    applyall((
+        member( OneControlObj, LControles),
+        json_write( OneControlObj, OneControlClob),
+        addStmt( groupPropertyPathCodes, KwGuiGroup, clob, OneControlClob, _)
+    )).
+
+define_canvas_exampleTemplate:-
+
+    class +$ 'testapp:contact_canvas' sc 'testapp:contact'
+        d[(es, 'clase para prueba de canvas'), (en, 'class for canvas testing')]
+        p [
+            schemaInst ¬> true
+    ],
+    class +$ 'testapp:contact_canvas_witharc' sc 'testapp:contact'
+        d[(es, 'clase para prueba de canvas con arc'), (en, 'class for canvas testing with arcs')]
+        p [
+            schemaInst ¬> true
+    ],
+    class +$ 'testapp:contact_canvas_editable' sc 'testapp:contact'
+        d[(es, 'clase para prueba de canvas editable'), (en, 'class for editable canvas testing')]
+        p [
+            schemaInst ¬> true
+    ],
+
+    'testapp:contact_canvas' *$$ testapp_contacto_canvas_001 d [(es, 'Contacto canvas 001'), (en, 'Canvas contact 001')]
+        p [ 
+            'contact:hasName' ¬> string $ 'Ana García',
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_001,
+            'contact:hasEmail' ¬> string $ 'ana.garcia@example.com',
+            'contact:hasPhoneNumber' ¬> string $ '+34 94 587 68 52'
+    ],
+
+    'testapp:contact_canvas_witharc' *$$ testapp_contacto_canvas_witharc_001 d [(es, 'Contacto canvas con arc 001'), (en, 'Canvas contact witharc 001')]
+        p [ 
+            'contact:hasName' ¬> string $ 'Ana García',
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_001,
+            'contact:hasEmail' ¬> string $ 'ana.garcia@example.com',
+            'contact:hasPhoneNumber' ¬> string $ '+34 94 587 68 52'
+    ],
+
+    'testapp:contact_canvas_witharc' *$$ testapp_contacto_canvas_witharc_002 d [(es, 'Contacto canvas con arc 002'), (en, 'Canvas contact witharc 002')]
+        p [ 
+            'contact:hasName' ¬> string $ 'Artemio Eustaquio',
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_003,
+            'contact:hasEmail' ¬> string $ 'artemio.eustaquio@example.com',
+            'contact:hasPhoneNumber' ¬> string $ '+34 94 587 68 52'
+    ],
+
+    'testapp:contact_canvas_editable' *$$ testapp_contacto_canvas_editable_001 d [(es, 'Contacto canvas editable 001'), (en, 'Canvas contact editable 001')]
+        p [ 
+            'contact:hasName' ¬> string,
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_001,
+            'contact:hasEmail' ¬> string,
+            'contact:hasPhoneNumber' ¬> string,
+            'contact:hasAddress' ª 0 ¬> 'testapp:contactAddress' $'testapp:direccion__1__contacto_008',
+            'contact:hasAddress' ª 1 ¬> 'testapp:contactAddress' $'testapp:direccion__2__contacto_008'
+    ],
+
+    LControles_canvas = [
+        {
+            type: 'image',
+            width: 120,
+            height: 150,
+            position: {
+                x: 100,
+                y: 100
+            },
+            source: '/repcon/f_get/repository/data/test_5gl_server/avatar4.png'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/repcon_grid.png',
+            height: 20,
+            width: 95,
+            position:{
+                x: 400,
+                y: 465
+            }
+        },
+        {
+            
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/semantic-systems.png',
+            height: 100,
+            position:{
+                x: 680,
+                y: 15
+            }
+        },
+        {
+            type: label,
+            color: white,
+            font: {
+                size: '1rem'
+            },
+            position: {
+                x: 710,
+                y: 115
+            },
+            d:'Semantic-Systems'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 90,
+                y: 297
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.2rem'
+            },
+            position: {
+                x: 100,
+                y: 305
+            },
+            d:'Ana García'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 90,
+                y: 327
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.2rem'
+            },
+            position: {
+                x: 100,
+                y: 335
+            },
+            d: '+34 94 587 68 52'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 90,
+                y: 357
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.2rem'
+            },
+            position: {
+                x: 100,
+                y: 365
+            },
+            d: 'ana.garcia@example.com'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 650,
+                y: 200
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.5rem'
+            },
+            color: white,
+            position: {
+                x: 670,
+                y: 205
+            },
+            d: 'Soluciones a medida'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 650,
+                y: 240
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.5rem'
+            },
+            color: white,
+            position: {
+                x: 670,
+                y: 245
+            },
+            d: 'Configurador'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 650,
+                y: 280
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.5rem'
+            },
+            color: white,
+            position: {
+                x: 670,
+                y: 285
+            },
+            d: 'Factory'
+        }
+    ],
+    LControles_canvas_witharc = [
+        {
+            type: 'image',
+            arc: 'contact:hasIdPhoto',
+            resourcePath: 'repository/data/test_5gl_server/',
+            width: 120,
+            height: 150,
+            position: {
+                x: 100,
+                y: 100
+            }
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/repcon_grid.png',
+            height: 20,
+            width: 95,
+            position:{
+                x: 400,
+                y: 465
+            }
+        },
+        {
+            
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/semantic-systems.png',
+            height: 100,
+            position:{
+                x: 680,
+                y: 15
+            }
+        },
+        {
+            type: label,
+            color: white,
+            font: {
+                size: '1rem'
+            },
+            position: {
+                x: 710,
+                y: 115
+            },
+            d:'Semantic-Systems'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 90,
+                y: 297
+            }
+        },
+        {
+            type: label,
+            arc: 'contact:hasName',
+            font: {
+                size: '1.2rem'
+            },
+            position: {
+                x: 100,
+                y: 305
+            }
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 90,
+                y: 327
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.2rem'
+            },
+            arc: 'contact:hasPhoneNumber',
+            position: {
+                x: 100,
+                y: 335
+            }
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 90,
+                y: 357
+            }
+        },
+        {
+            type: label,
+            arc: 'contact:hasEmail',
+            font: {
+                size: '1.2rem'
+            },
+            position: {
+                x: 100,
+                y: 365
+            }
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 650,
+                y: 200
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.5rem'
+            },
+            color: white,
+            position: {
+                x: 670,
+                y: 205
+            },
+            d: 'Soluciones a medida'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 650,
+                y: 240
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.5rem'
+            },
+            color: white,
+            position: {
+                x: 670,
+                y: 245
+            },
+            d: 'Configurador'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 650,
+                y: 280
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.5rem'
+            },
+            color: white,
+            position: {
+                x: 670,
+                y: 285
+            },
+            d: 'Factory'
+        }
+    ],
+
+    LControles_canvas_editable = [
+        {
+            type: 'image',
+            arc: 'contact:hasIdPhoto',
+            resourcePath: 'repository/data/test_5gl_server/',
+            width: 120,
+            height: 150,
+            position: {
+                x: 100,
+                y: 100
+            }
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/repcon_grid.png',
+            height: 20,
+            width: 95,
+            position:{
+                x: 400,
+                y: 465
+            }
+        },
+        {
+            
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/semantic-systems.png',
+            height: 100,
+            position:{
+                x: 680,
+                y: 15
+            }
+        },
+        {
+            type: label,
+            color: white,
+            font: {
+                size: '1rem'
+            },
+            position: {
+                x: 710,
+                y: 115
+            },
+            d:'Semantic-Systems'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 90,
+                y: 297
+            }
+        },
+        {
+            type: text,
+            label:{
+                d: 'kanvas:contact:hasName',
+                i18n: d
+            },
+            arc: 'contact:hasName',
+            display: inline,
+            showLabel: true,
+            position: {
+                x: 100,
+                y: 280
+            }
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 90,
+                y: 327
+            }
+        },
+        {
+            type: text,
+            arc: 'contact:hasPhoneNumber',
+            position: {
+                x: 100,
+                y: 310
+            }
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 90,
+                y: 357
+            }
+        },
+        {
+            type: text,
+            arc: 'contact:hasEmail',
+            showLabel: true,
+            position: {
+                x: 100,
+                y: 340
+            }
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 650,
+                y: 200
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.5rem'
+            },
+            color: white,
+            position: {
+                x: 670,
+                y: 205
+            },
+            d: 'Soluciones a medida'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 650,
+                y: 240
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.5rem'
+            },
+            color: white,
+            position: {
+                x: 670,
+                y: 245
+            },
+            d: 'Configurador'
+        },
+        {
+            type: image,
+            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+            width: 5,
+            height: 5,
+            position:{
+                x: 650,
+                y: 280
+            }
+        },
+        {
+            type: label,
+            font: {
+                size: '1.5rem'
+            },
+            color: white,
+            position: {
+                x: 670,
+                y: 285
+            },
+            d: 'Factory'
+        },
+        {
+            type: label,
+            % font: {
+            %     size: '1.5rem'
+            % },
+            position: {
+                x: 90,
+                y: 400
+            },
+            d: 'Sucursales:'
+        },
+        {
+            type: text,
+            width: '150px',
+            arc: 'pathAddresss_0contactAddress:hasAddressLine',
+            position: {
+                x: 170,
+                y: 400
+            },
+            path:{
+                arc: 'contactAddress:hasAddressLine',
+                fromPath: pathAddress_0,
+                pathAddress_0:[{
+                    from: '?IN',
+                    to: '?OUT',
+                    arc: 'contact:hasAddress',
+                    orda: 0
+                }]
+            }
+        },
+        {
+            type: text,
+            width: '150px',
+            arc: 'pathAddresss_1contactAddress:hasAddressLine',
+            position: {
+                x: 330,
+                y: 400
+            },
+            path:{
+                arc: 'contactAddress:hasAddressLine',
+                fromPath: pathAddress_1,
+                pathAddress_1:[{
+                    from: '?IN',
+                    to: '?OUT',
+                    arc: 'contact:hasAddress',
+                    orda: 1
+                }]
+            }
+        },
+        {
+            type: label,
+            position: {
+                x: 270,
+                y: 110
+            },
+            i18n: d,
+            d: 'kanvas:datos_académicos:'
+        },
+        {
+            type: checkbox,
+            arc: 'contact:hasMaster',
+            showLabel: true,
+            position: {
+                x: 270,
+                y: 140
+            }
+        }
+    ],
+
+    uiML *$ 'kanvas:datos_académicos:' d [(es, 'Datos académicos:'), (en, 'Academic data:')],
+    uiML *$ 'kanvas:contact:hasName' d [(es, 'Nombre completo'), (en, 'Complete name')],
+
+    
+    define_canvasGuiGroup( 'propertyGUIGroup_testapp:contact_canvas', LControles_canvas),
+    defineClassGUIGroup(
+        'testapp:contact_canvas',
+        [   
+            ( 'guiGroupClass_testapp:contact_canvas', 'propertyGUIGroup_testapp:contact_canvas', open, 2, 'assembly')
+        ]
+    ),
+    define_canvasGuiGroup( 'propertyGUIGroup_testapp:contact_canvas_witharc', LControles_canvas_witharc),
+    defineClassGUIGroup(
+        'testapp:contact_canvas_witharc',
+        [   
+            ( 'guiGroupClass_testapp:contact_canvas_witharc', 'propertyGUIGroup_testapp:contact_canvas_witharc', open, 2, 'assembly')
+        ]
+    ),
+    define_canvasGuiGroup( 'propertyGUIGroup_testapp:contact_canvas_editable', LControles_canvas_editable),
+    defineClassGUIGroup(
+        'testapp:contact_canvas_editable',
+        [   
+            ( 'guiGroupClass_testapp:contact_canvas_editable', 'propertyGUIGroup_testapp:contact_canvas_editable', open, 2, 'assembly')
+        ]
+    ).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TEST TEMPLATE POR AGRUPACIÓN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+'rc_test_schema_proveedor':-
+
+    %% Clase
+    class +$ 'testapp:provider'
+            sc ['testapp:contact']
+            d [(es, 'Proveedor: Subclase de contacto para testeo' ),(en, 'Provider: contact subclass for testing')]
+            p [
+                schemaInst ¬> true
+    ],
+    class +$ 'testapp:department'
+            d [(es, 'Departamento' ),(en, 'Department')]
+            p [
+                schemaInst ¬> true
+    ],
+    %% Propiedades
+    property +$ 'provider:hasProviderText'
+        d [( es, 'Texto del proveedor' ),  ( en, 'Provider text' )]
+        p [
+            domain  ¬> 'testapp:provider',
+            range   ¬> string,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy,
+            hasNumberLines ¬> 5
+    ],
+
+    property +$ 'provider:hasAffinity'
+        d [( es, 'Afinidad' ),  ( en, 'Affinity' )]
+        p [
+            domain  ¬> 'testapp:provider',
+            range   ¬> float,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy
+    ],
+
+    property +$ 'provider:hasProviderConfiguration'
+        d [( es, 'Configuración del proveedor' ),  ( en, 'Provider configuration' )]
+        p [
+            domain  ¬> 'testapp:provider',
+            range   ¬> clob,
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy,
+            hasWWWControl ¬> 'jsonEditor',
+            hasNumberLines ¬> 5
+    ],
+
+    property +$ 'provider:hasWorkingCountry'
+        d [( es, 'País en el que opera' ),  ( en, 'Country of work' )]
+        p [
+            domain  ¬> 'testapp:provider',
+            range   ¬> 'country',
+            cardMax ¬> 1,
+            allowCreation ¬> false,
+            allowOptions ¬> true,
+            hasInhType ¬> inhNoCopy,
+            hasWWWControl ¬> 'htmlAutoCompleteCombo'
+    ],
+
+    property +$ 'provider:hasWorkerNames'
+        d [( es, 'Nombres de sus operarios' ),  ( en, 'Worker names' )]
+        p [
+            domain  ¬> 'testapp:provider',
+            range   ¬> 'string',
+            cardMax ¬> nMax,
+            hasInhType ¬> inhNoCopy
+    ],
+
+    property +$ 'provider:hasLogo'
+        d [( es, 'Logotipo' ),  ( en, 'Logo' )]
+        p [
+            domain  ¬> 'testapp:provider',
+            range   ¬> 'url',
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy,
+            allowOptions ¬> false
+    ],
+
+    property +$ 'provider:hasDeliveryTime'
+        d [( es, 'Hora habitual de entregas' ),  ( en, 'Usual delivery time' )]
+        p [
+            domain  ¬> 'testapp:provider',
+            range   ¬> 'date',
+            cardMax ¬> 1,
+            hasInhType ¬> inhNoCopy,
+            hasWWWControl ¬> 'time'
+    ],
+
+    property +$ 'provider:hasSupplierCountries'
+        d [( es, 'Paises de sus proveedores' ),  ( en, 'Supplier countries' )]
+        p [
+            domain  ¬> 'testapp:provider',
+            range   ¬> 'country',
+            cardMax ¬> nMax,
+            allowCreation ¬> true,
+            allowOptions ¬> false,
+            hasInhType ¬> inhCopy
+    ],  
+    property +$ 'provider:hasSupplierBoss'
+        d [( es, 'Jefe de departmento' ),  ( en, 'Boss department' )]
+        p [
+            domain  ¬> 'testapp:provider',
+            range   ¬> 'testapp:department',
+            cardMax ¬> 1,
+            allowCreation ¬> true,
+            allowOptions ¬> false,
+            hasInhType ¬> inhCopy
+    ], 
+
+    %% Instancia
+
+    Obj_config = {
+        tipo: 'Habitual',
+        ubicacion: 'Madrid',
+        material: 'Chapa'
+    },
+    json_write(Obj_config, Clob_config),
+
+    'testapp:provider' *$$ testapp_provider_001 d [(es, 'Proveedor 001'), (en, 'Provider 001')]
+        p [
+            %% Control de tipo reloj
+            'provider:hasDeliveryTime' ¬> 2019645213000,
+            %% string con hasNumberLines
+            'provider:hasProviderText' ¬> 'Este es el texto que debe aparecer en el pie de los mails enviados al proveedor',
+            %% string sin hasNumberLines ni arco hasfHTML
+            'contact:hasName' ¬> 'Proveedor 1',
+            %% date
+            'contact:hasBirthDate' ¬> 830642400000,
+            %% integer
+            'contact:hasAge' ¬> integer $ 28,
+            %% float
+            'provider:hasAffinity' ¬> float $ 100.0,
+            %% mmResource
+            'contact:hasIdPhoto' ¬> mmResource__testapp_contacto_001,
+            %% url
+            'provider:hasLogo' ¬> '/repcon/f_get/repository/data/test_5gl_server/avatar1.png',
+            %% clob + wwwcontrol jsonEditor
+            'provider:hasProviderConfiguration' ¬> Clob_config,
+            %% clob
+            'contact:hasProfessionalProfile' ¬> "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas 'Letraset', las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.",
+            %% allowOptions con autocomplete
+            'provider:hasWorkingCountry' ¬> country_es,
+            %% allowCreation: true
+            'contact:hasBirthCountry' ¬> country_pt,
+            %% allowCreation: false
+            'contact:hasFathersCountry' ¬> country_es,
+            %% allowCreation y allowOptions
+            'contact:hasResidenceCountry' ¬> country_es,
+            %% cardMax > 1
+            'contact:hasVisitedCountry' ª 0 ¬> country_az,
+            'contact:hasVisitedCountry'ª 1  ¬> country_ao,
+            'contact:hasVisitedCountry'ª 2  ¬> country_es,
+            'contact:hasVisitedCountry'ª 3  ¬> country_pt,
+            'contact:hasVisitedCountry'ª 4  ¬> country_ai,
+            'contact:hasVisitedCountry'ª 5  ¬> country_fr,
+            'contact:hasVisitedCountry'ª 6  ¬> country_pl,
+            'contact:hasVisitedCountry'ª 7  ¬> country_al,
+            %% stmteditiontable
+            'contact:hasPreferredCountry' ª 0 ¬> country_es,
+            'contact:hasPreferredCountry' ª 1 ¬> country_pt,
+            %% stmteditionform
+            'provider:hasSupplierCountries' ª 0 ¬> country_es,
+            'provider:hasSupplierCountries' ª 1 ¬> country_pt,
+            %% string con cardMax n
+            'provider:hasWorkerNames' ª 0 ¬> 'Juan Carlos',
+            'provider:hasWorkerNames' ª 1 ¬> 'Ana Patricia',
+            'provider:hasWorkerNames' ª 2 ¬> 'Juan José',
+            'provider:hasWorkerNames' ª 3 ¬> 'Lucia Fernanda'
+    ],
+
+    %% Agrupacion
+
+    Lst_props_stmtForm_tienePaisProveedor = [
+        'codigoISO',
+        'hasDsca',
+        'countryCategory'
+    ],
+
+    createStmtEdition('stmtEdition_provider:hasSupplierCountries', Lst_props_stmtForm_tienePaisProveedor),
+    defineStmtEdition('stmtEdition_provider:hasSupplierCountries','provider:hasSupplierCountries', 'stmtEdition_form'),
+
+    Lst_props_allInfo = [
+        'provider:hasDeliveryTime',
+        'provider:hasProviderText',
+        'contact:hasName',
+        'contact:hasBirthDate',
+        'contact:hasAge',
+        'provider:hasAffinity',
+        'contact:hasIdPhoto',
+        'provider:hasLogo',
+        'provider:hasProviderConfiguration',
+        'contact:hasProfessionalProfile',
+        'provider:hasWorkingCountry',
+        'contact:hasBirthCountry',
+        'contact:hasFathersCountry',
+        'contact:hasResidenceCountry',
+        'contact:hasVisitedCountry',
+        'contact:hasPreferredCountry',
+        'provider:hasSupplierCountries',
+        'provider:hasWorkerNames'
+    ],
+    defineGUIGroupProperties( 'propertyGUIGroup_testapp:provider_allInfo', '', Lst_props_allInfo, []),
+    defineClassGUIGroup(
+        'testapp:provider',
+        [
+            ( 'guiGroupClass_testapp:provider_allInfo', 'propertyGUIGroup_testapp:provider_allInfo', open, 1, 'assembly')
+        ]
+    ).

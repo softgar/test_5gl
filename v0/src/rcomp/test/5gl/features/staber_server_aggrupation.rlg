@@ -1,0 +1,164 @@
+﻿/**staber_k
+@descr	staber_server_aggrupation <br>
+		staber_server_aggrupation
+@author CCP
+@date	2025_09_17
+**/
+rc_class('staber_server_aggrupation') :-
+	class +$ 'staber_server_aggrupation' d ( es,'Escenarios para comprobación de agrupaciones de servidor') sc function,
+    'staber_server_aggrupation::simple_test'(_, _, _, _),
+    'staber_server_aggrupation::folders'(_, _, _, _).
+
+'staber_server_aggrupation::simple_test'(_, _, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    
+    newKw('bus__container', BUS_RPROC), 
+    newKw('channel__container', CHANNEL_RPROC), 
+
+    newKw('channel_form_collapsible_', CHANNEL_ASSEMBLY_KDETAIL),
+    newKw('busid_form_collapsible_', BUSID_ASSEMBLY_KDETAIL),
+
+    newKw('channel_form_collapsible_', CHANNEL_COLLAPSIBLE_KDETAIL),
+    newKw('busid_form_collapsible_', BUSID_COLLAPSIBLE_KDETAIL),
+
+    newKw('channel_form_tab_', CHANNEL_TAB_KDETAIL),
+    newKw('busid_form_tab_', BUSID_TAB_KDETAIL),
+
+    newKw('channel_form_collapsibletab_', CHANNEL_COLLAPSIBLETAB_KDETAIL),
+    newKw('busid_form_collapsibletab_', BUSID__COLLAPSIBLETAB_KDETAIL),
+
+    newKw('channel_form_mix_', CHANNEL_MIX_KDETAIL),
+    newKw('busid_form_mix_', BUSID__MIX_KDETAIL),
+
+    IN_ASSEMBLY = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_005',
+        hasKwc: 'testapp:contact',        
+        hasEvent: 'e_edit_notoolbar',
+        hasAggrupationLegacy: true   
+    },
+
+    Obj_kdetail_assembly = {  
+        type : 'kdetail',
+        hasChannel: CHANNEL_ASSEMBLY_KDETAIL,
+        busId: BUSID_ASSEMBLY_KDETAIL,
+        in: IN_ASSEMBLY
+    },
+
+    IN_COLAPSABLE = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact_aggrupations_collapsible',        
+        hasEvent: 'e_edit_notoolbar',
+        hasAggrupationLegacy: true   
+    },
+
+    Obj_kdetail_collapsible = {  
+        type : 'kdetail',
+        hasChannel: CHANNEL_COLLAPSIBLE_KDETAIL,
+        busId: BUSID_COLLAPSIBLE_KDETAIL,
+        in : IN_COLAPSABLE
+    },
+
+    IN_TAB = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_006',
+        hasKwc: 'testapp:contact_aggrupations_tab',        
+        hasEvent: 'e_edit_notoolbar',
+        hasAggrupationLegacy: true   
+    },
+
+    Obj_kdetail_tab = {  
+        type : 'kdetail',
+        hasChannel: CHANNEL_TAB_KDETAIL,
+        busId: BUSID_TAB_KDETAIL,
+        in : IN_TAB,
+        hasStyle: {
+            cols: 1
+        }
+    },
+
+    IN_COLLAPSIBLETAB = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_008',
+        hasKwc: 'testapp:contact_aggrupations_collapsibletab',        
+        hasEvent: 'e_edit_notoolbar',
+        hasAggrupationLegacy: true   
+    },
+
+    Obj_kdetail_collapsibletab = {  
+        type : 'kdetail',
+        hasChannel: CHANNEL_COLLAPSIBLETAB_KDETAIL,
+        busId: BUSID__COLLAPSIBLETAB_KDETAIL,
+        in : IN_COLLAPSIBLETAB,
+        hasStyle: {
+            cols: 1
+        }
+    },
+
+    IN_MIX = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_010',
+        hasKwc: 'testapp:contact_aggrupations_mix',        
+        hasEvent: 'e_edit_notoolbar',
+        hasAggrupationLegacy: true   
+    },
+
+    Obj_kdetail_mix = {  
+        type : 'kdetail',
+        hasChannel: CHANNEL_MIX_KDETAIL,
+        busId: BUSID__MIX_KDETAIL,        
+        in : IN_MIX,
+        hasStyle: {
+            cols: 1
+        }
+    },
+
+    Obj_class = {
+        type: 'rprocess',
+        busId: BUS_RPROC,
+        hasChannel: CHANNEL_RPROC,
+        hasKw: staber_simpletest,           
+        hasDsca: ui_ux_staber_server_aggrupation_full_test,
+        hasIcon: 'layout',
+        isRoot: false,
+        isSession: true,
+        hasNavbar: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: {
+            type: 'assembly',
+            classList: [
+                "v-group"                
+            ],
+            children: [
+                Obj_kdetail_assembly,
+                Obj_kdetail_collapsible,
+                Obj_kdetail_tab,
+                Obj_kdetail_collapsibletab,
+                Obj_kdetail_mix
+            ]
+        }
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_server_aggrupation::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder___server_aggrupation,
+        hasDsca: ui_ux_staber_server_aggrupation_server,
+        hasIcon: 'layout',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            staber_simpletest
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

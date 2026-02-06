@@ -1,0 +1,623 @@
+﻿/**
+@descr	staber_kmenu <br>
+		staber_kmenu
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kmenu') :-
+	class +$ 'staber_kmenu' d ( es,'Patrón rproc para kmenu') sc function,
+    'staber_kmenu::usecase__1'(_, _, _, _),   
+    'staber_kmenu::contact_table_with_menu_override'(_, _, _, _),
+    'staber_kmenu::contact_table_with_menu'(_, _, _, _),
+    'staber_kmenu::tree_with_menu'(_, _, _, _),
+    'staber_kmenu::folders'(_, _, _, _).
+
+'staber_kmenu::usecase__1'(_, _OBJ_in, _, OBJ_out) :-  
+    newKw(channel, CHANNEL_MENU),
+    OVERRIDES = [            
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmenu::usecase__1::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }        
+    ],
+	IN = {},
+	Obj_class = {  
+        type : 'kmenu',
+        in : IN,
+        hasChannel: CHANNEL_MENU,
+        overrides: OVERRIDES,
+        hasKw: rproc__kmenu__001,
+        hasDsca: [('es', 'Menú no integrado en nigún componente')],
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kmenu::contact_table_with_menu'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__resultwithmenu', CHANNEL_RESULTWITHMENU),
+    newKw('bus__kresultwithmenu', BUSID_RESULTWITHMENU),
+    newKw('bus__kresultwithmenu_menu', BUSID_MENU),
+    ACTIONS = [
+        {
+            label: {
+                text: 'Acción genérica'
+            },
+            events: [{
+                type: 'click',                            
+                method: 'log',
+                targetBusId: '$.busId',
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        {
+                            type: 'function',
+                            in: {
+                                type: 'infoMsg'
+                            },
+                            name: 'tdsapp::forced_failure',
+                            context: {
+                                delegatedTo: 'builderweb'
+                            }
+                        }
+                    ]
+                }                    
+            }]
+        }                  
+    ],
+	IN = {
+        selectable: false,
+        hasAgent: 'builderweb',
+        hasDataset: 'dataset__test_5gl_server',
+        hasKw: 'testapp:contact',
+        layoutType: 'kpivotgrid',
+        persistence: 'remote',
+        searchType: 'rem',
+        limit: 500,
+        selectable: true,
+        singleselection: true,
+        hasMenu: {
+            type: 'kmenu',
+            busId: BUSID_MENU,
+            in: {
+                type: menunav,
+                floating: true,
+                menuBtn: {},
+                state: {
+                    visible: false
+                },
+                children: ACTIONS
+            },
+            evtSubscribe: [{ topic: 'setPayload', channel: CHANNEL_RESULTWITHMENU}]
+        }
+    },
+
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,
+        hasChannel: CHANNEL_RESULTWITHMENU,
+        busId: BUSID_RESULTWITHMENU, 
+        hasKw: rproc__kmenu_contact_table_with_menu,
+        hasDsca: [('es', 'Tabla de contactos con menú')],
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        evtPublish: [{topic: 'setNode', channel: CHANNEL_RESULTWITHMENU}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kmenu::contact_table_with_menu_override'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__resultwithmenu', CHANNEL_RESULTWITHMENU),
+    newKw('bus__kresultwithmenu', BUSID_RESULTWITHMENU),
+    newKw('bus__kresultwithmenu_menu', BUSID_MENU),
+    MENU_OVERRIDES = [          
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function', 
+                        name: 'staber_kmenu::menu_of_table::rc_gui_out', 
+                        context: { delegatedTo: 'builderweb' } 
+                    }
+                ]
+            }
+        }
+    ],
+	IN = {
+        selectable: false,
+        hasAgent: 'builderweb',
+        hasDataset: 'dataset__test_5gl_server',
+        hasKw: 'testapp:contact',
+        layoutType: 'kpivotgrid',
+        persistence: 'remote',
+        searchType: 'rem',
+        limit: 500,
+        selectable: true,
+        singleselection: true,
+        hasMenu: {
+            type: 'kmenu',
+            busId: BUSID_MENU,
+            in: {      
+                state: {
+                    visible: false
+                },
+                parentBusId: '$.busId'
+            },
+            overrides: MENU_OVERRIDES,
+            evtSubscribe: [{ topic: 'setPayload', channel: CHANNEL_RESULTWITHMENU}]
+        }
+    },
+
+	Obj_class = {  
+        type : 'kresult',
+        in : IN,
+        hasChannel: CHANNEL_RESULTWITHMENU,
+        busId: BUSID_RESULTWITHMENU, 
+        hasKw: rproc__kmenu_contact_table_with_menu_override,
+        hasDsca: [('es', 'Tabla de contactos con menú calculado con override')],
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        evtPublish: [{topic: 'setNode', channel:CHANNEL_RESULTWITHMENU}],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+% GUI_OUT predicates
+'staber_kmenu::usecase__1::rc_gui_out'(Ctx, _Obj_in, Ctx, Obj_out):-
+    getKmenuExampleActions(ACTIONS),
+    Obj_out = {
+        type: 'menunav',
+        children: ACTIONS
+    }.
+
+getKmenuExapleActions(ACTIONS):-
+ACTIONS = [
+    {
+        label: {
+            text: 'SEMANTIC SYSTEMS',
+            icon: 'group'
+
+        },
+        actions: [
+            {
+            label: {
+                d: 'Acción 1'
+            },
+            collapse: true,
+            onclick: 'alert( \'Acción 1 pulsada\')'
+            },
+            {
+            label: {
+                d: 'Acción 2'
+            },
+            collapse: true,
+            onclick: 'alert( \'Acción 2 pulsada\')'
+            }
+        ],
+        children: [
+            {
+                type: 'menuchild',
+                children: [
+                    {
+                        label: {
+                            text: 'EMPRESA'
+                            
+                        },
+                        actions: [
+                                {
+                                label: {
+                                    d: 'Acción 1'
+                                },
+                                collapse: true,
+                                onclick: 'alert( \'Acción 1 pulsada\')'
+                                },
+                                {
+                                label: {
+                                    d: 'Acción 2'
+                                },
+                                collapse: true,
+                                onclick: 'alert( \'Acción 2 pulsada\')'
+                                }
+                        ],
+                        children: [
+                            {
+                                type: 'menuchild',
+                                children: [
+                                    {
+                                        label: {
+                                            text: 'Quienes somos'
+                                        }
+                                    },
+                                    {
+                                        label: {
+                                            text: 'Casos de éxito'
+                                        }
+                                    },
+                                    {
+                                        label: {
+                                            text: 'Kit Digital Pymes'
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        label: {
+                            text: 'COMUNICACIÓN'
+                        },
+                        children: [
+                            {
+                                type: 'menuchild',
+                                children: [
+                                    {
+                                        label: {
+                                            text: 'Noticias de empresa'
+                                        }
+                                    },
+                                    {
+                                        label: {
+                                            text: 'Casos de éxito'
+                                        }
+                                    },
+                                    {
+                                        label: {
+                                            text: 'Kit Digital Pymes'
+                                        }
+                                    },
+                                    {
+                                        label: {
+                                            text: 'Feria digital SMticDigital'
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        label: {
+            text: 'PRODUCTOS'
+        },
+        children: [
+            {
+                type: 'menuchild',
+                children: [
+                    {
+                        label: {
+                            text: 'Tecnología repcon'
+                        }
+                    },
+                    {
+                        label: {
+                            text: 'Configurador para producto personalizado'
+                        }
+                    },
+                    {
+                        label: {
+                            text: 'Generación de pedidos y ofertas (CPQ)'
+                        }
+                    },
+                    {
+                        label: {
+                            text: 'Gestión del conocimiento y red social'
+                        }
+                    }, {
+                        label: {
+                            text: 'Proceso automático de facturas'
+                        }
+                    },
+                    {
+                        label: {
+                            text: 'Soluciones a medida'
+                        }
+                    },
+                    {
+                        label: {
+                            text: 'repcon TicketBai'
+                        }
+                    },
+                    {
+                        label: {
+                            text: 'repcon Factory'
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        label: {
+            text: 'SERVICIOS'
+        }
+    }
+].
+
+'staber_kmenu::menu_of_table::rc_gui_out'(_CTX, OBJ_in, _CTX, OBJ_out):-
+    obj_get(in:busId, OBJ_in, BusId),
+    OBJ_out =  
+    {
+        type: 'menunav',
+        state: '$.in.state',
+        floating: true,
+        menuBtn: {},
+        children: [
+            {
+                label: {
+                    text: 'Acción Específica'
+                },
+                events: [{
+                    type: 'click',                            
+                    method: 'log',
+                    targetBusId: BusId,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [                                                     
+                            {
+                                type: 'function',
+                                name: 'kmenu:actionNotification',
+                                context: {
+                                    delegatedTo: 'builderweb'
+                                }
+                            }
+                        ]
+                    }                    
+                }]
+            },
+            {
+                label: {
+                    text: 'Acción con llamada larga duración'
+                },
+                events: [{
+                    type: 'click',                            
+                    method: 'log',
+                    targetBusId: BusId,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            {
+                                type: 'function',
+                                name: 'kmenu:longDurationCall',
+                                context: {
+                                    delegatedTo: 'builderweb'
+                                }
+                            },
+                            {
+                                type: 'function',
+                                name: 'kmenu:actionNotification',
+                                context: {
+                                    delegatedTo: 'builderweb'
+                                }
+                            }
+                        ]
+                    }                    
+                }]
+            }                       
+        ]
+    }.
+
+'staber_kmenu::tree_with_menu'(_, _Obj_in, _, Obj_out):-
+    newKw('kmenu__result_channel_', ChannelResult),
+    newKw('kmenu__result_busId_', BusIdResult),
+    newKw('kmenu__menu_channel_', ChannelMenu),
+    newKw('kmenu__menu_busId_', BusIdMenu),
+    HasMenu = {
+        type: kmenu,
+        busId: BusIdMenu,
+        hasChannel:ChannelMenu,
+        in: {      
+            state: {
+                visible: false
+            },
+            parentBusId: '$.busId',
+            parentchannel: '$.hasChannel'
+        },
+        overrides: [
+            {
+                type: 'getUIControls',            
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        { 
+                            type: 'function', 
+                            name: 'staber_kmenu::tree_menu::rc_gui_out', 
+                            context: { delegatedTo: 'builderweb' } 
+                        }
+                    ]
+                }
+            }
+        ],
+        evtSubscribe: [{ topic: 'setPayload', channel: ChannelResult}]
+    },
+    Schema_nav =[
+        {
+            label: {
+                d: 'Calle'
+            },
+            arc: 'contactAddress:hasAddressLine',
+            enabled: false
+        },     
+        {
+            label: {
+                d: 'Ciudad'
+            },
+            arc: 'contactAddress:hasCity',
+            inputtype: 'integer',
+            enabled: false
+        }
+    ],
+    In_nav = {
+        hasDataset: 'Default',
+        hasMenu: HasMenu,
+        schema: Schema_nav,
+        searchType: 'rql',
+        predicate: 'testapp::contacts::get_elements',
+        expanded: false,
+        selectable: true,
+        singleselection: true,
+        multiselection: false,
+        persistence: local,
+        hasKw: 'testapp:hasAddress'
+    },
+    Nav = [{ hasProperty: 'contact:hasAddress', in: In_nav }],
+	In = {
+        hasAgent: 'builderweb',
+        hasDataset: 'Default',
+        hasKw: 'testapp:contact',
+        hasMenu: HasMenu,
+        schema: {
+            data: [
+                {
+                    label: {
+                        d: 'Nombre'
+                    },
+                    arc: 'contact:hasName',
+                    enabled: false
+                },     
+                {
+                    label: {
+                        d: 'Edad'
+                    },
+                    arc: 'contact:hasAge',
+                    inputtype: 'integer',
+                    enabled: false
+                }
+            ]
+        },
+        predicate: 'testapp::contacts::get_elements',
+        searchType: 'rql',
+        persistence: 'local',
+        selectable: true,
+        limit: 10,
+        multiselection: false,
+        singleselection: true,
+        pagination: true,
+        schemaHeader: true,
+        nav: Nav
+    },
+	Obj_class = {  
+        type : 'kresult',
+        busId: BusIdResult,
+        in : In,
+        hasChannel: ChannelResult,
+        hasKw: rproc__kresult_tree_with_kmenu,
+        hasDsca: [('es', 'Árbol de usuarios con menú')],
+        hasIcon: 'clase',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,Obj_out).
+
+'staber_kmenu::tree_menu::rc_gui_out'(_, Obj_in, _, Obj_out):-
+    obj_get(in:data, Obj_in, Data),
+    obj_get(in:parentBusId, Obj_in, BusId),
+    obj_get('contact:hasName', Data, User, 'nouser'),
+    (User == 'nouser' ->
+        Action = {
+            label: {
+                text: 'Acción de Dirección'
+            },
+            events: [{
+                type: 'click',                            
+                method: 'log',
+                targetBusId: BusId,
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        {
+                            type: 'function',
+                            in: {
+                                data: Data,
+                                prop: 'contactAddress:hasAddressLine',
+                                txt: 'Se ha ejecutado la acción para la dirección <b>?a{1}</b>'
+                            },
+                            name: 'kmenu:actionNotification',
+                            context: {
+                                delegatedTo: 'builderweb'
+                            }
+                        }
+                    ]
+                }                    
+            }]
+        }
+    ;    Action = {
+            label: {
+                text: 'Acción de Usuario'
+            },
+            events: [{
+                type: 'click',                            
+                method: 'log',
+                targetBusId: BusId,
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        {
+                            type: 'function',
+                            in: {
+                                data: Data,
+                                prop: 'contact:hasName',
+                                txt: 'Se ha ejecutado la acción para el usuario <b>?a{1}</b>'
+                            },
+                            name: 'kmenu:actionNotification',
+                            context: {
+                                delegatedTo: 'builderweb'
+                            }
+                        }
+                    ]
+                }                    
+            }]
+        }
+    ),
+    Obj_out = {
+        type: 'menunav',
+        state: '$.in.state',
+        floating: true,
+        menuBtn: {},
+        children: [Action]
+}.
+
+'kmenu:actionNotification'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_get(txt, Obj_in, Txt, 'Se ha ejecutado la acción para el usuario <b>?a{1}</b>'),
+    wAddInfoMsgML('Aviso', Txt,{showTime:3}),
+    Obj_out = Obj_in.
+
+'kmenu:longDurationCall'(Ctx, Obj_in, Ctx, Obj_out):-
+    sleep_ms(40000),
+    Obj_out = Obj_in.
+
+'staber_kmenu::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kmenu,
+        hasDsca: 'kmenu (Ejemplos)',
+        hasIcon: 'ellipsis',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+        hasERCPart:[
+            rproc__kmenu__001,
+            rproc__kmenu_contact_table_with_menu,
+            rproc__kmenu_contact_table_with_menu_override,
+            rproc__kresult_tree_with_kmenu
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).
+

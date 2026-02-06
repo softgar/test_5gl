@@ -1,0 +1,83 @@
+{
+    "data": [{
+            "id": 2,
+            "title": "BeDigital 2022",
+            "start": 1646902800000,
+            "end": 1646906400000,
+            "isAllDay": true,
+            "event": "event__0",
+            "member": "member__0"
+        },
+        {
+            "id": 3,
+            "title": "Webinar Tecnológico",
+            "start": 1647298800000,
+            "end": 1647298800000,
+            "event": "event__1",
+            "member": "member__1"
+        },
+        {
+            "id": 4,
+            "title": "Ebook Tecnológico",
+            "start": 1647241200000,
+            "end": 1647259200000,
+            "event": "event__1",
+            "member": "member__2"
+        },
+        {
+            "id": 5,
+            "title": "Planificacíon Mensual",
+            "start": 1646211600000,
+            "end": 1646218800000,
+            "event": "event__2",
+            "member": ["member__1", "member__2", "member__3"]
+        }
+    ],
+    "resources": [{
+            "field": "event",
+            "title": "Tipos de eventos",
+            "dataSource": [{
+                    "text": "Convenciones",
+                    "value": "event__0",
+                    "color": "#FFA726"
+                },
+                {
+                    "text": "Ponencias",
+                    "value": "event__1",
+                    "color": "#EF5350"
+                },
+                {
+                    "text": "Reuniones",
+                    "value": "event__2",
+                    "color": "#42A5F5"
+                }
+            ]
+        },
+        {
+            "field": "member",
+            "multiple": true,
+            "title": "Responsables",
+            "dataSource": [{
+                    "text": "Ana García",
+                    "value": "member__0",
+                    "color": "#FFA726"
+                },
+                {
+                    "text": "Carlos López",
+                    "value": "member__1",
+                    "color": "#EF5350"
+                },
+                {
+                    "text": "Marta Sánchez",
+                    "value": "member__2",
+                    "color": "#7E57C2"
+                },
+                {
+                    "text": "Unai Simón",
+                    "value": "member__3",
+                    "color": "#009688"
+                }
+            ]
+        }
+    ]
+}

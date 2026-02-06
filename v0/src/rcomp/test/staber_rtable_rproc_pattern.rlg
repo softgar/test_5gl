@@ -1,0 +1,215 @@
+﻿/**
+@descr	staber_rtable_rproc_pattern <br>
+		staber_rtable_rproc_pattern
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_rtable_rproc_pattern') :-
+
+	class +$ 'staber_rtable_rproc_pattern' d ( es,'Ejemplos rtable') sc function,
+    'staber_rtable_rproc_pattern::exampleOdataSource'(_, _, _, _),
+    'staber_rtable_rproc_pattern::exampleLocalSource'(_, _, _, _),
+    'staber_rtable_rproc_pattern::exampleStaberSource'(_, _, _, _),
+    'staber_rtable_rproc_pattern::folders'(_, _, _, _).
+
+'staber_rtable_rproc_pattern::exampleOdataSource'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('rtable_examble',BUSID),
+	GUIOUT = {
+        type: 'rtable',
+        busId: BUSID,
+        hasCKDIStatus: 'ckdiStatusKD',
+        class:'page-bottom-grid',
+        hasTag:'instance',
+        scope: { origin: 'odata' },
+        context:{
+            dataset: 'dataset__test_5gl_server',
+            root:'testapp:contact'
+        },
+        rows: 20,
+        schema:[
+            {
+                label: {
+                    d: 'Contacto'
+                },
+                id: 'contact:hasName',
+                filter: true,
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Foto Carnet'
+                },
+                id: 'contact:hasIdPhoto',
+                filter: true,
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Tiene edad'
+                },
+                id: 'contact:hasAge',
+                filter: true,
+                sorted: true
+            }
+        ]
+    },
+    Obj ={
+        type: 'rprocess',
+        hasKw: example_rtable_odata,
+        hasIcon: 'grid',
+        hasDsca: 'Ejemplo origen odata',
+        gui_out: GUIOUT,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_, Obj, _, OBJ_out).
+
+'staber_rtable_rproc_pattern::exampleLocalSource'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('rtable_examble',BUSID),
+	GUIOUT = {
+        type: 'rtable',
+        busId: BUSID,
+        hasCKDIStatus: 'ckdiStatusKD',
+        class:'page-bottom-grid',
+        hasTag:'instance',
+        scope: { origin: 'dst' },
+        context:{
+            dataset: 'dataset__test_5gl_server',
+            root:'testapp:contact'
+        },
+        rows: 20,
+        schema:[
+            {
+                label: {
+                    d: 'Contacto'
+                },
+                id: 'tieneNombre',
+                filter: true,
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Foto Carnet'
+                },
+                id: 'tieneFotoCarnet',
+                filter: true,
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Tiene edad'
+                },
+                id: 'tieneEdad',
+                filter: true,
+                sorted: true
+            }
+        ],
+        data:[
+            {
+            'type': 'testapp:contact',
+            'hasKw': 'testapp_contacto_001',
+            'hasDsca': 'Contacto 001',
+            'tieneNombre': 'Contacto 001, nombre largon no editable para probar el tip',
+            'tieneFotoCarnet': 'mmResource__testapp_contacto_001',
+            'tieneEdad': 19
+            }
+        ]
+    },
+    Obj ={
+        type: 'rprocess',
+        hasKw: example_rtable_local,
+        hasIcon: 'grid',
+        hasDsca: 'Ejemplo origen Local',
+        gui_out: GUIOUT,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_, Obj, _, OBJ_out).
+
+'staber_rtable_rproc_pattern::exampleStaberSource'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('rtable_examble',BUSID),
+	GUIOUT = {
+        type: 'rtable',
+        busId: BUSID,
+        hasCKDIStatus: 'ckdiStatusKD',
+        class:'page-bottom-grid',
+        hasTag:'instance',
+        includedProperties: ['hasKw','hasDsca', 'contact:hasName', 'contact:hasIdPhoto', 'contact:hasAge'],
+        scope: {
+            origin: 'staber',
+            query:
+                {
+                context:{
+                    delegatedTo:{
+                        implementedBy:'C',
+                        module:'repconPAPI'
+                    }
+                },
+                type: 'function',
+                name:'remQuery',
+                in:{
+                    inlineCount: true,
+                    dataset:'dataset__test_5gl_server',
+                    query:'stmt(type, KwInst, \'testapp:contact\')'
+                }
+            }
+        },
+        context:{
+            dataset: 'dataset__test_5gl_server',
+            root:'testapp:contact'
+        },
+        rows: 20,
+        schema:[
+            {
+                label: {
+                    d: 'Contacto'
+                },
+                id: 'contact:hasName',
+                filter: true,
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Foto Carnet'
+                },
+                id: 'contact:hasIdPhoto',
+                filter: true,
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Tiene edad'
+                },
+                id: 'contact:hasAge',
+                filter: true,
+                sorted: true
+            }
+        ]
+    },
+    Obj ={
+        type: 'rprocess',
+        hasKw: example_rtable_staber,
+        hasIcon: 'grid',
+        hasDsca: 'Ejemplo origen Staber *En Desarrollo',
+        gui_out: GUIOUT,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_, Obj, _, OBJ_out).
+
+'staber_rtable_rproc_pattern::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_rtable,
+        hasDsca: 'Tests rtable *En Desarrollo',
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            example_rtable_odata,
+            example_rtable_staber,
+            example_rtable_local
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

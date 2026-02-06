@@ -1,0 +1,267 @@
+
+{
+    "data": {
+        "type": "assembly",
+        "children": [{
+                "type": "assembly",
+                "width": 50,
+                "label": {
+                    "d": "1. Dialogos de respuesta (apperror)"
+                },
+                "children": [{
+                        "type": "label",
+                        "d": "1.1. Mensaje de error",
+                        "size": "h3"
+                    },
+                    {
+                        "type": "button",
+                        "label": {
+                            "d": "Ejemplo"
+                        },
+                        "events": [{
+                            "type": "click",
+                            "targetBusId": "bus__app",
+                            "method": "log",
+                            "p_exec": {
+                                "type": "sequence",
+                                "hasProcess": [{
+                                    "type": "function",
+                                    "name": "tdsapp::forced_failure",
+                                    "context": {
+                                        "delegatedTo": "builderweb"
+                                    }
+                                }]
+                            }
+                        }]
+                    },
+                    {
+                        "type": "textarea",
+                        "enabled": false,
+                        "lines": 7,
+                        "value": "{\napperror:{\ncode: 23212,\ntype: 'errorMsg',\ntxt: 'Mensaje por defecto'\n}\n}"
+                    },
+                    {
+                        "type": "label",
+                        "d": "1.2. Mensaje de Información",
+                        "size": "h3"
+                    },
+                    {
+                        "type": "button",
+                        "label": {
+                            "d": "Ejemplo"
+                        },
+                        "events": [{
+                            "type": "click",
+                            "targetBusId": "bus__app",
+                            "method": "log",
+                            "p_exec": {
+                                "type": "sequence",
+                                "hasProcess": [{
+                                    "type": "function",
+                                    "in": {
+                                        "type": "infoMsg"
+                                    },
+                                    "name": "tdsapp::forced_failure",
+                                    "context": {
+                                        "delegatedTo": "builderweb"
+                                    }
+                                }]
+                            }
+                        }]
+                    },
+                    {
+                        "type": "textarea",
+                        "enabled": false,
+                        "lines": 7,
+                        "value": "{\napperror:{\ncode: 23212,\ntype: 'infoMsg',\ntxt: 'Mensaje por defecto'\n}\n}"
+                    },
+                    {
+                        "type": "label",
+                        "d": "1.3. Mensaje de error con Icono personalizado",
+                        "size": "h3"
+                    },
+                    {
+                        "type": "button",
+                        "label": {
+                            "d": "Ejemplo"
+                        },
+                        "events": [{
+                            "type": "click",
+                            "targetBusId": "bus__app",
+                            "method": "log",
+                            "p_exec": {
+                                "type": "sequence",
+                                "hasProcess": [{
+                                    "type": "function",
+                                    "in": {
+                                        "label": {
+                                            "icon": "incidences"
+                                        },
+                                        "message": "Hemos cambiado el icono"
+                                    },
+                                    "name": "tdsapp::forced_failure",
+                                    "context": {
+                                        "delegatedTo": "builderweb"
+                                    }
+                                }]
+                            }
+                        }]
+                    },
+                    {
+                        "type": "textarea",
+                        "enabled": false,
+                        "lines": 10,
+                        "value": "{\napperror:{\ncode: 3212,\nlabel:{\nicon: incidences\n},\ntxt: 'Hemos cambiado el icono',\ntype: 'errorMsg'\n}\n}"
+                    },
+                    {
+                        "type": "label",
+                        "d": "1.4. Mensaje de Información asíncrono",
+                        "size": "h3"
+                    },
+                    {
+                        "type": "button",
+                        "label": {
+                            "d": "Ejemplo"
+                        },
+                        "events": [{
+                            "type": "click",
+                            "targetBusId": "bus__app",
+                            "method": "log",
+                            "p_exec": {
+                                "type": "sequence",
+                                "hasProcess": [{
+                                    "type": "function",
+                                    "in": {
+                                        "type": "infoMsg",
+                                        "async": true,
+                                        "message": "Este mensaje es asincrono"
+                                    },
+                                    "name": "tdsapp::forced_failure",
+                                    "context": {
+                                        "delegatedTo": "builderweb"
+                                    }
+                                }]
+                            }
+                        }]
+                    },
+                    {
+                        "type": "textarea",
+                        "enabled": false,
+                        "lines": 8,
+                        "value": "{\napperror:{\nasync: true,\ncode: 23212,\ntxt: 'Este mensaje es asincrono',\ntype: 'infoMsg'\n}\n}"
+                    }
+                ]
+            },
+            {
+                "type": "assembly",
+                "width": 50,
+                "label": {
+                    "d": "2. Dialogos generados en Js"
+                },
+                "children": [{
+                        "type": "label",
+                        "d": "2.1. Mensaje de error",
+                        "size": "h3"
+                    },
+                    {
+                        "type": "button",
+                        "label": {
+                            "d": "Ejemplo"
+                        },
+                        "events": [{
+                            "type": "click",
+                            "targetBusId": "testmsgdialog_busId",
+                            "method": "msg_dialog"
+                        }]
+                    },
+                    {
+                        "type": "textarea",
+                        "enabled": false,
+                        "lines": 5,
+                        "value": "{\n\"type\": \"errorMsg\",\n\"message\": \"Mensaje por defecto\",\n\"code\": \"internal\"\n}"
+                    },
+                    {
+                        "type": "label",
+                        "d": "2.2. Mensaje de información",
+                        "size": "h3"
+                    },
+                    {
+                        "type": "button",
+                        "label": {
+                            "d": "Ejemplo"
+                        },
+                        "events": [{
+                            "type": "click",
+                            "targetBusId": "testmsgdialog_busId",
+                            "method": "msg_dialog",
+                            "payload": {
+                                "type": "infoMsg"
+                            }
+                        }]
+                    },
+                    {
+                        "type": "textarea",
+                        "enabled": false,
+                        "lines": 4,
+                        "value": "{\n\"type\": \"infoMsg\",\n\"message\": \"Mensaje por defecto\"\n}"
+                    },
+                    {
+                        "type": "label",
+                        "d": "2.3. Mensaje de error con icono personalizado",
+                        "size": "h3"
+                    },
+                    {
+                        "type": "button",
+                        "label": {
+                            "d": "Ejemplo"
+                        },
+                        "events": [{
+                            "type": "click",
+                            "targetBusId": "testmsgdialog_busId",
+                            "method": "msg_dialog",
+                            "payload": {
+                                "label": {
+                                    "icon": "incidences"
+                                },
+                                "message": "Hemos cambiado el icono"
+                            }
+                        }]
+                    },
+                    {
+                        "type": "textarea",
+                        "enabled": false,
+                        "lines": 8,
+                        "value": "{\n\"type\": \"errorMsg\",\n\"message\": \"Hemos cambiado el icono\",\n\"code\": \"internal\",\n\"label\":{\n\"icon\": \"incidences\"\n}\n}"
+                    },
+                    {
+                        "type": "label",
+                        "d": "2.4. Mensaje de información bloqueante (asíncrono)",
+                        "size": "h3"
+                    },
+                    {
+                        "type": "button",
+                        "label": {
+                            "d": "Ejemplo"
+                        },
+                        "events": [{
+                            "type": "click",
+                            "targetBusId": "testmsgdialog_busId",
+                            "method": "msg_dialog",
+                            "payload": {
+                                "type": "infoMsg",
+                                "async": false,
+                                "message": "Este mensaje NO es asincrono"
+                            }
+                        }]
+                    },
+                    {
+                        "type": "textarea",
+                        "enabled": false,
+                        "lines": 5,
+                        "value": "{\n\"type\": \"infoMsg\",\n\"message\": \"Este mensaje NO es asincrono\",\n\"async\": false\n}"
+                    }
+                ]
+            }
+        ]
+    }
+}

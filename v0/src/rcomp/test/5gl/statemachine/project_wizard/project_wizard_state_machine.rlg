@@ -1,0 +1,31 @@
+
+'project_wizard_state_machine'(O_sm):-
+    'project_wizard_state::state_init'(State_init),
+    'project_wizard_state::state_step1'(State_step1),
+    'project_wizard_state::state_step2'(State_step2),
+    'project_wizard_state::state_finish'(State_finish),
+
+    'project_wizard_transition::transition_init'(Transition_init),
+    'project_wizard_transition::transition_start'(Transition_start),
+    'project_wizard_transition::transition_step1'(Transition_step1),
+    'project_wizard_transition::transition_step2'(Transition_step2),
+    'project_wizard_transition::transition_finish'(Transition_finish),
+
+
+    O_sm = {
+        type: 'stateMachine',
+        hasInitState: 'state_init',
+        hasState:[
+            { state_init: State_init },
+            { state_step1: State_step1 },
+            { state_step2: State_step2 },
+            { state_finish: State_finish }
+        ],
+        hasTransition: [
+            { e_init: Transition_init },
+            { e_start: Transition_start },
+            { e_step1: Transition_step1},            
+            { e_step2: Transition_step2},
+             { e_finish: Transition_finish}
+        ]
+   }.

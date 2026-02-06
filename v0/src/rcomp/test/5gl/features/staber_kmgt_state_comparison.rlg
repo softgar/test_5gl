@@ -1,0 +1,124 @@
+﻿/**
+@descr	staber_kmgt_state_comparison <br>
+		staber_kmgt_state_comparison
+@author ccp
+@date	2023_10_27
+**/
+rc_class('staber_kmgt_state_comparison') :-
+	class +$ 'staber_kmgt_state_comparison' d ( es,'Comportamientos máquina de estados según configuración') sc function,
+    %% hasDataset Default
+    'staber_kmgt_state_comparison::usecase_001'(_, _, _, _),
+    %% hasDataset dataset__test_5gl_server
+    'staber_kmgt_state_comparison::usecase_002'(_, _, _, _),
+    %% hasconfiguration
+    % 'staber_kmgt_state_comparison::usecase_003'(_, _, _, _),
+    'staber_kmgt_state_comparison::folders'(_, _, _, _).
+
+'staber_kmgt_state_comparison::usecase_001'(_, _ObjIn, _, ObjOut):-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('bus__kmgt__', BUSID_Kmgt),
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',
+        navigationFilter: all,
+        selectable: true
+    },
+    Obj_kmgt = {
+        type: 'kmgt',
+        busId: BUSID_Kmgt,
+        in: IN
+    },
+    Title =  'Comportamiento hasDataset: Default',
+    OBJ = {
+        type: 'rprocess',
+        hasKw: kmgt_SM_001,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_kmgt
+    },
+    create_rprocess(_,OBJ,_,ObjOut).
+
+'staber_kmgt_state_comparison::usecase_002'(_, _ObjIn, _, ObjOut):-
+
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+    newKw('bus__kmgt__', BUSID_Kmgt),
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',
+        navigationFilter: all,
+        selectable: true
+    },
+    Obj_kmgt = {
+        type: 'kmgt',
+        busId: BUSID_Kmgt,
+        in: IN
+    },
+    Title =  'Comportamiento hasDataset: dataset__test_5gl_server',
+    OBJ = {
+        type: 'rprocess',
+        hasKw: kmgt_SM_002,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_kmgt
+    },
+    create_rprocess(_,OBJ,_,ObjOut).
+
+'staber_kmgt_state_comparison::usecase_003'(_, _ObjIn, _, ObjOut):-
+
+    I_config = 'configuration__staber_testapp_server',
+    I_agent = 'builderweb',
+    newKw('bus__kmgt__', BUSID_kmgt),
+	IN = {
+        hasAgent: I_agent,
+        hasConfiguration: I_config,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',
+        navigationFilter: all,
+        selectable: true
+    },
+    Obj_kmgt = {
+        type: 'kmgt',
+        busId: BUSID_kmgt,
+        in: IN
+    },
+    Title =  'Comportamiento hasConfiguration',
+    OBJ = {
+        type: 'rprocess',
+        hasKw: kmgt_SM_003,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_kmgt
+    },
+    create_rprocess(_,OBJ,_,ObjOut).
+
+'staber_kmgt_state_comparison::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kmgt_SM,
+        isRoot: false,
+        hasIcon: 'folder-line',
+        hasDsca: 'kmgt: Comportamientos SM según configuración',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[          
+            kmgt_SM_001,
+            kmgt_SM_002
+            % kmgt_SM_003
+        ]
+	},	
+	create_rprocess(_, Conf_folder, _, _).

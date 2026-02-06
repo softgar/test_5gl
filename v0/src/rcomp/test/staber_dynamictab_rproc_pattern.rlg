@@ -1,0 +1,96 @@
+﻿/**
+@descr	staber_dynamictab_rproc_pattern <br>
+		staber_dynamictab_rproc_pattern
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_dynamictab_rproc_pattern') :-
+
+	class +$ 'staber_dynamictab_rproc_pattern' d ( es,'Ejemplos dynamictab') sc function,
+    'staber_dynamictab_rproc_pattern::usecase_001'(_, _, _, _),
+    'staber_dynamictab_rproc_pattern::folders'(_, _, _, _).
+
+'staber_dynamictab_rproc_pattern::usecase_001'(_, _OBJ_in, _, OBJ_out) :-
+	OBJ_form = {
+        type: 'assembly',
+        children: [
+            {
+                type: dynamictab,
+                elements: [
+                    {
+                        label: {
+                            d: 'Pestaña 1'
+                        },
+                        actions: [
+                            {
+                                label: {
+                                    icon: 'cancel'
+                                },
+                                collapse: false
+                            },
+                            {
+                                label: {
+                                    d: 'Acción 1'
+                                },
+                                collapse: true,
+                                onclick: 'alert( \"Acción 1 pulsada\")'
+                            }
+                        ]
+                    },
+                    {
+                        label: {
+                            d: 'Pestaña 2'
+                        },
+                        actions: [
+                            {
+                                label: {
+                                    icon: cancel
+                                },
+                                collapse: false
+                            }
+                        ]
+                    },
+                    {
+                        label: {
+                            d: 'Pestaña 3'
+                        },
+                        actions: [
+                            {
+                                label: {
+                                    icon: cancel
+                                },
+                                collapse: false
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+	},
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ_form,
+        hasKw: rproc__4gl_dynamictab__001,
+        hasDsca: [(es, 'Test_001 dynamictab')],
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_dynamictab_rproc_pattern::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_dynamictab,
+        hasDsca: 'Tests dynamictab',
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__4gl_dynamictab__001
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

@@ -1,0 +1,229 @@
+﻿/**
+@descr	staber_testapp_kresult <br>
+		staber_testapp_kresult
+@author ccp
+@date	2024/02/27
+**/
+rc_class('staber_testapp_kmerge') :-
+	class +$ 'staber_testapp_kmerge' d ( es,'Patrón rproc para kmgt Class') sc function,
+    'staber_testapp_kmerge::mergeControl_test'(_, _, _, _),
+    'staber_testapp_kmerge::folders'(_, _, _, _).
+
+'staber_testapp_kmerge::mergeControl_test'(_, _OBJ_in, _, OBJ_out) :-
+    generate_b50_mergeFlag_model,
+    I_agent = 'builderweb',
+    Dataset = 'Default',
+    KwC = 'b50_mergeFlag_test',
+    'staber_testapp_pivotgrid::resultmerge::schema'(OBJ_schema),
+
+    IN = {
+        hasTitle: 'resultMerge',
+        hasAgent: I_agent,
+        hasDataset: Dataset,
+        hasKw: KwC,
+        mapFunction: 'map_rson_complete_mergeFlags_test_info',
+        schema : OBJ_schema, 
+        searchType: 'rem',
+        persistence: 'local'
+    },
+    Title = 'Test de control MERGE en un kresult para mergeFlags',
+	OBJ_out = {
+            type: 'kresult',            
+            in: IN,
+            isSession: true,
+            hasNavbar: false,
+            hasKw: testapp_kresult_mergeFlagMerge,            
+            hasDsca: Title,            
+            hasIcon: 'project',
+            isRoot: false, 
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+
+'staber_testapp_pivotgrid::resultmerge::schema'(OBJ_out_schema):-
+
+    Schema = [
+            {
+                label: { d: 'Propiedad' },
+                arc: 'b50_mergeFlag:propiedad',
+                enabled: false,
+                sorted: false,
+                filter: false
+            },
+            {
+                label: { d: 'Info' },
+                arc: 'b50_mergeFlag:info',
+                enabled: false,                    
+                sorted: false,
+                filter: false
+            },
+            {
+                label: { d: 'Merge Control' },
+                arc: 'hasMergeControl',
+                control:{
+                    type: 'merge',
+                    leftContent: '_.hasMergeControl.leftContent',
+                    rightContent: '_.hasMergeControl.rightContent',
+                    delColor: 'red',
+                    addColor: 'orange'
+                },
+                enabled: false,
+                sorted: false,
+                filter: false
+            }
+    ],
+    OBJ_out_schema = {data: Schema }.
+
+'staber_testapp_kmerge::folders'(_, _, _, _):-    
+    Title =  'Escenarios KMERGE',              
+    create_rprocess(_, 
+        {
+        type: 'krp:folder',
+        hasKw: folder__testapp_merge,            
+        hasDsca: Title,            
+        hasIcon: 'app',
+        isRoot: false,            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            testapp_kresult_mergeFlagMerge
+        ]
+    },_,_).
+
+
+generate_b50_mergeFlag_model:-
+    ( dicc( _, b50_mergeFlag_test) -> 
+        true
+    ;   generate_mergeFlag_model,
+        generate_mergeFlag_instance
+    ).
+
+
+generate_mergeFlag_model:-
+
+    class +$ b50_mergeFlag_test sc resourceRepcon,
+
+    property +$ 'b50_mergeFlag:propiedad'
+        d [ (es, 'Elemento'),(en, 'Item')]
+        p [
+            domain ¬> b50_mergeFlag_test,
+            range ¬> string
+        ],
+
+    property +$ 'b50_mergeFlag:info'
+        d [ (es, 'Info'),(en, 'Info')]
+        p [
+            domain ¬> b50_mergeFlag_test,
+            range ¬> string
+        ],
+
+    property +$ 'b50_mergeFlag:valor1'
+        d [ (es, 'Valor1'),(en, 'Value1')]
+        p [
+            domain ¬> b50_mergeFlag_test,
+            range ¬> string
+        ],
+    
+    property +$ 'b50_mergeFlag:valor2'
+        d [ (es, 'Valor2'),(en, 'Value2')]
+        p [
+            domain ¬> b50_mergeFlag_test,
+            range ¬> string
+        ].
+
+
+generate_mergeFlag_instance:-
+
+    % b50_mergeFlag_test +$ _Test_inst1
+    % p[
+    %     'b50_mergeFlag:propiedad' ¬> string $ 'prop1',
+    %     'b50_mergeFlag:info' ¬> string $ ' ',
+    %     'b50_mergeFlag:valor1' ¬> string $ 'Valor test1',
+    %     'b50_mergeFlag:valor2' ¬> string $ 'Valor modificado1'
+    % ],
+
+    b50_mergeFlag_test +$ _Test_inst2
+    p[
+        'b50_mergeFlag:propiedad' ¬> string $ 'domain',
+        'b50_mergeFlag:info' ¬> string $ 'es',
+        'b50_mergeFlag:valor1' ¬> string $ ' ',
+        'b50_mergeFlag:valor2' ¬> string $ 'cibor'
+    ],
+    VALOR_1 = 'data:;base64,eyJydWxlQ29kZSI6IHsidG8iOiAiZGF0YTo7YmFzZTY0LFpHWW9JRzF2WkhWc1lYSkRkV0pwWTJ4bFFVMURJQ1FnUTBWTVJFRWd3cXdnZEdsbGJtVk5iMlJsYkc5ZlkybGliM0lnT2owZ2JXOWtNalV3TUVFeU1UQnRiU2tnYVdZSklBb2dJQ0FnSUVORlRFUkJJTUtzd3F3Z2RHbGxibVZFYVhOMFVHOXNiM05mWTJsaWIzSWd3cXcrSUNCa2FYTjBVRzlzYjNNeU1UQWdZVzVrQ2lBZ0lDQWdRMFZNUkVFZ3dxekNyQ0FnZEdsbGJtVkpiblJsYzJsa1lXUk9iMjFwYm1Gc1gyTnBZbTl5SU1Lc1BpQnBiblJsYm5OcFpHRmtUbTl0YVc1aGJFTnBZbTl5TWpVd01DND0ifX0=',
+    parse_base64_to_json(VALOR_1, Json1),
+    obj_fetch( ruleCode:to, Json1, CodeB64_1),
+    parse_base64_to_text_codes(CodeB64_1, Text_codes1),
+    atom_codes( RuleText1, Text_codes1 ),
+    VALOR_2 = 'data:;base64,eyJydWxlQ29kZSI6IHsidG8iOiAiZGF0YTo7YmFzZTY0LFpHWW9JRzF2WkhWc1lYSkRkV0pwWTJ4bFFVMURJQ1FnUTBWTVJFRWd3cXdnZEdsbGJtVk5iMlJsYkc5ZlkybGliM0lnT2owZ2JXOWtNalV3TUVFeU1UQnRiU2tnYVdZSklBb2dJQ0FnSUVORlRFUkJJTUtzd3F3Z2RHbGxibVZFYVhOMFVHOXNiM05mWTJsaWIzSWd3cXcrSUNCa2FYTjBVRzlzYjNNeU1UQWdZVzVrQ2lBZ0lDQWdRMFZNUkVFZ3dxekNyQ0IwYVdWdVpVUnBjM1JRYjJ4dmMxOWphV0p2Y2lEQ3JENGdJR1JwYzNSUWIyeHZjelF5TUNCaGJtUUtJQ0FnSUNCRFJVeEVRU0RDck1Lc0lDQjBhV1Z1WlVsdWRHVnphV1JoWkU1dmJXbHVZV3hmWTJsaWIzSWd3cXcrSUdsdWRHVnVjMmxrWVdST2IyMXBibUZzUTJsaWIzSXlOVEF3TGc9PSJ9fQ==',
+    parse_base64_to_json(VALOR_2, Json2),
+    obj_fetch( ruleCode:to, Json2, CodeB64_2),
+    parse_base64_to_text_codes(CodeB64_2, Text_codes2),
+    atom_codes( RuleText2, Text_codes2 ),
+    
+    b50_mergeFlag_test +$ _Test_inst3
+    p[
+        'b50_mergeFlag:propiedad' ¬> string $ 'ruleCode',
+        'b50_mergeFlag:info' ¬> string $ '1',
+        'b50_mergeFlag:valor1' ¬> string $ RuleText1,
+        'b50_mergeFlag:valor2' ¬> string $ RuleText2
+    ].
+
+
+map_rson_complete_mergeFlags_test_info(Obj_ctx, Obj_in, Obj_ctx, Obj_out):-
+
+    ( obj_get('result',Obj_in,L_in) ;  obj_get('resultset',Obj_in,L_in) ),
+    !,
+    obj_get('count', Obj_in, Total),
+    obj_get('page', Obj_in, Page),
+    obj_get('limit', Obj_in, Limit),
+    % obj_get('format', Obj_in, Format, 'rson'),
+
+    % obtener root de todos
+    findall( X,
+        (   member(Result, L_in),
+            ( Result = [ X |_] ->
+                true
+            ; X = Result
+            )
+        ), LstMergeFlagsKw
+    ),
+    
+    ( LstMergeFlagsKw == [] ->
+        Obj_out = {
+            'count': Total,
+            'limit': Limit,
+            'page':Page,
+            'result': []
+        }
+    ;
+        findall(
+            Obj_data,
+            (
+                member(MergeFlagKw, LstMergeFlagsKw),
+                stmt( 'b50_mergeFlag:propiedad', MergeFlagKw, Prop),
+                stmt( 'b50_mergeFlag:info', MergeFlagKw, Info),
+                stmt( 'b50_mergeFlag:valor1', MergeFlagKw, Valor1),
+                stmt( 'b50_mergeFlag:valor2', MergeFlagKw, Valor2),
+                Obj_data = {
+                    format: 'rson',
+                    data: {
+                        MergeFlagKw: {
+                            'b50_mergeFlag:propiedad': { cto: 'string', to: Prop},
+                            'b50_mergeFlag:info': { cto: 'string', to: Info},
+                            'hasMergeControl': { leftContent: Valor1, rightContent: Valor2}
+                        }
+                    },
+                    hasRoot: MergeFlagKw
+                }
+            ),
+            L_Obj_data
+        )
+    ),
+
+    Obj_out = {
+        'count': Total,
+        'limit': Limit,
+        'page': Page,
+        'result': L_Obj_data
+    }.

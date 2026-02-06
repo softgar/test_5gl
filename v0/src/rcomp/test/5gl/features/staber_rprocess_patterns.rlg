@@ -1,0 +1,439 @@
+﻿/**
+@descr	staber_rprocess_patterns <br>
+		staber_rprocess_patterns
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_rprocess_patterns') :-    
+	class +$ 'staber_rprocess_patterns' d ( es,'Patrón rproc') sc function,
+
+    'staber_rprocess_patterns::example_refresh'(_, _, _, _),
+    'staber_rprocess_patterns::zoom_example'(_, _, _, _),
+    'staber_rprocess_patterns::unitary_refresh'(_, _, _, _),
+    'staber_rprocess_patterns::before_after_process'(_, _, _, _),
+    'staber_rprocess_patterns::navbar_example'(_, _, _, _),
+    'staber_rprocess_patterns::refresh_current_session'(_, _, _, _),
+    'staber_rprocess_patterns::rprocess_with_tablepagination'(_, _, _, _),
+
+    'staber_rprocess_patterns::folders'(_, _, _, _).
+    
+'staber_rprocess_patterns::example_refresh'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent   = 'builderweb',
+    I_dataset = 'Default',
+    KW = mrAgent,
+    IN = {                      
+        hasDataset: I_dataset,
+        hasAgent : I_agent,            
+        hasKw: KW            
+    },
+    OBJ_form =  {        
+        type: 'rprocexample1',          
+        in: IN,
+        busId : 'bus__example1',
+        % overrides: [
+        %     {
+        %         type: 'customFourierTransformation',
+        %         p_exec: {
+        %             type: 'sequence',
+        %             hasProcess: [
+        %                 { 
+        %                     type: 'function', 
+        %                     name: 'staber_rprocess_patterns::ANOTHER_FUNCTION', 
+        %                     context: { delegatedTo: 'builderweb' }
+        %                 }
+        %             ]
+        %         }
+        %     }
+        % ],
+        hasKw: rproc__4gl_rproc__example1,
+        hasDsca: [('es', 'Refresco en RProcess (cliente)')],
+        hasIcon: 'staber',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_rprocess_patterns::zoom_example'(_, _OBJ_in, _, OBJ_out) :-    
+    I_agent   = 'builderweb',
+    I_dataset = 'dataset_semantic',    
+    IN = {                      
+            hasDataset: I_dataset,
+            hasAgent : I_agent,            
+            hasChannel: 'channel_example_zoom'
+    },
+    OBJ_form =  {        
+        type: 'rprocexample2',
+        in: IN,
+        busId : 'bus__example2',
+        hasKw: rproc__4gl_rproc__example2,
+        hasDsca: [('es', 'Zoom en RProcess (cliente)')],
+        hasIcon: 'staber',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_rprocess_patterns::unitary_refresh'(_, _OBJ_in, _, OBJ_out) :-    
+    I_agent   = 'builderweb',
+    I_dataset = 'dataset_semantic',    
+    IN = {                      
+            hasDataset: I_dataset,
+            hasAgent : I_agent,            
+            hasChannel: 'channel_example_zoom'
+    },
+    OBJ_form =  {        
+        type: 'rprocrefresh',
+        in: IN,
+        busId : 'bus__example3',
+        hasKw: rproc__4gl_rproc__example3,
+        hasDsca: [('es', 'Refresco Unitario (cliente)')],
+        hasIcon: 'staber',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+
+
+'staber_rprocess_patterns::before_after_process'(_, _OBJ_in, _, OBJ_out) :- 
+    Obj_assembly = {
+        type:'assembly',
+        children:[
+            {
+                type: 'label',
+                d: 'En este ejemplo se esta probando las propiedades "before_proc" y "after_proc" cuyo objetivo es poder lanzar procesos previos y posterior a la ejecutción del proceso principal.'
+            }
+        ]
+    },
+    Before_proc = {
+        type: 'sequence',
+        hasProcess: [
+            { 
+                type: 'function', 
+                in : {
+                    title: 'Despues del proceso',
+                    msg: 'Se ha lanzado un proceso después de la ejecución'
+                },
+                name: 'staber_rprocess_patterns::doAction',
+                context: { delegatedTo: 'builderweb' }
+            }
+        ]        
+    },
+    After_proc = {
+        type: 'sequence',
+        hasProcess: [
+            { 
+                type: 'function', 
+                in : {
+                    title: 'Antes del proceso',
+                    msg: 'Se ha lanzado un proceso antes de la ejecución'
+                },
+                name: 'staber_rprocess_patterns::doAction',
+                context: { delegatedTo: 'builderweb' }
+            }
+        ]
+    },
+    IN = {
+
+    }, 
+    OBJ_form = {
+        type: 'rprocess',
+        busId: 'bus__example4',
+        hasKw: rproc__4gl_rproc__example4,
+        hasDsca: 'Gestión de procesos antes y después del PROC (server)',
+        hasIcon: 'staber',
+        in: IN,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        before_proc: Before_proc,
+        after_proc: After_proc,
+        gui_out: Obj_assembly
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+
+
+'staber_rprocess_patterns::navbar_example'(_, _OBJ_in, _, OBJ_out) :-    
+    IN = {},
+    newKw('bus__', BUS_EXAMPLE),
+   
+    OBJ_form =  {        
+        type: 'rprocess',
+        in: IN,
+        hasNavbar: true,
+        busId : BUS_EXAMPLE,
+        hasKw: rproc__4gl_rproc__example5,
+        hasDsca: [('es', 'Patrón rprocess con miga de pan (Simulación Wizard)')],
+        hasIcon: 'staber',
+        gui_out: {
+            type: 'function',
+            name: 'staber_rprocess_patterns:get_gui_out',
+            context: { delegatedTo: 'builderweb' }
+        },
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_rprocess_patterns:get_gui_out'(Ctx_in, Obj_in, Ctx_in, Obj_out):-    
+    Obj_out = {
+        type: 'assembly',
+        classList: [
+            'toolButtonBar'
+        ],
+        id: 'buttons_assembly',
+        children: [                   
+            {
+                type: 'button',
+                label: {
+                    d: 'Resta'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',                            
+                    targetBusId: BUS_EXAMPLE,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            {  type: 'function',
+                               name: 'staber_rprocess_patterns:resta',
+                               context: { delegatedTo: 'builderweb' }
+                            },
+                            { 
+                                type: 'method', 
+                                name: 'navigation', 
+                                busId: BUS_EXAMPLE
+                            }
+                        ]
+                    }
+                }]
+            },
+            {
+                type: 'button',
+                label: {
+                    d: 'Suma'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',                            
+                    targetBusId: BUS_EXAMPLE,
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            {  type: 'function',
+                               name: 'staber_rprocess_patterns:suma',
+                               context: { delegatedTo: 'builderweb' }
+                            },
+                            { 
+                                type: 'method', 
+                                name: 'navigation', 
+                                busId: BUS_EXAMPLE
+                            }
+                        ]
+                    }
+                }]
+            }
+        ]
+    },
+
+'staber_rprocess_patterns:resta'(Ctx_in, Obj_in, Ctx_in, Obj_in).
+'staber_rprocess_patterns:suma'(Ctx_in, Obj_in, Ctx_in, Obj_in).
+'staber_rprocess_patterns::refresh_current_session'(_, _Obj_in, _, Obj_out) :-
+    newKw('bus__', BUS_EXAMPLE),
+    newKw('channel__', CHANNEL_EXAMPLE),
+    newKw('bus__', BUS_RESULT),
+
+    IN = {},
+
+    Obj_proc = {
+        type: 'rprocess',
+        in: IN,
+        hasNavbar: true,
+        busId : BUS_EXAMPLE,
+        hasChannel: CHANNEL_EXAMPLE,
+        hasKw: rproc__4gl_rproc__example6,
+        hasDsca: [('es', 'Refresco de sesión actual')],
+        hasIcon: 'staber',
+        gui_out: {
+            type: 'assembly',
+            children: [
+                {
+                    type: 'button',
+                    label: { d: 'Refrescar sesión' },
+                    events: [
+                        {
+                            type: 'click',
+                            method: 'log',
+                            targetBusId: BUS_EXAMPLE,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    {
+                                        type: 'method',
+                                        name: 'publish',
+                                        module: 'PubSub',
+                                        in: {
+                                            publish: [{ topic: 'refreshSelected', channel: 'channel__broadcast' }]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'kresult',
+                    busId: BUS_RESULT,
+                    in: {
+                        hasAgent: 'builderweb',
+                        hasDataset: 'Default',
+                        hasKw: 'testapp:contact',
+                        includedProperties:['hasDsca'],
+                        hasLayout: 'result',
+                        searchType: 'rem',
+                        selectable: true
+                    }
+                }
+            ]
+        },
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        evtSubscribe: [{ topic: 'refreshNode', channel: CHANNEL_EXAMPLE }]
+    },
+
+    create_rprocess(_, Obj_proc, _, Obj_out).
+
+'staber_rprocess_patterns::rprocess_with_tablepagination'(_, _Obj_in, _, Obj_out) :-
+
+    newKw('bus__', BUS_RPROCESS_TABLEPAGINATION),
+    newKw('channel__', CHANNEL_RPROCESS_TABLEPAGINATION),
+
+    Before_proc = {
+        type: 'sequence',
+        hasProcess: [
+            { 
+                type: 'function', 
+                in : {
+                    title: 'Despues del proceso',
+                    msg: 'Se ha lanzado un proceso después de la ejecución'
+                },
+                name: 'staber_rprocess_patterns::doAction',
+                context: { delegatedTo: 'builderweb' }
+            },
+            { 
+                type: 'method', 
+                name: 'merge_in', 
+                busId: BUS_RPROCESS_TABLEPAGINATION 
+            }
+        ]        
+    },
+
+    % staber_test_fake_get_kresult(_,_,_, KRESULTFAKE),
+    Obj_proc = {
+        type: 'rprocess',
+        busId : BUS_RPROCESS_TABLEPAGINATION,
+        hasChannel: CHANNEL_RPROCESS_TABLEPAGINATION,
+        hasKw: rproc__4gl_rproc__example7,
+        hasDsca: [('es', 'Comportamiento en tablas con RPROCESS Y GUI_OUT')],
+        hasIcon: 'staber',
+        before_proc: Before_proc,
+        % gui_out: KRESULTFAKE,
+        gui_out: { 
+            type: 'function', 
+            name: 'staber_test_fake_get_kresult', 
+            context: { delegatedTo: 'builderweb' } 
+        },
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+
+    create_rprocess(_, Obj_proc, _, Obj_out).
+
+'staber_rprocess_patterns::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasDsca: 'Patrones rprocess',
+        hasKw: folder__repositorioTests_rproc_pattern,
+        hasIcon: 'award',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            rproc__4gl_rproc__example1,
+            rproc__4gl_rproc__example2,
+            rproc__4gl_rproc__example3,
+            rproc__4gl_rproc__example4,
+            rproc__4gl_rproc__example5,
+            rproc__4gl_rproc__example6,
+            rproc__4gl_rproc__example7
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).
+
+'staber_rprocess_patterns::doAction'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_get(title, Obj_in, Title),
+    obj_get(msg, Obj_in, Msg),
+    wAddInfoMsgML(Title, Msg, ['Msg1']),
+    Obj_out = Obj_in.
+
+staber_test_fake_call(Obj_ctx, Obj_in, Obj_ctx, Obj_out) :-
+    rpc_call_safe( staber_test_fake_call_safe, Obj_ctx, Obj_in, Obj_ctx, Obj_out).
+
+staber_test_fake_call_safe( Obj_ctx, Obj_in, Obj_ctx, Obj_out) :-
+    % builder40_check_input_params( Obj_in, [ hasKw ]),
+	staber_test_fake_call_proc( Obj_ctx, Obj_in, Obj_ctx, Obj_out).
+
+staber_test_fake_call_proc( Obj_ctx, Obj_in, Obj_ctx, Obj_out):-
+    obj_set( in:resultFunction, Obj_in, 'testapp_contacto_002', Obj_out).
+
+staber_test_fake_get_kresult(Obj_ctx, _Obj_in, Obj_ctx, Obj_out) :-
+    Obj_out = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'kresult',
+                 busId: 'BUS_RPROCESS_TABLEPAGINATION_kresult',
+                in: {
+                    hasAgent: 'builderweb',
+                    hasDataset: 'Default',
+                    hasKw: 'testapp:contact',
+                    pagination: true,
+                    limit: 3,
+                    schema: {
+                        data:  [                   
+                            {
+                                arc: 'contact:hasName',            
+                                label: {
+                                    d: 'Nombre'
+                                },
+                                enabled: false,
+                                filter: true
+                            },
+                            {
+                                arc: 'contact:hasEmail',
+                                label: {
+                                    d: 'Email'
+                                },
+                                enabled: false,
+                                filter: true  
+                            }
+                        ]
+                    }
+                }
+            }
+        ]
+    }.
+       
+staber_test_filterquery_call(Obj_ctx, Obj_in, Obj_ctx, Obj_out) :-
+    rpc_call_safe( staber_test_filterquery_call_safe, Obj_ctx, Obj_in, Obj_ctx, Obj_out).
+
+staber_test_filterquery_call_safe( Obj_ctx, Obj_in, Obj_ctx, Obj_out) :-
+    % builder40_check_input_params( Obj_in, [ hasKw ]),
+	staber_test_filterquery_call_proc( Obj_ctx, Obj_in, Obj_ctx, Obj_out).
+
+staber_test_filterquery_call_proc( Obj_ctx, Obj_in, Obj_ctx, Obj_out):-
+    Obj_Query = {
+        queryFilter: 'stmt( type, HASKW, Class), member( Class,[\'testapp:contact\']), like_ci(\'*_001*\', HASKW)'
+    },
+    obj_merge(Obj_Query, Obj_in, Obj_out),
+    obj_ppd( Obj_out).

@@ -1,0 +1,280 @@
+'project_wizard_state_toolbar::state_init'(State):-
+    State = {
+        type: "assembly",
+        children: [
+            {
+                type: "button",
+                label: {
+                     d: "Comenzar",
+                     icon: "ray-line"
+                },
+                enabled: true,
+                appearance: line,
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.busId",
+                    payload: { hasEvent: 'e_start' }
+                }]
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Anterior",
+                     icon: "arrow-left"
+                },
+                enabled: false,
+                appearance: line
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Siguiente",
+                     icon: "arrow-right"
+                },
+                enabled: false,
+                appearance: line
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Guardar",
+                     icon: "ok"
+                },
+                enabled: false,
+                appearance: line
+            },
+             {
+                type: "button",
+                label: {
+                     d: "Forzar refresco",
+                     icon: "arrow-ccw"
+                },
+                enabled: false,
+                appearance: line
+            }
+        ]
+    }.
+'project_wizard_state_toolbar::state_step1'(State):-
+    State = {
+        type: "assembly",
+        children: [
+            {
+                type: "button",
+                label: {
+                     d: "Reiniciar",
+                     icon: "ray-line"
+                },
+                enabled: true,
+                appearance: line,
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.busId",
+                    payload: { hasEvent: 'e_init' }
+                }]
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Anterior",
+                     icon: "arrow-left"
+                },
+                enabled: true,
+                appearance: line,
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.busId",
+                    payload: { hasEvent: 'e_init' }
+                }]
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Siguiente",
+                     icon: "arrow-right"
+                },
+                enabled: true,
+                appearance: line,
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.busId",
+                    payload: { hasEvent: 'e_step2' }
+                }]
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Guardar",
+                     icon: "ok"
+                },
+                enabled: false,
+                appearance: line
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Forzar refresco",
+                     icon: "arrow-ccw"
+                },
+                enabled: true,
+                appearance: line,
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.busId",
+                    payload: { hasEvent: 'e_step1' }
+                }]
+            }
+        ]
+    }.
+    
+'project_wizard_state_toolbar::state_step2'(State):-
+    State = {
+        type: "assembly",
+        children: [
+            {
+                type: "button",
+                label: {
+                     d: "Reiniciar",
+                     icon: "ray-line"
+                },
+                enabled: true,
+                appearance: line,
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.busId",
+                    payload: { hasEvent: 'e_init' }
+                }]
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Anterior",
+                     icon: "arrow-left"
+                },
+                enabled: true,
+                appearance: line,
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.busId",
+                    payload: { hasEvent: 'e_step1' }
+                }]
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Siguiente",
+                     icon: "arrow-right"
+                },
+                enabled: true,
+                appearance: line,
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.busId",
+                    payload: { hasEvent: 'e_finish' }
+                }]
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Guardar",
+                     icon: "ok"
+                },
+                enabled: false,
+                appearance: line
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Forzar refresco",
+                     icon: "arrow-ccw"
+                },
+                enabled: true,
+                appearance: line,
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.busId",
+                    payload: { hasEvent: 'e_step2' }
+                }]
+            }
+        ]
+    }.
+
+
+'project_wizard_state_toolbar::state_finish'(State):-
+    State= {
+        type: "assembly",
+        children: [
+            {
+                type: "button",
+                label: {
+                     d: "Reiniciar",
+                     icon: "ray-line"
+                },
+                enabled: true,
+                appearance: line,
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.busId",
+                    payload: { hasEvent: 'e_init' }
+                }]
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Anterior",
+                     icon: "arrow-left"
+                },
+                enabled: true,
+                appearance: line,
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.busId",
+                    payload: { hasEvent: 'e_step2' }
+                }]
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Siguiente",
+                     icon: "arrow-right"
+                },
+                enabled: false,
+                appearance: line
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Guardar",
+                     icon: "ok"
+                },
+                enabled: true,
+                appearance: line
+            },
+            {
+                type: "button",
+                label: {
+                     d: "Forzar refresco",
+                     icon: "arrow-ccw"
+                },
+                enabled: true,
+                appearance: line,
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.busId",
+                    payload: { hasEvent: 'e_finish' }
+                }]
+            }
+        ]
+    }.
+

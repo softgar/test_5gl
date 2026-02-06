@@ -1,0 +1,33 @@
+
+'kdetail_state_machine'(O_sm):-
+    'kdetail_state::state_init'(State_init),
+    'kdetail_state::state_noedit'(State_noedit),
+    'kdetail_state::state_edit'(State_edit),
+
+    'kdetail_transition::transition_init'(Transition_init),
+    'kdetail_transition::transition_load'(Transition_load),
+    'kdetail_transition::transition_edit'(Transition_edit),
+    'kdetail_transition::transition_unlock'(Transition_unlock),
+    'kdetail_transition::transition_save'(Transition_save),
+    'kdetail_transition::transition_delete'(Transition_delete),
+    'kdetail_transition::transition_new'(Transition_new),
+
+
+    O_sm = {
+        type: 'stateMachine',
+        hasInitState: 'state_init',
+        hasState:[
+            { state_init: State_init },
+            { state_noedit: State_noedit },
+            { state_edit: State_edit }
+        ],
+        hasTransition: [
+            { e_init: Transition_init },
+            { e_load: Transition_load },
+            { e_edit: Transition_edit },
+            { e_unlock: Transition_unlock },
+            { e_save: Transition_save },
+            { e_delete: Transition_delete},
+            { e_new: Transition_new}
+        ]
+   }.

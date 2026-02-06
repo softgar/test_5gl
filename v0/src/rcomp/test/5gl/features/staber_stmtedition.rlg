@@ -1,0 +1,212 @@
+﻿/**
+@descr	staber_stmtedition <br>
+		staber_stmtedition
+@author ccp
+@date	2023_11_02
+**/
+rc_class('staber_stmtedition') :-
+	class +$ 'staber_stmtedition' d ( es,'Escenarios para stmtedition') sc function,
+    'staber_stmtedition::allowcreation'(_, _, _, _),
+    'staber_stmtedition::allowcreation_rform'(_, _, _, _),
+    'staber_stmtedition::folders'(_, _, _, _).
+
+'staber_stmtedition::allowcreation'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+
+    newKw('channel__stmtedition__', CHANNEL_STMT),
+    newKw('bus__stmtedition__', BUSID_STMT),  
+
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        hasEvent: 'e_init',
+        % hasAggrupationLegacy: true,
+        enabled: true,
+        template:{
+            type: assembly,
+            children:[                
+                { 
+                    arc:  'contact:hasAddress'             
+                }
+            ]
+        }
+    },
+	Obj_class = {  
+        type : 'kdetail',
+        in : IN,                 
+        hasChannel: CHANNEL_STMT,
+        busId :BUSID_STMT, 
+        hasKw: stmt_allow_creation,
+        hasDsca: [('es', 'stmtedition configurable')],
+        hasIcon: 'table',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_stmtedition::allowcreation_rform'(_, _OBJ_in, _, Obj_out) :-
+    I_dataset = 'dataset__test_5gl_server',
+    newKw('bus__stmtedition__', BUSID_STMT),  
+    addHelp( 'testapp:contact', 'contact:hasAddress',
+        es,
+        [ title( 'Prueba de ayuda para stmtedition')
+    ]),
+    OBJ_form = {       
+        type: 'rform',
+        hasKw: 'allowcreation_rform__00',
+        hasNavbar: true,
+        hasDataset: I_dataset,
+        busId: BUSID_STMT,
+        do_exec: true,
+        scope:{
+            origin: 'dst',
+            query:{
+                from: 'testapp_contacto_007'
+            }
+        },
+        template:{
+            type: assembly,
+            children:[                
+                { 
+                    arc:  'contact:hasAddress',
+                    hasNumberLines: 5,
+                    hasHelp: true,
+                    % hasAdd: false,
+                    rowactions: {
+                        add:true,    
+                        delete: true,   
+                        navigate: true,
+                        zoom: true,             
+                        newAction:{
+                            collapse: false,
+                                label: {
+                                    icon: 'project'
+                                },
+                            events : [{
+                                type: 'click',
+                                method: 'reload',
+                                targetBusId: BUSID_STMT
+                            }]
+                        }
+                    },
+                    actions: {
+                        add:true,
+                        delete: true,
+                        navigate: true,
+                        zoom: true,
+                        newAction:{
+                            collapse: false,
+                                label: {
+                                    icon: 'project'
+                                },
+                            events : [{
+                                type: 'click',
+                                method: 'reload',
+                                targetBusId: BUSID_STMT
+                            }]
+                        }                        
+                    }            
+                },
+                % {
+                %     arc:  'contact:hasPreferredCountry',
+                %     label: {
+                %         d: 'Preferred Country'
+                %     }
+                % }   
+                {
+                    arc: 'contact:hasBirthCountry',
+                    hasNumberLines: 5,
+                    rowactions: {
+                        add:true,    
+                        delete: true,   
+                        navigate: true,
+                        zoom: true,             
+                        newAction:{
+                            collapse: false, 
+                                label: {
+                                    icon: 'project'
+                                },
+                            events : [{
+                                type: 'click',
+                                method: 'reload',
+                                targetBusId: BUSID_STMT
+                            }]
+                        }                        
+                    },
+                    actions: {                        
+                        add:true,    
+                        delete: true,   
+                        navigate: true,
+                        zoom: true, 
+                        newAction:{
+                            collapse: false, 
+                                label: {
+                                    icon: 'project'
+                                },
+                            events : [{
+                                type: 'click',
+                                method: 'reload',
+                                targetBusId: BUSID_STMT
+                            }]
+                        }                        
+                    }       
+                }
+            ]
+        },
+        enabled: true,
+        events:[
+            {
+                type: 'init',
+                payload: {navigationFilter: 'all', options:{getSchema: true}, hasDataset: 'Default'},
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        {  type: 'function', name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+                        {  type: 'method',   name: 'import',  module: 'Dataset' }
+                    ]
+                }
+            }
+        ]    
+	},
+    Obj_out_help = {
+        type: 'help',
+        busId: 'helpBusId'
+    },
+    Obj_out_aux = {
+        type: 'rprocess',
+        hasKw: stmt_allow_creation_rform,
+        hasDsca: [('es', 'stmtedition configurable (RFORM)')],
+        hasIcon: 'table',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: {
+            type: assembly,
+            children: [
+                Obj_out_help,
+                OBJ_form
+            ]
+        }
+    },
+    create_rprocess(_,Obj_out_aux,_,Obj_out).
+
+'staber_stmtedition::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_stmtedition,
+        isRoot: false,
+        hasIcon: 'table',
+        hasDsca: 'Stmtedition Examples',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            stmt_allow_creation,
+            stmt_allow_creation_rform
+        ]
+	},	
+	create_rprocess(_, Conf_folder, _, _).
+
+

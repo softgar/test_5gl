@@ -1,0 +1,129 @@
+
+/* Estados de la máquina */
+
+
+'kclass_state::state_init'(State_init):-
+    kclass_navbar(O_navbar),    
+    State_init ={    
+        type: 'state',
+        gui_out: {
+            type: 'assembly',
+            children: [
+                O_navbar,
+                
+                {
+                    type: 'assembly',
+                    classList :['card'],
+                    scroll: 'main',
+                    children: [{
+                        busId: '$.hasArea.form.busId',
+                        type: 'kclass',
+                        hasChannel: '$.hasAppChannel.form',                         
+                        do_exec: true,
+                        in: {
+                            hasTag: 'generic',
+                            enabled: false,
+                            hasAgent: '$.hasArea.form.hasAgent',
+                            hasDataset: '$.hasArea.form.hasDataset',
+                            hasCKDIStatusFrom: '$.hasArea.form.ckdiStatusFrom',
+                            hasKw: '$.hasArea.form.hasKw'
+                        },
+                        proc: {
+                            type: "sequence",
+                            hasProcess: [
+                                { type: "function", name: "get_node_attributes", context: { delegatedTo: "$.hasArea.form.hasAgent" } },
+                                { type: "method", name: "deserialize", module: "DataProcess" }
+                            ]
+                        },
+                        evtPublish: [{ topic: 'setNode', channel: '$.hasAppChannel.form' }],
+                        evtSubscribe: [{ topic: 'setNode', channel: '$.hasChannel' }]
+                    }]
+
+                }
+            ]
+        }
+    }.
+
+'kclass_state::state_edit'(State_edit):-
+    kclass_navbar(O_navbar),
+    %'kclass_state_toolbar::state_edit'(O_toolbar),
+    State_edit = {
+        type: 'state',
+        gui_out: {
+            type: 'assembly',
+            children: [
+                O_navbar,
+     %           O_toolbar,
+                {
+                    type: 'assembly',
+                    classList :['card'],
+                    scroll: 'main',
+                    children: [{
+                        busId: '$.hasArea.form.busId',
+                        type: 'kclass',
+                        hasChannel: '$.hasAppChannel.form',
+                        do_exec: true,
+                        in: {
+                            enabled: true,
+                            hasAgent: '$.hasArea.form.hasAgent',
+                            hasDataset: '$.hasArea.form.hasDataset',
+                            hasCKDIStatusFrom: '$.hasArea.form.ckdiStatusFrom',
+                            hasKw: '$.hasArea.form.hasKw'
+                        },
+                         proc: {
+                            type: "sequence",
+                            hasProcess: [
+                                { type: "function", name: "get_node_attributes", context: { delegatedTo: "$.hasArea.form.hasAgent" } },
+                                { type: "method", name: "deserialize", module: "DataProcess" }
+                            ]
+                        },
+                        evtPublish: [{ topic: 'setNode', channel: '$.hasAppChannel.form' }],
+                        evtSubscribe: [{ topic: 'setNode', channel: '$.hasChannel' }]
+                    }]
+
+                }
+            ]
+        }
+    }.
+
+'kclass_state::state_noedit'(State_noedit):-
+    kclass_navbar(O_navbar),
+    %'kclass_state_toolbar::state_noedit'(O_toolbar),
+    State_noedit = {
+        type: 'state',
+        gui_out: {
+            type: 'assembly',
+            children: [
+                O_navbar,
+     
+                {
+                    type: 'assembly',
+                    classList :['card'],
+                    scroll: 'main',
+                    children: [{
+                        busId: '$.hasArea.form.busId',
+                        type: 'kclass',
+                        hasChannel: '$.hasAppChannel.form',
+                        do_exec: true,
+                        in: {
+                            enabled: false,
+                            hasAgent: '$.hasArea.form.hasAgent',
+                            hasDataset: '$.hasArea.form.hasDataset',
+                            hasCKDIStatusFrom: '$.hasArea.form.ckdiStatusFrom',
+                            hasKw: '$.hasArea.form.hasKw'
+                        },
+                        proc: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', in: { options: { getSchema: true } }, name: 'get_formInfo', context: { delegatedTo: '$.hasArea.form.hasAgent' } },
+                                { type: 'method', name: 'import', module: 'Dataset' }
+                            ]
+                        },
+                        evtPublish: [{ topic: 'setNode', channel: '$.hasAppChannel.form' }],
+                        evtSubscribe: [{ topic: 'setNode', channel: '$.hasChannel' }]
+                    }]
+
+                }
+            ]
+        }
+    }.

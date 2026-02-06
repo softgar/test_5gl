@@ -1,0 +1,105 @@
+'staber::result::rc_gui_out::rql__pivotgrid'(CTX, OBJ_in, CTX, OBJ_out):-
+    obj_get(in:hasAgent, OBJ_in,  I_agent, 'sAgent'),
+    obj_get(in:hasDataset, OBJ_in,  I_dataset, 'Default'),
+    obj_get(in:layoutType, OBJ_in,  Layout, 'kpivotgrid'),
+    obj_get(in:hasKw, OBJ_in,  Kw, thing),    
+    obj_get(in:cols, OBJ_in,  Cols, 4),    
+    obj_get(in:hasChannel, OBJ_in,  Channel),
+    obj_get(in:busId, OBJ_in,  BusId),
+    obj_get(in:backButton, OBJ_in,  BackButton, false),
+    obj_get(in:hasTemplate, OBJ_in,  Template, {}),
+    !,
+    
+    'staber_kmgt::result::schema::usecase__001'(CTX, OBJ_in, CTX, OBJ_schema),
+    obj_get(data, OBJ_schema, Table_Schema_aux),
+    obj_get(in:schema, OBJ_in,  Table_Schema, Table_Schema_aux),
+    
+    IncludedProperties = ['hasERCPart', 'hasDsca', 'hasIDI', 'ownedBy','createdOn','lastModificationOn', 'krp:hasMMResource'],
+    NavigableProperties =['hasERCPart', 'ownedBy'],
+    concatConstants([
+        '?hasDataset @ ( \n',
+        '?I0 type ?hasClass.\n',
+        'like_ci(?hasKw, ?I0). \n',
+        'get_dsca(?I0, ?D). \n',
+        'like_ci(?hasDsca, ?D). \n',
+        '?pointer = {navigableProperties: ?hasNavigableProperties, includedProperties:?hasIncludedProperties,hasDataset:?hasDataset,hasKw:?I0}. \n',
+        'rg_obj_get(_,?pointer,_,?OUT). \n'
+
+    ],CODE),
+	concatConstants([
+        '?hasDataset @ ( \n',
+        '?hasInstance ?hasProperty ?I.\n',
+        'like_ci(?hasKw, ?I). \n',
+        'get_dsca(?I, ?D). \n',
+        'like_ci(?hasDsca, ?D). \n',
+        '?pointer = {hasInstance: ?hasInstance, navigableProperties: ?hasNavigableProperties, includedProperties:?hasIncludedProperties,hasDataset:?hasDataset,hasKw:?I}. \n',
+        'rg_obj_get(_,?pointer,_,?OUT). \n'
+    ],DOC_S_NAV),
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset, 
+        hasClass: Kw,
+        searchType: 'rql',
+        pagination: true,                     
+        hasKw: '*',
+        hasIDI: '*',
+        hasDsca: '*',                
+        code: CODE,
+        %%
+        rootElement: true,
+        expanded: false,
+        enabled: true,
+        limit: 40,
+        persistence : 'remote',
+        schemaHeader: true,
+        resizable: true,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Table_Schema,
+        backButton: BackButton,
+        cols: Cols,
+        hasTemplate: Template
+        
+    },
+	IN_NAV_PART= {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+		hasInstance: Kw,
+        hasProperty: 'hasERCPart',
+        hasKw: '*',
+        hasIDI: '*',
+        hasDsca: '*',
+        code: DOC_S_NAV,        %%        
+        limit: 1000,
+        persistence: 'remote',
+        resizable: true,        
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Table_Schema,
+        backButton: BackButton,
+        cols: Cols,
+        hasTemplate: Template
+
+    },
+    % En este ejemplo no es necesario gui_in, ni gui_out porque al meter type: krpsearch se sobrecarga por extension en JS
+    NAV = [{ hasProperty: 'hasERCPart',  in: IN_NAV_PART}           
+    ],  
+    concatAtoms([BusId,'__table'], BusIdPivot),  
+	OBJ_out = {
+        type: Layout,                
+        in : IN,  
+        do_exec: true, 
+        busId: BusIdPivot,        
+        proc: { type: 'function', name: 'rql', context: { delegatedTo: I_agent } },
+        nav: NAV,        
+        autoRows: true,
+        evtPublish: [{ topic: 'setNode', channel: Channel}]
+	}.
+
+
+/* 5GL con Búsqueda personalizada  */
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CASO DE EJEMPLO DE SUSTITUCIÓN PARA OVERRIDE DE MAS ARRIBA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

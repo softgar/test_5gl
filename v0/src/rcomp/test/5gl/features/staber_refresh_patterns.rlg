@@ -1,0 +1,289 @@
+﻿/**staber_k
+@descr	staber_refresh_patterns <br>
+		staber_refresh_patterns
+@author ccp
+@date	2025_11_11
+**/
+rc_class('staber_refresh_patterns') :-
+	class +$ 'staber_refresh_patterns' d ( es,'Funcionalidad de links') sc function,
+    'staber_refresh_patterns::testing_5gl_components'(_, _, _, _),
+    'staber_refresh_patterns::folders'(_, _, _, _).
+
+'staber_refresh_patterns::testing_5gl_components'(_, _OBJ_in, _, OBJ_out) :-
+    
+    % I_agent = 'builderweb',
+    % I_dataset = 'dataset__test_5gl_server',
+
+    newKw('channel__container', CHANNEL_RPROC),  
+    newKw('busid__container', BUS_RPROC),    
+
+    newKw('channel__toolbar_', CHANNEL_KTOOLBAR),
+    newKw('busid__toolbar_', BUSID_KTOOLBAR),
+
+    newKw('channel__rproc_assembly_', CHANNEL_RPROC_ASSEMBLY),
+    newKw('busid__rproc_assembly_', BUSID_RPROC_ASSEMBLY),
+
+    newKw('channel__rproc_sequence_', CHANNEL_RPROC_SEQUENCE),
+    newKw('busid__rproc_sequence_', BUSID_RPROC_SEQUENCE),
+
+    IN_TOOLBAR = {
+        actions: [
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Evento refreshNode'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_RPROC,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [     
+                                {
+                                    type: 'method',                                    
+                                    name: 'refreshNode',
+                                    busId: BUS_RPROC
+                                }  
+                            ]
+                        }
+                    }
+                ]  
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Evento refresh_gui'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_RPROC,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [     
+                                {
+                                    type: 'method',                                    
+                                    name: 'refresh_gui',
+                                    busId: BUSID_RPROC_ASSEMBLY
+                                }  
+                            ]
+                        }
+                    }
+                ]  
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Evento exec'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_RPROC,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [     
+                                {
+                                    type: 'method',                                    
+                                    name: 'exec',
+                                    busId: BUS_RPROC
+                                }  
+                            ]
+                        }
+                    }
+                ]  
+            }
+        ]
+    }, 
+
+    Obj_toolbar = {
+        type: 'ktoolbar',
+        in : IN_TOOLBAR,
+        hasChannel: CHANNEL_KTOOLBAR,
+        busId: BUSID_KTOOLBAR        
+    },
+
+    Obj_rprocess_assembly = {
+        type: 'rprocess',
+        hasChannel: CHANNEL_RPROC_ASSEMBLY,
+        busId: BUSID_RPROC_ASSEMBLY,
+        do_exec: true,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                { 
+                    type: 'function', 
+                    name: 'staber_refresh_patterns::fake_call', 
+                    context: { delegatedTo: 'builderweb' } 
+                }
+            ]
+        },
+        gui_out: {
+            type: 'assembly',
+            children:[
+                {
+                    type: 'text',
+                    id: 'text-0',
+                    value: "My refresh test"
+                }
+            ]
+        }
+    },
+
+    Obj_rprocess_sequence = {
+        type: 'rprocess',
+        hasChannel: CHANNEL_RPROC_SEQUENCE,
+        busId: BUSID_RPROC_SEQUENCE,
+        do_exec: true,
+        in: {
+            selectionGui : 'false'
+        },
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                { 
+                    type: 'function', 
+                    name: 'staber_refresh_patterns::fake_call', 
+                    context: { delegatedTo: 'builderweb' } 
+                }
+            ]
+        },
+        gui_out: {
+            type: 'sequence',
+            hasProcess: [
+                { 
+                    type: 'function', 
+                    name: 'staber_refresh_patterns::get_guiout', 
+                    context: { delegatedTo: 'builderweb' } 
+                }
+            ]
+        }
+    },
+
+    Obj_container = {
+        type: 'assembly',
+        children:[
+            Obj_toolbar,
+            Obj_rprocess_assembly,
+            {
+                type: checkbox,
+                label: {
+                    d: 'Título del control'
+                },
+                appearance: 'toggle2',
+                options: [
+                    {
+                        label: {
+                            d: 'Mostrar texto',
+                            style: {
+                                background: 'purple',
+                                color: 'lightpink'
+                            }
+                        }
+                    },
+                    {
+                        label: {
+                            d: 'Mostrar label'
+                        }
+                    }
+                ],
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_RPROC_SEQUENCE,
+                        payload: { property: 'selectionGui' },
+                        p_exec: {
+                            type: "sequence",
+                            hasProcess: [
+                                % set_propertyValue launch refresh_gui internaly
+                                {
+                                    type: 'method',                                    
+                                    name: 'set_propertyValue',
+                                    busId: BUSID_RPROC_SEQUENCE
+                                }
+                                % {
+                                %     type: 'method',                                    
+                                %     name: 'refresh_gui',
+                                %     busId: BUSID_RPROC_SEQUENCE
+                                % }  
+                            ]
+                        }
+                    }
+                ]
+            },
+            Obj_rprocess_sequence
+
+        ]
+    },
+
+    Obj_class = {        
+        type : 'rprocess',
+        busId: BUS_RPROC,
+        hasChannel: CHANNEL_RPROC,
+        hasKw: refresh_patterns_5gl,
+        hasDsca: [('es', 'Escenarios de refrescos de componentes 5GLs')],
+        hasIcon: 'rocket',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_container,
+        isSession: true,
+        hasNavbar: false   
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_refresh_patterns::fake_call'(Obj_ctx, Obj_in, Obj_ctx, Obj_out) :-
+    wAddInfoMsgML('Aviso', 'Se ha realizado una ejecución del PROC',[] ,{showTime:3}),
+    Obj_out = Obj_in.
+
+'staber_refresh_patterns::get_guiout'(Obj_ctx, Obj_in, Obj_ctx, Obj_out) :-
+
+    obj_fetch(in:selectionGui, Obj_in, Selection, 'text'),
+
+    (Selection == 'false' ->
+        Child = {
+            type: 'text',
+            id: 'text-0',
+            value: 'My refresh test'
+        }
+    ; Selection == 'true' ->
+        Child = {
+            type: 'label',
+            d: 'My refresh label'
+        }
+    ;
+        Child = {
+            type: 'label',
+            d: 'Unknown selection value'
+        }
+    ),
+
+    Obj_out = {
+        type: 'assembly',
+        children:[
+            Child
+        ]
+    }.
+
+'staber_refresh_patterns::folders'(_, _, _, _):-
+    Title = 'Patrones de refrescos',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__pattern_5gl,
+        hasDsca: Title,
+        hasIcon: 'send',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            refresh_patterns_5gl
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

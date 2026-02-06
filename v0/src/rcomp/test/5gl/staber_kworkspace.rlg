@@ -1,0 +1,320 @@
+﻿/**
+@descr	staber_kworkspace <br>
+		staber_kworkspace
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kworkspace') :-
+	class +$ 'staber_kworkspace' d ( es,'Patrón rproc para kworkspace') sc function,
+    % configuración con servicio de directorio
+    'staber_kworkspace::usecase__001'(_, _, _, _),
+    % configuración sin datos
+    'staber_kworkspace::usecase__002'(_, _, _, _),
+    'staber_kworkspace::usecase__003'(_, _, _, _),
+    'staber_kworkspace::folders'(_, _, _, _).
+
+
+% configuración con Máquina de Estados 
+'staber_kworkspace::usecase__001'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__dir',
+    I_agent = 'builderweb',   
+    'kworkspace_state_machine'(O_sm), 
+    newKw('channel', CHANNEL_CONTENT),
+    newKw('channel', CHANNEL_MAIN),    
+    IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasEvent: 'e_init'   
+    },   
+    Title =  'Navegación Máquina de Estados (usecase__001)',         
+    OBJ_out = {
+        type: 'kworkspace',            
+        in: IN,
+        hasStateMachine: O_sm,
+        hasKw: kworkspace_test_001,            
+        hasDsca: Title,            
+        hasIcon: 'folder-open',
+        isRoot: false,
+        hasChannel: CHANNEL_MAIN,
+        hasAppChannel:{
+            content: CHANNEL_CONTENT
+        },                                    
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        evtSubscribe:[{topic: 'addNode', channel:CHANNEL_CONTENT, subTopic: 'setNode'}]
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+/* Configuración sin Maquina de estados con proceso */
+'staber_kworkspace::usecase__002'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__dir',
+    I_agent = 'builderweb', 
+    newKw('channel', CHANNEL_CONTENT),
+    newKw('channel', CHANNEL_MAIN),    
+      
+    
+    IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset
+    },       
+    Title =  'Navegación sin SM con Proceso (usecase__002)',         
+    OBJ_out = {
+        type: 'kworkspace',            
+        in: IN,            
+        hasKw: kworkspace_test_002,            
+        hasDsca: Title,            
+        hasIcon: 'folder-open',
+        isRoot: false,
+        hasChannel: CHANNEL_MAIN,            
+        hasAppChannel:{
+            content: CHANNEL_CONTENT
+        },
+
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        evtSubscribe:[{topic: 'addNode', channel:CHANNEL_CONTENT, subTopic: 'setNode'}],
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                { type: 'method',   name: 'getUserContextInfo', module: 'SessionContext'},
+                { type: 'function', name: 'prepare_security_root_search', context: {delegatedTo: 'builderweb'}},
+                { type: 'function', name: 'staber_pSearch', context: {delegatedTo: 'builderweb'}}
+            ]
+        },
+        gui_out: {
+            type: 'assembly',
+            class : 'layout-desktopwidth body-builder',
+            children: [
+                {
+                    type: 'kbrowser',
+                    busId: '{$.busId}__browser',
+                    do_exec: true,
+                    hasChannel: '$.hasAppChannel.content',
+                    result: '$.out.resultset',                        
+                    evtSubscribe :[ {topic:'setNode', channel:'$.hasChannel'},
+                                    {topic:'addNavigateTo', channel:'channel__broadcast'} ]
+                }
+            ]
+        }
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+/* Kworkspace con resultados fijos*/
+'staber_kworkspace::usecase__003'(_, _OBJ_in, _, OBJ_out) :-
+   
+    I_dataset = 'dataset__dir',
+    I_agent = 'builderweb', 
+    newKw('channel', CHANNEL_CONTENT),
+    newKw('channel', CHANNEL_MAIN),    
+    %% Generacion de contenidos fijos
+    'staber_kworkspace::contents'(Result),
+    IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset
+    },       
+
+    Title =  'Navegación por Resultados fijos (usecase__003)',   
+    Obj_gui_out = {
+                type: 'assembly',
+                class : 'layout-desktopwidth body-builder',
+                children: [
+                    {
+                        type: 'kbrowser',
+                        busId: '{$.busId}__browser',
+                        do_exec: true,
+                        in: {fixedHeight: false},
+                        hasChannel: '$.hasAppChannel.content',
+                        out: Result,                        
+                        evtSubscribe :[ {topic:'setNode', channel:'$.hasChannel'},
+                                        {topic:'addNavigateTo', channel:'channel__broadcast'} ]
+                    }
+                ]
+    },      
+    OBJ_out = {
+        type: 'kworkspace',            
+        in: IN,            
+        hasKw: kworkspace_test_003,            
+        hasDsca: Title,            
+        hasIcon: 'folder-open',
+        isRoot: false,
+        hasChannel: CHANNEL_MAIN,            
+        hasAppChannel:{
+            content: CHANNEL_CONTENT
+        },
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        evtSubscribe:[{topic: 'addNode', channel:CHANNEL_CONTENT, subTopic: 'setNode'}],           
+        gui_out: Obj_gui_out
+    },    
+    create_rprocess(_,OBJ_out,_,_).
+
+'staber_kworkspace::folders'(_, _, _, _):-    
+     Title =  'kworkspace  [Navegación por contenidos]',              
+     create_rprocess(_, 
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_kworkspace,            
+            hasDsca: Title,            
+            hasIcon: 'folder-line',
+            isRoot: false,            
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [
+                        kworkspace_test_001,
+                        kworkspace_test_002,
+                        kworkspace_test_003
+    
+            ]
+    },_,_).
+
+/*
+    Tipos de contenido soportados
+*/
+'staber_kworkspace::contents'(Obj_result):-
+
+    % Cajas con imagen
+     Title1 =  'Contenido con Imagen',     
+     Obj_content1 = {
+        type: 'krp:folder',
+        hasKw: folder__content__001,            
+        hasDsca: Title1,            
+        hasImage: '/testapp/img/manual/louvre.jpg',
+        isRoot: false,            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },
+    create_rprocess(_,Obj_content1,_,_),
+    Title2 =  'Contenido con subtítulo, Imagen y acciones',     
+    Subtitle2 =  '04/05/2023',
+     Obj_content2 = {
+        type: 'krp:folder',
+        hasKw: folder__content__002,            
+        hasDsca: Title2,
+        hasDscaIcon: '/testapp/img/manual/attention.png',
+        hasCaption:  Subtitle2,            
+        hasImage: '/testapp/img/manual/lake.jpg',            
+        hasActions:[
+            {
+                'label': {
+                    'icon': 'share2'
+                }
+            }
+        ],
+        isRoot: false,            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },
+
+    create_rprocess(_,Obj_content2,_,_),
+    Title3 =  'Contenido Sólo Icono y label',         
+     Obj_content3 = {
+        type: 'krp:folder',
+        hasKw: folder__content__003,            
+        hasDsca: Title3,
+        hasDscaIcon: '/testapp/img/manual/default_female.png',
+        isRoot: false,            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },
+    create_rprocess(_,Obj_content3,_,_),
+     Title4 =  'Contenido Con botones',         
+     Obj_content4 = {
+        type: 'krp:folder',
+        hasKw: folder__content__004,            
+        hasDsca: Title4,
+        hasDscaIcon: '/testapp/img/manual/default_female.png',
+        isRoot: false,          
+        hasFooter: [
+            {
+                'type': 'button',
+                'class': 'grey-bg',
+                'label': {
+                'd': 'Compilar',
+                'events': [
+                    {
+                    'type': 'click'
+                    }
+                ]
+                }
+            },
+            {
+            'type': 'button',
+            'class': 'grey-bg',
+            'label': {
+                'd': 'Reiniciar',
+                'events': [
+                {
+                    'type': 'click'
+                }
+                ]
+            }
+            }  
+        ],
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },     
+     create_rprocess(_,Obj_content4,_,_),
+      Title5 =  'Contenido Con componentes hijo',         
+     Obj_content5 = {
+        type: 'krp:folder',
+        hasKw: folder__content__005,            
+        hasDsca: Title5,
+        hasDscaIcon: '/testapp/img/manual/default_male.png',
+        isRoot: false,          
+        children: [{
+            'type': 'label',
+            'd': 'Texto libre que podemos indicar como abstract de información',
+            'events': [
+                {
+                    'type': 'click'
+                }  
+            ]  
+        }],
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },
+     create_rprocess(_,Obj_content5,_,_),
+     Title6 =  'Contenido Con componentes Hijo2',         
+     Obj_content6 = {
+        type: 'krp:folder',
+        hasKw: folder__content__006,            
+        hasDsca: Title6,
+        hasDscaIcon: '/testapp/img/manual/default_male.png',
+        isRoot: false,          
+        hasFooter: [
+                {
+                    'type': 'button',                    
+                    'label': {
+                        'd': 'Salir de Tofu',
+                        'events': [
+                            {
+                            'type': 'click'
+                            }
+                        ]
+                    }
+                }
+        ],
+        children: [
+            {
+                type: 'label',
+                d: 'Ya estás tardando en montar uno de estos',
+                events: [
+                    {
+                        'type': 'click'
+                    }  
+                ]
+            },
+            {
+                'type': 'clock'                    
+            }
+        ],            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },
+     create_rprocess(_,Obj_content6,_,_),
+     Obj_result = {resultset: [Obj_content1, Obj_content2,Obj_content3, Obj_content4, Obj_content5, Obj_content6]}.
+
+
+    
+
+

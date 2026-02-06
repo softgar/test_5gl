@@ -1,0 +1,151 @@
+﻿/**
+@descr	staber_state_machine <br>
+		staber_state_machine
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_state_machine') :-
+	class +$ 'staber_state_machine' d ( es,'Patrón rproc para SM') sc function,
+    % configuración básica
+    'staber_state_machine::usecase__001'(_, _, _, _),
+    'staber_state_machine::beforetransition'(_, _, _, _),
+    'staber_state_machine::folders'(_, _, _, _).
+
+
+/* Ejemplo de Wizard sobre documentos */   
+'staber_state_machine::usecase__001'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('channel__sm__', CHANNEL_SM), 
+    newKw('bus__sm__', BUS_SM), 
+    'project_wizard_state_machine'(O_sm),
+    newKw('project__', KWI),
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'ss:project',        
+        hasKw : KWI,
+        applyRules: true,
+        hasEvent: 'e_init'         
+    },
+	Obj_class = {  
+        in: IN,
+        type : 'rprocess',
+        busId: BUS_SM,
+        hasChannel: CHANNEL_SM,
+        hasStateMachine: O_sm,
+        hasIcon: 'play',
+        hasDsca: 'StateMachine Project Wizard',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasKw: ksm_test_001,
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_, Obj_class, _, OBJ_out).
+ 
+'staber_state_machine::beforetransition'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('channel__sm__', CHANNEL_SM), 
+    newKw('bus__sm__', BUS_SM), 
+    Transition_init = {
+        type: 'transition',
+        stateTo: 'state_init'
+
+    },
+    State_init = {     
+        type: 'state',
+        gui_out: {                   
+            type: 'assembly',
+            label: {d: 'Ejecutado proceso con notificación antes de la transición'}
+        }
+    },
+    O_sm = {
+        type: 'stateMachine',
+        hasInitState: 'state_init',
+        hasState:[
+            { state_init: State_init }
+        ],
+        hasTransition: [
+            { e_init: Transition_init }
+        ]
+    },
+    Before_Transition= {
+        type: 'sequence',
+        hasProcess: [
+            {
+                type: 'function',
+                in : {
+                    title: 'Antes de la transición',
+                    msg: 'Se ha lanzado un proceso antes de la transición'
+                },     
+                name: 'staber_state_machine::doAction',
+                context: {
+                    delegatedTo: I_agent
+                }
+            }
+        ]
+    },
+    After_Transition= {
+        type: 'sequence',
+        hasProcess: [
+            {
+                type: 'function',       
+                in : {
+                    title: 'Después de la transición',
+                    msg: 'Se ha lanzado un proceso después de la transición'
+                },           
+                name: 'staber_state_machine::doAction',
+                context: {
+                    delegatedTo: I_agent
+                }
+            }
+        ]    
+    },
+    IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasEvent: 'e_init',
+        before_transition: Before_Transition,
+        after_transition: After_Transition
+    },
+	Obj_class = {  
+        in: IN,
+        type : 'rprocess',
+        busId: BUS_SM,
+        hasChannel: CHANNEL_SM,
+        hasStateMachine: O_sm,
+        hasIcon: 'play',
+        hasDsca: 'Probando ejecución de secuencias antes y despues de una transición',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasKw: ksm_test_002,
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_, Obj_class, _, OBJ_out).
+
+'staber_state_machine::doAction'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_get(title, Obj_in, Title),
+    obj_get(msg, Obj_in, Msg),
+    wAddInfoMsgML(Title, Msg, ['Msg1']),
+    Obj_out = Obj_in.
+
+'staber_state_machine::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_ksm,
+        isRoot: false,
+        hasIcon: 'play',
+        hasDsca: 'StateMachine Examples',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            ksm_test_001,
+            ksm_test_002
+        ]
+	},	
+	create_rprocess(_, Conf_folder, _, _).
+
+

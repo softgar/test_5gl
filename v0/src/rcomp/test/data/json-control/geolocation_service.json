@@ -1,0 +1,81 @@
+{
+  "data": {
+    "type": "assembly",
+    "width": 50,
+    "label": {
+      "d": "Salida de funciones del módulo GeoLocalization"
+    },
+    "children": [
+      {
+        "type": "button",
+        "label": {
+          "d": "Refrescar geolocalización"
+        },
+        "events": [
+          {
+            "type": "click",
+            "targetBusId": "bus__console_0",
+            "method": "setNode",
+            "payload": {
+              "enableHighAccuracy": true,
+              "timeout": 100000
+            },
+            "p_exec": {
+              "type": "sequence",
+              "hasProcess": [
+                {
+                  "type": "method",
+                  "name": "getGeolocalization",
+                  "module": "Localization"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "type": "button",
+        "label": {
+          "d": "Procesar mapa desde una posición valida"
+        },
+        "events": [
+          {
+            "type": "click",
+            "targetBusId": "bus__console_0",
+            "method": "setNode",
+            "payload": {
+              "framework": "googlemaps",
+              "type": "url",
+              "in": {
+                "action": "search",
+                "parameters": {
+                  "position": {
+                    "latitude": "43.2",
+                    "longitude": "-2.7"
+                  }
+                }
+              },
+              "out": {
+                "type": "link",
+                "parameters": {
+                  "title": "Este es mi mapa",
+                  "newTab": "true"
+                }
+              }
+            },
+            "p_exec": {
+              "type": "sequence",
+              "hasProcess": [
+                {
+                  "type": "method",
+                  "name": "processMap",
+                  "module": "Localization"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,425 @@
+﻿/**
+@descr	staber_advancedSearch <br>
+		staber_advancedSearch
+@author CCP
+@date	2025_07_15
+**/
+rc_class('staber_advancedSearch') :-
+
+	class +$ 'staber_advancedSearch' d ( es,'Búsquedas avanzadas con kmgt') sc function,
+    'staber_advancedSearch::rprocess_advanced_and_kmgt'(_, _, _, _),
+    'staber_advancedSearch::rprocess_advanced_and_kmgt_with_prequery'(_, _, _, _),
+    'staber_advancedSearch::kmgt_with_searchArea_advanced'(_, _, _, _),
+    'staber_advancedSearch::folders'(_, _, _, _).
+
+'staber_advancedSearch::rprocess_advanced_and_kmgt'(_, _OBJ_in, _, OBJ_out) :-	
+    newKw('bus__rprocess__', BUS_RPROCESS),
+    newKw('channel__rprocess__', CHANNEL_RPROCESS),
+    newKw('bus__ksearchform__', BUS_KSEARCHFORM),
+    newKw('bus__kmgt__', BUS_KMGT),
+    newKw('channel__kmgt__', CHANNEL_KMGT),
+    
+    SearchForm_Obj_in = {
+        hasKwc: "testapp:contact",
+        enabled: true,
+        hasDataset: "Default",
+        hasPropertySearchMode: "customProperties",
+        hasCustomPropertyLst: ['hasIcon','contact:hasIdPhoto' ,'contact:hasName', 'contact:hasEmail', 'contact:hasProfessionalProfile','contact:hasBirthCountry', 'contact:hasAddress']
+    },
+
+    SearchForm = {
+        type: "kadvancedsearch",
+        busId: BUS_KSEARCHFORM,
+        hasKw: "kadvancedsearchForm_test_kadvancedsearch__kdpa",
+        hasDsca: "Búsqueda avanzada",
+        in: SearchForm_Obj_in
+    },
+
+    concatAtoms([CHANNEL_KMGT, '_search'], CHANNEL_KMGT_SEARCH),
+
+    AreaSearch = {
+        type: "assembly",
+        children: [
+            SearchForm,
+            {
+                type: "button",
+                label: {
+                    d: "Buscar",
+                    icon: "search"
+                },
+                appearance: "flat",
+                events: [
+                    {
+                        type: "click",
+                        method: "log",
+                        targetBusId: BUS_KSEARCHFORM,
+                        p_exec: {
+                            type: "sequence",
+                            hasProcess: [
+                                { type: "method", in: { format: "json" }, name: "getSelectedProperties", busId: BUS_KSEARCHFORM },
+                                { type: "method", in: { searchType: "rem" }, name: "selectedPropertiesToFilter", module: "QueryFilterService" },
+                                {
+                                    type: "method", name: "publish", module: "PubSub",
+                                    in: {
+                                        publish: [
+                                            { topic: "setSearch", channel: CHANNEL_KMGT_SEARCH }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+
+    AreaResults = {
+        type: "kmgt",
+        busId: BUS_KMGT,
+        hasChannel: CHANNEL_KMGT,
+        do_exec: true,
+        in: {
+            hasLayout: "result",
+            hasLayoutNavigation: true,
+            hasKwc: "testapp:contact",
+            hasDataset: "Default",
+            hasArea: {
+                result: {
+                    multiselection: false,
+                    includedProperties:['hasIcon','contact:hasIdPhoto' ,'contact:hasName', 'contact:hasEmail', 'contact:hasProfessionalProfile','contact:hasBirthCountry', 'contact:hasAddress', 'contact:hasBirthDate', 'contact:hasHeritage'],
+                    navigableProperties: ['contact:hasIdPhoto','resourcePath', 'remoteURL', 'contact:hasBirthCountry', 'contact:hasAddress'],
+                    schema : {
+                        data: [
+                            {
+                                label: {
+                                    d: 'Nombre'
+                                },
+                                arc: 'contact:hasName',
+                                class: 'user',
+                                sorted: true
+                            },
+                            {
+                                label: {
+                                    d: 'Email'
+                                },
+                                arc: 'contact:hasEmail'
+                            },
+                            {
+                                label: {
+                                    d: 'Fecha de nacimiento'
+                                },
+                                arc: 'contact:hasBirthDate',
+                                inputtype: 'date',
+                                range: date
+                            },
+                            {
+                                label: {
+                                    d: 'Patrimonio'
+                                },
+                                arc: 'contact:hasHeritage',
+                                inputtype: 'float'
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+
+    SearchAssembly = {
+        type: "assembly",
+        width: 15,
+        collapsible: {
+            floating: true
+        },
+        children: [
+            AreaSearch
+        ]
+    },
+
+    ResultsAssembly = {
+        type: "assembly",
+        children: [
+            AreaResults
+        ]
+    },
+
+    SearchResultArea = {
+        type: "assembly",
+        children: [
+            SearchAssembly,
+            ResultsAssembly
+        ]
+    },
+
+    GUI_OUT = {        
+        type: 'assembly',
+        children: [
+            SearchResultArea
+        ]       
+    },
+
+    Title = 'Rprocess con búsqueda avanzada y kmgt', 
+
+    IN = {},
+
+    Obj_proc = {        
+        type: 'rprocess',                
+        busId: BUS_RPROCESS,
+        hasChannel: CHANNEL_RPROCESS,
+        hasDsca: Title,
+        in: IN,        
+        gui_out: GUI_OUT,
+        hasKw: rproc__rprocess_advanced_and_kmgt,     
+        hasIcon: 'search',
+        do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],       
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_advancedSearch::rprocess_advanced_and_kmgt_with_prequery'(_, _OBJ_in, _, OBJ_out) :-	
+    newKw('bus__rprocess__', BUS_RPROCESS),
+    newKw('channel__rprocess__', CHANNEL_RPROCESS),
+    newKw('bus__ksearchform__', BUS_KSEARCHFORM),
+    newKw('bus__kmgt__', BUS_KMGT),
+    newKw('channel__kmgt__', CHANNEL_KMGT),
+    
+    SearchForm_Obj_in = {
+        hasKwc: "testapp:contact",
+        enabled: true,
+        hasDataset: "Default",
+        hasPropertySearchMode: "customProperties",
+        hasCustomPropertyLst: ['hasIcon','contact:hasIdPhoto' ,'contact:hasName', 'contact:hasEmail', 'contact:hasProfessionalProfile','contact:hasBirthCountry', 'contact:hasAddress']
+    },
+
+    SearchForm = {
+        type: "kadvancedsearch",
+        busId: BUS_KSEARCHFORM,
+        hasKw: "kadvancedsearchForm_test_kadvancedsearch__kdpa",
+        hasDsca: "Búsqueda avanzada",
+        in: SearchForm_Obj_in
+    },
+
+    concatAtoms([CHANNEL_KMGT, '_search'], CHANNEL_KMGT_SEARCH),
+
+    AreaSearch = {
+        type: "assembly",
+        children: [
+            SearchForm,
+            {
+                type: "button",
+                label: {
+                    d: "Buscar",
+                    icon: "search"
+                },
+                appearance: "flat",
+                events: [
+                    {
+                        type: "click",
+                        method: "log",
+                        targetBusId: BUS_KSEARCHFORM,
+                        p_exec: {
+                            type: "sequence",
+                            hasProcess: [
+                                { type: "method", in: { format: "json" }, name: "getSelectedProperties", busId: BUS_KSEARCHFORM },
+                                { type: "method", in: { searchType: "rem" }, name: "selectedPropertiesToFilter", module: "QueryFilterService" },
+                                {
+                                    type: "method", name: "publish", module: "PubSub",
+                                    in: {
+                                        publish: [
+                                            { topic: "setSearch", channel: CHANNEL_KMGT_SEARCH }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+
+    AreaResults = {
+        type: "kmgt",
+        busId: BUS_KMGT,
+        hasChannel: CHANNEL_KMGT,
+        do_exec: true,
+        in: {
+            hasLayout: "result",
+            hasLayoutNavigation: true,
+            hasKwc: "testapp:contact",
+            query: "stmt('contact:hasName', HASKW, CONTACTHASNAME), like_ci('*Ana*', CONTACTHASNAME)",
+            hasDataset: "Default",
+            hasArea: {
+                result: {
+                    multiselection: false,
+                    includedProperties:['hasIcon','contact:hasIdPhoto' ,'contact:hasName', 'contact:hasEmail', 'contact:hasProfessionalProfile','contact:hasBirthCountry', 'contact:hasAddress', 'contact:hasBirthDate', 'contact:hasHeritage'],
+                    navigableProperties: ['contact:hasIdPhoto','resourcePath', 'remoteURL', 'contact:hasBirthCountry', 'contact:hasAddress'],
+                    schema : {
+                        data: [
+                            {
+                                label: {
+                                    d: 'Nombre'
+                                },
+                                arc: 'contact:hasName',
+                                class: 'user',
+                                sorted: true
+                            },
+                            {
+                                label: {
+                                    d: 'Email'
+                                },
+                                arc: 'contact:hasEmail'
+                            },
+                            {
+                                label: {
+                                    d: 'Fecha de nacimiento'
+                                },
+                                arc: 'contact:hasBirthDate',
+                                inputtype: 'date',
+                                range: date
+                            },
+                            {
+                                label: {
+                                    d: 'Patrimonio'
+                                },
+                                arc: 'contact:hasHeritage',
+                                inputtype: 'float'
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+
+    SearchAssembly = {
+        type: "assembly",
+        width: 15,
+        collapsible: {
+            floating: true
+        },
+        children: [
+            AreaSearch
+        ]
+    },
+
+    ResultsAssembly = {
+        type: "assembly",
+        children: [
+            AreaResults
+        ]
+    },
+
+    SearchResultArea = {
+        type: "assembly",
+        children: [
+            SearchAssembly,
+            ResultsAssembly
+        ]
+    },
+
+    GUI_OUT = {        
+        type: 'assembly',
+        children: [
+            SearchResultArea
+        ]       
+    },
+
+    Title = 'Rprocess con búsqueda avanzada y kmgt con prequery', 
+
+    IN = {},
+
+    Obj_proc = {        
+        type: 'rprocess',                
+        busId: BUS_RPROCESS,
+        hasChannel: CHANNEL_RPROCESS,
+        hasDsca: Title,
+        in: IN,        
+        gui_out: GUI_OUT,
+        hasKw: rproc__rprocess_advanced_and_kmgt_with_prequery,     
+        hasIcon: 'search',
+        do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],       
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_advancedSearch::kmgt_with_searchArea_advanced'(_, _OBJ_in, _, OBJ_out) :-	
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('kmgt_test_000_', BusId),
+	IN = {
+        hasLayout: 'searchResult',
+        hasTitle: 'Contactos modelo de Tests',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',
+        selectable: true,
+        hasArea: {
+            result: {                
+                includedProperties:['hasIcon','contact:hasIdPhoto' ,'contact:hasName', 'contact:hasEmail', 'contact:hasProfessionalProfile','contact:hasBirthCountry', 'contact:hasAddress'],
+                navigableProperties: ['contact:hasIdPhoto','resourcePath', 'remoteURL', 'contact:hasBirthCountry', 'contact:hasAddress'],                
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            class: 'user',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+                },
+            search: {
+                searchLayout: "advanced"
+            }
+        }
+    },   
+    Title =  'Kmgt con search avanzado',
+    OBJ_proc = {
+        type: 'kmgt',
+        busId: BusId,
+        in: IN,
+        hasKw: rproc__kmgt_with_searchArea_advanced,
+        hasDsca: Title,
+        hasIcon: 'search',
+        isRoot: false,
+        isSession: true,
+        hasNavbar: true,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_proc,_,OBJ_out).
+
+'staber_advancedSearch::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_advancedSearch,
+        hasDsca: 'Búsquedas avanzadas con kmgt',
+        hasIcon: 'search',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__rprocess_advanced_and_kmgt,
+            rproc__rprocess_advanced_and_kmgt_with_prequery,
+            rproc__kmgt_with_searchArea_advanced
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

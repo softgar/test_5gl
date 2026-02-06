@@ -1,0 +1,55 @@
+﻿/**
+@descr	staber_form_behaviors <br>
+		staber_form_behaviors
+@author CCP
+@date	2024_03_20
+**/
+rc_class('staber_form_behaviors') :-
+	class +$ 'staber_form_behaviors' d ( es,'Patrón rproc para SM') sc function,
+    'staber_form_behaviors::list'(_, _, _, _),
+    'staber_form_behaviors::folders'(_, _, _, _).
+
+'staber_form_behaviors::list'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_005'
+    },         
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: { options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',
+        in: IN,
+        proc: PROC,
+        hasKw: form_behaviors_list,
+        hasDsca: [('es', 'Comportamiento de listas')],
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_form_behaviors::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__form_behaviors_list,
+        isRoot: false,
+        hasIcon: 'play',
+        hasDsca: 'Comportamientos en formularios',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            form_behaviors_list
+        ]
+	},	
+	create_rprocess(_, Conf_folder, _, _).
+
+

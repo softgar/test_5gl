@@ -1,0 +1,96 @@
+﻿'rc_gui_out:tree:testapp:contact'(_,OBJ_in,_,Obj_out):-
+    newKw('channel__treecontact_kpivotgrid', Channel0),
+    newKw('bus____treecontact_kpivotgrid', BusIdPivot0),
+
+    obj_get(in:hasAgent, OBJ_in, I_agent, 'builderweb'),
+    obj_get(in:hasPivotBusId, OBJ_in, BusIdPivot, BusIdPivot0),
+    obj_get(in:hasChannel, OBJ_in, Channel, Channel0),
+    obj_get(in:hasDataset, OBJ_in, I_dataset, 'Default'),
+    obj_get(in:singleselection, OBJ_in, Selectable, false),
+    obj_get(in:limit, OBJ_in, Limit, 10),
+    obj_get(in:selectedTreePath, OBJ_in, SelectedTreePath, 'none'),
+    obj_get(hasCustomization, OBJ_in, HasCustomization, 'none'),
+    IN0 = {
+        hasDataset: I_dataset,
+        query: 'stmt( hasDsca, HASKW, _), member( HASKW,[\'testapp:contact\'])',
+        searchType: 'rql',
+        hasDsca: '*',
+        rql_before: 'staber_kmgt::ontology::get_root_classes',
+        predicate: 'staber_kmgt::ontology::get_elements',        
+        hasOntologyItems:['classes', 'properties', 'instances'],
+        hasIncludedProperties: [ 'hasDsca' ],
+        hasClass: 'testapp:contact',
+        schemaHeader: false,
+        limit: Limit,
+        pagination: true,
+        case: false,
+        fullWord: '',
+        persistence: 'remote',
+        getCount: false,
+        expandedLevels: 1,
+        enabled: false,
+        schema:[
+            % {
+            %     label: {
+            %         d: 'Keyword'
+            %     },
+            %     arc: 'hasKw',
+            %     width: 'auto',
+            %     mandatory: true
+            %     % enabled: false
+            % },
+            {
+                label: {
+                    d: 'Descripción'
+                },
+                arc: 'hasDsca'
+                % enabled: false
+            },
+            {
+                label: {
+                    d: 'Etiquetas'
+                },
+                arc: 'schemaInfoTags',                                        
+                % enabled: false,
+                control: {
+                    type: 'taglist'
+                }
+            }
+        ]
+    },
+    ( Selectable == true ->
+        SelectObj = {
+            selectable: true,
+            multiselection: false,
+            singleselection: true
+        },
+        obj_merge(IN0, SelectObj, IN1)
+    ; 
+        IN = IN0    
+    ),
+    ( SelectedTreePath == 'none' ->
+        IN = IN1
+    ;   obj_merge(IN1, { selectedTreePath: SelectedTreePath } , IN)
+    ),
+    obj_merge(IN, { getCount: true } , NAVIN),
+    NAV = [{ hasProperty: 'children', in: NAVIN}],
+    Obj_out0 = {
+        type: 'kpivotgrid',
+        hasChannel: Channel,
+        busId: BusIdPivot,
+        in: IN,
+        nav: NAV,
+        scroll: 'main',
+        do_exec: true,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                { type: 'function', name: 'rql', context: { delegatedTo: I_agent } }
+            ]
+        },
+        autoRows: true
+    },
+    (HasCustomization \== 'none' ->
+        obj_merge(Obj_out0, { hasCustomization: HasCustomization, hasDlg: true }, Obj_out )
+    ; Obj_out = Obj_out0
+    ).

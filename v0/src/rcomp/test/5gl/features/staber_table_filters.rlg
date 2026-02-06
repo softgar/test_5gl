@@ -1,0 +1,316 @@
+﻿/**
+@descr  staber_table_filters <br>
+    staber_rprocess_patterns
+@author FGC
+@date   2025_04_25
+**/
+rc_class('staber_table_filters') :-
+    class +$ 'staber_table_filters' d ( es,'Filtros por tech') sc function,
+    'staber_table_filters_rem_sql'(_, _, _, _),
+    'staber_table_filters::folders'(_, _, _, _).
+
+'staber_table_filters_rem_sql'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__result_filters', CHANNEL_FILTERS),
+    newKw('channel__result_filtersrem', CHANNEL_FILTERS_REM),
+    newKw('channel__result_filterssql', CHANNEL_FILTERS_SQL),
+
+    newKw('bus__kresult_filters', BUSID_FILTERS),
+    newKw('bus__kresult_filtersrem', BUSID_FILTERS_REM),
+    newKw('bus__kresult_filterssql', BUSID_FILTERS_SQL),
+
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+
+    CODE = 'SELECT NOMBRE, EMAIL, TELEFONO, EDAD, FECHANACIMIENTO, PATRIMONIO, TIENEMASTER from Contactos',
+
+    Schema_REM = {
+        data: [
+            {
+                arc: 'contact:hasName',
+                label: {
+                    d: 'Nombre'
+                },
+                filter: true,
+                sorted: true
+            },
+            {
+                arc: 'contact:hasEmail',
+                label: {
+                    d: 'Email'
+                },
+                filter: true,
+                sorted: true,
+                control: {
+                    type: 'label',
+                    inputtype: 'string',
+                    d: '_.contact:hasEmail'
+                }
+            },
+            {
+                arc: 'contact:hasPhoneNumber',
+                label: {
+                    d: 'Teléfono'
+                },
+                filter: true,
+                sorted: true
+            },
+            {
+                arc: 'contact:hasAge',
+                label: {
+                    d: 'Edad'
+                },
+                range: 'integer',
+                filter: true,
+                sorted: true
+            },
+            {
+                arc: 'contact:hasBirthDate',
+                label: {
+                    d: 'Fecha de nacimiento'
+                },
+                range: 'date',
+                filter: true,
+                sorted: true
+            },
+            {
+                arc: 'contact:hasBirthDate',
+                label: {
+                    d: 'Fecha de nacimiento (con control)'
+                },
+                range: 'date',
+                filter: true,
+                sorted: true,
+                control: {
+                    type: 'label',
+                    inputtype: 'dateTime',
+                    d: '_.contact:hasBirthDate'
+                }
+            },
+            {
+                arc: 'contact:hasHeritage',
+                label: {
+                    d: 'Patrimonio (con control)'
+                },
+                range: 'float',
+                filter: true,
+                sorted: true,
+                control: {
+                    type: 'label',
+                    inputtype: 'float',
+                    d: '_.contact:hasHeritage'
+                }
+            },
+            {
+                arc: 'contact:hasMaster',
+                label: {
+                    d: 'Tiene maestría'
+                },
+                range: 'boolean',
+                filter: true,
+                sorted: true
+            },
+            {
+                arc: 'contact:hasMaster',
+                label: {
+                    d: 'Tiene maestría (con control)'
+                },
+                range: 'boolean',
+                filter: true,
+                sorted: true,
+                control: {
+                    type: 'label',
+                    inputtype: 'boolean',
+                    d: '_.contact:hasMaster'
+                }
+            }
+        ]
+    },
+
+    IN_FILTERS_REM = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        searchType: 'rem',
+        schema: Schema_REM,
+        pagination: true,
+        limit: 5
+    },
+
+    Obj_filters_rem = {
+        type : 'kresult',
+        hasChannel: CHANNEL_FILTERS_REM,
+        busId: BUSID_FILTERS_REM,
+        in : IN_FILTERS_REM    
+    },
+
+    Schema_SQL = { 
+        data: [                   
+            {
+                label: {
+                    d: 'Nombre'
+                },
+                arc: 'NOMBRE',  
+                filter: true,                                      
+                sorted: true
+            },                                                                                                                                                 
+            {
+                label: {
+                    d: 'Email'
+                },
+                arc: 'EMAIL',  
+                filter: true,                                      
+                sorted: true,
+                control: {
+                    type: 'label',
+                    d: '_.EMAIL',
+                    inputtype: 'string'
+                }
+            },                                                                         
+            {
+                label: {
+                    d: 'Teléfono'
+                },
+                arc: 'TELEFONO',  
+                filter: true,                                      
+                sorted: true
+            },                                                                         
+            {
+                label: {
+                    d: 'Edad'
+                },
+                arc: 'EDAD',
+                range: 'integer',
+                filter: true,
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Fecha de nacimiento'
+                },
+                arc: 'FECHANACIMIENTO',
+                range: 'date',
+                filter: true,
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Fecha de nacimiento (con control)'
+                },
+                arc: 'FECHANACIMIENTO',
+                range: 'date',
+                filter: true,
+                sorted: true,
+                control: {
+                    type: 'label',
+                    d: '_.FECHANACIMIENTO',
+                    inputtype: 'dateTime'
+                }
+            },
+            {
+                label: {
+                    d: 'Patrimonio (con control)'
+                },
+                arc: 'PATRIMONIO',
+                range: 'float',
+                filter: true,
+                sorted: true,
+                control: {
+                    type: 'label',
+                    d: '_.PATRIMONIO',
+                    inputtype: 'float'
+                }
+            },
+            {
+                label: {
+                    d: 'Tiene maestría'
+                },
+                arc: 'TIENEMASTER',
+                range: 'boolean',
+                filter: true,
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Tiene maestría (con control)'
+                },
+                arc: 'TIENEMASTER',
+                range: 'boolean',
+                filter: true,
+                sorted: true,
+                control: {
+                    type: 'label',
+                    d: '_.TIENEMASTER',
+                    inputtype: 'boolean'
+                }
+            }
+        ]
+    },
+
+    IN_FILTERS_SQL = {
+        searchType: 'sql',
+        dbType: 'mysql',
+        dbConn: 'sqlite_contacts',
+        code: CODE,
+        schema: Schema_SQL,
+        pagination: true,
+        limit: 5
+    },
+
+    Obj_filters_sql = {
+        type : 'kresult',
+        hasChannel: CHANNEL_FILTERS_SQL,
+        busId: BUSID_FILTERS_SQL,
+        in : IN_FILTERS_SQL    
+    },
+
+    Gui_out = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'label',
+                id: 'label-rem',
+                size: 'h2',
+                i18n: 'd',
+                d: 'table_filters_rem_test_uiML'
+            },
+            Obj_filters_rem,
+            {
+                type: 'label',
+                id: 'label-sql',
+                size: 'h2',
+                i18n: 'd',
+                d: 'table_filters_mysql_test_uiML'
+            },
+            Obj_filters_sql
+        ]
+    },
+
+    Obj_class = {
+        type: 'rprocess',
+        hasKw: kresult_filters_rem_sql,
+        hasChannel: CHANNEL_FILTERS,
+        busId: BUSID_FILTERS,
+        hasDsca: folder__repositorioTests_table_filters_uiML,
+        hasIcon: 'filter',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: true,
+        hasNavbar: false,
+        gui_out: Gui_out
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_table_filters::folders'(_, _, _, _) :-
+    Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_table_filters,
+        hasDsca: folder__repositorioTests_table_filters_uiML,
+        hasIcon: 'filter-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            kresult_filters_rem_sql
+        ]
+    },
+    create_rprocess(_, Conf_folder, _, _).

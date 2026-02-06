@@ -1,0 +1,1360 @@
+﻿/**
+@descr	staber_ktoolbar <br>
+		staber_ktoolbar
+@author CCP
+@date	2024_05_27
+**/
+rc_class('staber_ktoolbar') :-
+	class +$ 'staber_ktoolbar' d ( es,'Patrón rproc para ktoolbar') sc function,
+
+    'staber_ktoolbar::by_override'(_, _, _, _),   
+    'staber_ktoolbar::by_configuration'(_, _, _, _),   
+    'staber_ktoolbar::interaction_table_multiselection'(_, _, _, _),
+    'staber_ktoolbar::interaction_button_ktoolbar_event'(_, _, _, _),
+    'staber_ktoolbar::ktoolbar_grouped_buttons'(_, _, _, _),
+    'staber_ktoolbar::ktoolbar_ulma'(_, _, _, _),
+    'staber_ktoolbar::folders'(_, _, _, _).
+
+'staber_ktoolbar::by_override'(_, _Obj_in, _, Obj_out) :-  
+    newKw('channel_toolbar_', CHANNEL_KTOOLBAR),
+    newKw('busid_toolbar_', BUSID_KTOOLBAR),
+    OVERRIDES = [            
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name:'staber_ktoolbar::toolbar::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }        
+    ],
+	Obj_class = {  
+        type : 'ktoolbar',
+        hasChannel: CHANNEL_KTOOLBAR,
+        busId: BUSID_KTOOLBAR,
+        overrides: OVERRIDES,
+        hasKw: rproc__ktoolbar_override,
+        hasDsca: [('es', 'Botonera configurada con sobrecarga del GUI_OUT prueba')],
+        hasIcon: 'list-add',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,Obj_out).
+
+'staber_ktoolbar::by_configuration'(_, _Obj_in, _, Obj_out) :-  
+    newKw('channel_toolbar_', CHANNEL_KTOOLBAR),
+    newKw('busid_toolbar_', BUSID_KTOOLBAR),
+	IN = {
+        actions: [
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    icon: 'delete',
+                    d: 'Nueva acción configurada'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BUSID_KTOOLBAR,                                         
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [            
+                             { 
+                                type: 'function',
+                                name: 'staber_ktoolbar::doAction',
+                                in: { mode: 'configurado' },
+                                context: { delegatedTo: 'builderweb' }
+                            }                     
+                        ]
+                    }
+                }]      
+            }
+        ]
+    },
+	Obj_class = {  
+        type : 'ktoolbar',
+        in : IN,
+        hasChannel: CHANNEL_KTOOLBAR,
+        busId: BUSID_KTOOLBAR,
+        hasKw: rproc__ktoolbar_configuration,
+        hasDsca: [('es', 'Botonera configurada con configuración dinámica')],
+        hasIcon: 'list-alt',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,Obj_out).
+
+'staber_ktoolbar::interaction_table_multiselection'(_, _Obj_in, _, Obj_out) :- 
+    newKw('bus__container', BUS_RPROC), 
+    newKw('channel_toolbar_', CHANNEL_KTOOLBAR),
+    newKw('busid_toolbar_', BUSID_KTOOLBAR),
+    newKw('channel_pivot_', CHANNEL_KPIVOT),
+    newKw('busid_pivot_', BUSID_KPIVOT),
+
+	IN_TOOLBAR = {
+        actions: [
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Notificar seleccionados'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BUSID_KTOOLBAR,                                         
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [                            
+                            { 
+                                type: 'method', 
+                                name: 'getSelected',
+                                busId: BUSID_KPIVOT 
+                            },                      
+                            { 
+                                type: 'function',
+                                name: 'staber_ktoolbar::showSelected',
+                                context: { delegatedTo: 'builderweb' }
+                            }                     
+                        ]
+                    }
+                }]      
+            },
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    d: 'Mostrar ayuda'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: BUSID_KTOOLBAR,                                         
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [                            
+                            { 
+                                type: 'method',
+                                in: {                                        
+                                    position: 'right',
+                                    hasHelp: '{\"title\":\"Componente configurado con conexion entre pestañas y área de trabajo\" , \"html\": \"Aquí va la explicación\"}'
+                                },
+                                name: 'showHelp',
+                                busId: 'helpBusId' 
+                            }                    
+                        ]
+                    }
+                }]      
+            }
+        ]
+    },
+    Obj_toolbar = {
+        type: 'ktoolbar',
+        in : IN_TOOLBAR,
+        hasChannel: CHANNEL_KTOOLBAR,
+        busId: BUSID_KTOOLBAR        
+    },
+
+    Obj_pivot = {
+        type: 'kpivotgrid',
+        busId: BUSID_KPIVOT,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                {
+                    type: 'method',
+                    name: 'schemaToQuery',
+                    module: 'QueryFilterService'
+                },
+                {
+                    type: 'function',
+                    name: 'remql',
+                    context: {
+                        delegatedTo: 'builderweb'
+                    }
+                }
+            ]
+        },
+        do_exec: true,
+        autoRows: true,
+        enabled: false,
+        evtPublish: [
+            {
+                topic: 'setNode',
+                channel: CHANNEL_KPIVOT
+            },
+            {
+                topic: 'setNodes',
+                channel: CHANNEL_KPIVOT
+            }
+        ],
+        evtSubscribe: [
+            {
+                topic: 'clearSelected',
+                channel: CHANNEL_KPIVOT
+            },
+            {
+                topic: 'clearSelection',
+                channel: CHANNEL_KPIVOT
+            }
+        ],
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'Default',
+            hasKw: 'testapp:contact',
+            rowTemplate: 'style=\"background-color: ##{_.hasKw}##\"//class=\"##{_.hasKw}##\"',
+            schema: [
+                {
+                    label: {
+                        d: 'Nombre'
+                    },
+                    arc: 'contact:hasName',
+                    enabled: false
+                },     
+                {
+                    label: {
+                        d: 'Edad'
+                    },
+                    arc: 'contact:hasAge',
+                    inputtype: 'integer',
+                    enabled: false
+                }
+            ],
+            searchType: 'rem',
+            persistence: 'remote',
+            selectable: false,
+            enabled: false,
+            limit: 20,            
+            layoutType: 'kpivotgrid',
+            multiselection: true,
+            page: 0,
+            inlineCount: true,
+            orderByOneColumn: true,
+            pagination: true,
+            rootElement: true,
+            expanded: false,
+            schemaHeader: true,
+            resizable: false,
+            hasIncludedProperties: [
+                'contact:hasName',
+                'contact:hasAge'
+            ]
+        }
+    },
+
+    Obj_container = {
+        type: 'assembly',
+        children:[
+            Obj_toolbar,
+            Obj_pivot,
+            {
+                type: 'help',
+                classList: [
+                    'info-font-icon',
+                    'floating'
+                ],
+                busId: 'helpBusId'
+            }
+        ]
+    },
+
+    IN_RPROC = {
+    },
+    Obj_class = {
+        in : IN_RPROC,
+        type : 'rprocess',
+        busId: BUS_RPROC,
+        hasKw: rproc__ktoolbar_kpivotgrid,
+        hasDsca: 'Componente configurado con conexion entre pestañas y área de trabajo',
+        hasIcon: 'group',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_container,
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,Obj_out).
+
+'staber_ktoolbar::interaction_button_ktoolbar_event'(_, _Obj_in, _, Obj_out) :- 
+    newKw('bus__container', BUS_RPROC), 
+    newKw('channel_toolbar1_', CHANNEL_KTOOLBAR1),
+    newKw('channel_toolbar2_', CHANNEL_KTOOLBAR2),
+    newKw('busid_toolbar1_', BUSID_KTOOLBAR1),
+    newKw('busid_toolbar2_', BUSID_KTOOLBAR2),
+
+    Obj_ktoolbar = {
+        type: 'ktoolbar',
+        in : {
+            actions: [
+                {
+                    type: 'button',
+                    label: {
+                        d: 'Habilitar segundo botón'
+                    },
+                    enabled: '$.in.enabled1',
+                    events: [{
+                        type: 'click',
+                        method: 'log',
+                        payload: {
+                            enabled2: true
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'method', name: 'refreshActionsConfig', busId: BUSID_KTOOLBAR1 }
+                            ]
+                        },
+                        targetBusId: BUSID_KTOOLBAR1
+                    }]
+                },
+                {
+                    type: 'button',
+                    label: {
+                        d: 'Deshabilitar segundo botón'
+                    },
+                    enabled: '$.in.enabled2',
+                    events: [{
+                        type: 'click',
+                        method: 'log',
+                        payload: {
+                            enabled2: false
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'method', name: 'refreshActionsConfig', busId: BUSID_KTOOLBAR1 }
+                            ]
+                        },
+                        targetBusId: BUSID_KTOOLBAR1
+                    }]
+                },
+                {
+                    type: 'button',
+                    label: {
+                        d: 'Habilitar primer botón'
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'refreshActionsConfig',
+                        payload: {
+                            enabled1: true
+                        },
+                        targetBusId: BUSID_KTOOLBAR1
+                    }]
+                },
+                {
+                    type: 'button',
+                    label: {
+                        d: 'Deshabilitar primer botón'
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'refreshActionsConfig',
+                        payload: {
+                            enabled1: false
+                        },
+                        targetBusId: BUSID_KTOOLBAR1
+                    }]
+                }
+            ]
+        },
+        hasChannel: CHANNEL_KTOOLBAR1,
+        busId: BUSID_KTOOLBAR1
+    },
+
+    Obj_outerButton = {
+        type: 'ktoolbar',
+        in : {
+            actions: [
+                {
+                    type: 'button',
+                    label: {
+                        d: 'Habilitar primer botón de la primera toolbar'
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUSID_KTOOLBAR2,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'method', name: 'publish', module: 'PubSub',
+                                    in: {
+                                        publish: [
+                                            { topic: 'refreshActionsConfig', channel: CHANNEL_KTOOLBAR1, data: { enabled1: true } }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }]
+                }
+            ]
+        },
+        hasChannel: CHANNEL_KTOOLBAR2,
+        busId: BUSID_KTOOLBAR2
+    },
+
+    Obj_container = {
+        type: 'assembly',
+        children:[
+            {
+                type: 'label',
+                d: 'Primera toolbar'
+            },
+            Obj_ktoolbar,
+            {
+                type: 'label',
+                d: 'Segunda toolbar'
+            },
+            Obj_outerButton
+        ]
+    },
+
+    IN_RPROC = {
+    },
+    Obj_class = {
+        in : IN_RPROC,
+        type : 'rprocess',
+        busId: BUS_RPROC,
+        hasKw: rproc__ktoolbar_event_enabled,
+        hasDsca: 'Componente configurado con conexión entre botón y ktoolbar (event)',
+        hasIcon: 'group',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_container,
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,Obj_out).
+
+'staber_ktoolbar::toolbar::rc_gui_out'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_get(busId, Obj_in, MyBus),
+    Obj_out = {
+        type: 'assembly',
+        id: 'buttons_assembly',
+        children: [
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    icon: 'add',
+                    d: 'Nueva acción sobrecargada'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: MyBus,                                         
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [            
+                             { 
+                                type: 'function',
+                                name: 'staber_ktoolbar::doAction',
+                                in: { mode: 'sobrecargado' },
+                                context: { delegatedTo: 'builderweb' }
+                            }                     
+                        ]
+                    }
+                }]      
+            }
+        ]
+    }.
+
+'staber_ktoolbar::doAction'(Ctx, Obj_in, Ctx, Obj_out):- 
+    obj_fetch(mode, Obj_in, Mode),
+    wAddInfoMsgML('Aviso', 'Se ha realizado clic en un botón ?a{_,1}', [Mode],{showTime:10}),
+    Obj_out = Obj_in.
+
+'staber_ktoolbar::showSelected'(Ctx, Obj_in, Ctx, Obj_out):- 
+    obj_get(hasKw, Obj_in, Lkw),
+    concatConstants( Lkw, ';', Skw),
+    wAddInfoMsgML('Aviso', Skw, ['CCP'],{showTime:10}),
+    Obj_out = Obj_in.
+
+'staber_ktoolbar::ktoolbar_grouped_buttons'(_, _Obj_in, _, Obj_out) :- 
+    newKw('bus__container', BUS_RPROC), 
+    newKw('channel_grouped_toolbar1_', CHANNEL_GROUPEDKTOOLBAR1),
+    newKw('busid_grouped_toolbar1_', BUSID_GROUPEDKTOOLBAR1),
+    newKw('channel_grouped_toolbar2_', CHANNEL_GROUPEDKTOOLBAR2),
+    newKw('busid_grouped_toolbar2_', BUSID_GROUPEDKTOOLBAR2),
+
+    Obj_ktoolbar1 = {
+        type: 'ktoolbar',
+        in : {
+            hasTitle: 'Título toolbar',
+            hasTitleSize: 'h3',
+            actions: [
+                {
+                    type: 'button',
+                    appearance: 'text',
+                    label: {
+                        icon: 'comment-line',
+                        tip: {
+                            value: 'Botón 1',
+                            delay: 0,
+                            position: 'bottom'
+                        }
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'doNothing',
+                        payload: {
+                            message: 'Botón 1'
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                            ]
+                        },
+                        targetBusId: BUSID_GROUPEDKTOOLBAR1
+                    }]
+                },
+                {
+                    type: 'button',
+                    appearance: 'text',
+                    label: {
+                        icon: 'comment-line',
+                        tip: {
+                            value: 'Botón 2',
+                            delay: 0,
+                            position: 'bottom'
+                        }
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'doNothing',
+                        payload: {
+                            message: 'Botón 2'
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                            ]
+                        },
+                        targetBusId: BUSID_GROUPEDKTOOLBAR1
+                    }]
+                },
+                {
+                    type: 'actions',
+                    actions: [
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            enabled: false,
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 3',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 3'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_GROUPEDKTOOLBAR1
+                            }]
+                        },
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 4',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 4'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_GROUPEDKTOOLBAR1
+                            }]
+                        }
+                    ]
+                },
+                {
+                    type: 'actions',
+                    hasLayout: 'combo',
+                    hasLayoutData: {
+                        % hasTitle: 'Combo botones',
+                        hasIcon: 'add',
+                        hasTip: 'Prueba'
+                    },
+                    actions: [
+                        {
+                            type: 'button',
+                            enabled: false,
+                            label: {
+                                d: 'Botón 5',
+                                icon: 'comment-line'
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 5'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_GROUPEDKTOOLBAR1
+                            }]
+                        },
+                        {
+                            type: 'button',
+                            label: {
+                                d: 'Botón 6',
+                                icon: 'comment-line'
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 6'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_GROUPEDKTOOLBAR1
+                            }]
+                        }
+                    ]
+                },
+                {
+                    type: 'actions',
+                    enabled: false,
+                    actions: [
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 7',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 7'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_GROUPEDKTOOLBAR1
+                            }]
+                        },
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 8',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 8'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_GROUPEDKTOOLBAR1
+                            }]
+                        }
+                    ]
+                }
+            ]
+        },
+        hasChannel: CHANNEL_GROUPEDKTOOLBAR1,
+        busId: BUSID_GROUPEDKTOOLBAR1
+    },
+
+    Obj_ktoolbar2 = {
+        type: 'ktoolbar',
+        in : {
+            actions: [
+                {
+                    type: 'button',
+                    appearance: 'text',
+                    label: {
+                        icon: 'comment-line',
+                        tip: {
+                            value: 'Botón 1',
+                            delay: 0,
+                            position: 'bottom'
+                        }
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'doNothing',
+                        payload: {
+                            message: 'Botón 1'
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                            ]
+                        },
+                        targetBusId: BUSID_GROUPEDKTOOLBAR1
+                    }]
+                },
+                {
+                    type: 'button',
+                    appearance: 'text',
+                    label: {
+                        icon: 'comment-line',
+                        tip: {
+                            value: 'Botón 2',
+                            delay: 0,
+                            position: 'bottom'
+                        }
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'doNothing',
+                        payload: {
+                            message: 'Botón 2'
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                            ]
+                        },
+                        targetBusId: BUSID_GROUPEDKTOOLBAR1
+                    }]
+                },
+                {
+                    type: 'actions',
+                    actions: [
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            enabled: false,
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 3',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 3'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_GROUPEDKTOOLBAR1
+                            }]
+                        },
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 4',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 4'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_GROUPEDKTOOLBAR1
+                            }]
+                        }
+                    ]
+                },
+                {
+                    type: 'actions',
+                    hasLayout: 'combo',
+                    enabled: false,
+                    hasLayoutData: {
+                        hasTitle: 'Combo botones',
+                        hasIcon: 'add'
+                    },
+                    actions: [
+                        {
+                            type: 'button',
+                            label: {
+                                d: 'Botón 5',
+                                icon: 'comment-line'
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 5'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_GROUPEDKTOOLBAR1
+                            }]
+                        },
+                        {
+                            type: 'button',
+                            label: {
+                                d: 'Botón 6',
+                                icon: 'comment-line'
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 6'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_GROUPEDKTOOLBAR1
+                            }]
+                        }
+                    ]
+                },
+                {
+                    type: 'actions',
+                    enabled: false,
+                    actions: [
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 7',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 7'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_GROUPEDKTOOLBAR1
+                            }]
+                        },
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: 'comment-line',
+                                tip: {
+                                    value: 'Botón 8',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 8'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_GROUPEDKTOOLBAR1
+                            }]
+                        }
+                    ]
+                }
+            ]
+        },
+        hasChannel: CHANNEL_GROUPEDKTOOLBAR2,
+        busId: BUSID_GROUPEDKTOOLBAR2
+    },
+
+    Obj_container = {
+        type: 'assembly',
+        children:[
+            {
+                type: 'label',
+                size: 'h2',
+                d: 'Toolbar con título y con agrupaciones'
+            },
+            Obj_ktoolbar1,
+            {
+                type: 'label',
+                size: 'h2',
+                d: 'Toolbar sin título y con agrupaciones'
+            },
+            Obj_ktoolbar2
+        ]
+    },
+
+    IN_RPROC = {
+    },
+    Obj_class = {
+        in : IN_RPROC,
+        type : 'rprocess',
+        busId: BUS_RPROC,
+        hasKw: rproc__ktoolbar_grouped_buttons,
+        hasDsca: 'Botonera con botones agrupados (en desarrollo)',
+        hasIcon: 'group',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_container,
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,Obj_out).
+
+'sendMessage'(_, Obj_in, _, Obj_out):-
+    obj_fetch(message, Obj_in, Msg),
+    wAddInfoMsgML('Aviso', 'Se ha realizado clic en un botón ?a{_,1}', [Msg],{showTime:3}),
+    Obj_out = Obj_in.
+
+'staber_ktoolbar::ktoolbar_ulma'(_, _Obj_in, _, Obj_out) :-
+    newKw('bus__container_', BUS_RPROC), 
+    newKw('channel_container_', CHANNEL_RPROC),
+    
+    newKw('busid_toolbar_ulma_', BUSID_ULMA_TOOLBAR),
+    newKw('channel_toolbar_ulma_', CHANNEL_ULMA_TOOLBAR),
+
+    Obj_ktoolbar = {
+        type: 'ktoolbar',
+        busId: BUSID_ULMA_TOOLBAR,
+        hasChannel: CHANNEL_ULMA_TOOLBAR,
+        in : {          
+            actions: [
+                {
+                    type: 'button',
+                    appearance: 'text',
+                    label: {
+                        icon: {
+                            source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_AÑADIR_AVANZADO_MATERIALES.svg',
+                            width: '16px',
+                            height: '16px'
+                        },
+                        tip: {
+                            value: 'Botón 1',
+                            delay: 0,
+                            position: 'bottom'
+                        }
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'doNothing',
+                        payload: {
+                            message: 'Botón 1'
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                            ]
+                        },
+                        targetBusId: BUSID_ULMA_TOOLBAR
+                    }]
+                },
+                {
+                    type: 'button',
+                    appearance: 'text',
+                    label: {
+                        icon: {
+                            source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_AÑADIR_CONFIGURACION_PERSONAL.svg',
+                            width: '16px',
+                            height: '16px'
+                        },
+                        tip: {
+                            value: 'Botón 2',
+                            delay: 0,
+                            position: 'bottom'
+                        }
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'doNothing',
+                        payload: {
+                            message: 'Botón 2'
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                            ]
+                        },
+                        targetBusId: BUSID_ULMA_TOOLBAR
+                    }]
+                },
+                {
+                    type: 'actions',
+                    hasLayout: 'combo',
+                    hasLayoutData: {
+                        hasIcon: {
+                            source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_CANTIDADES_TOTALES.svg',
+                            width: '16px',
+                            height: '16px'
+                        }
+                    },
+                    actions: [
+                        {
+                            type: 'button',
+                            label: {
+                                icon: {
+                                    source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_AÑADIR_MATERIALES.svg',
+                                    width: '16px',
+                                    height: '16px'
+                                },
+                                tip: {
+                                    value: 'Botón 3',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 3'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_ULMA_TOOLBAR
+                            }]
+                        },
+                        {
+                            type: 'button',
+                            appearance: 'text',
+                            label: {
+                                icon: {
+                                    source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_BUSQUEDA_AVANZADA.svg',
+                                    width: '16px',
+                                    height: '16px'
+                                },
+                                tip: {
+                                    value: 'Botón 4',
+                                    delay: 0,
+                                    position: 'bottom'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 4'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_ULMA_TOOLBAR
+                            }]
+                        }
+                    ]
+                },
+                {
+                    type: 'actions',
+                    hasLayout: 'combo',
+                    hasLayoutData: {
+                        hasIcon:  {
+                            source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_CARGAR_AUTOCAD.svg',
+                            width: '16px',
+                            height: '16px'
+                        }
+                    },
+                    actions: [
+                        {
+                            type: 'button',
+                            enabled: false,
+                            label: {
+                                icon: {
+                                    source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_CAMBIAR_COLOR_LINEAS.svg',
+                                    width: '16px',
+                                    height: '16px'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 5'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_ULMA_TOOLBAR
+                            }]
+                        },
+                        {
+                            type: 'button',
+                            label: {
+                                icon: {
+                                    source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_CAMBIAR_MODO_SUMINISTRO.svg',
+                                    width: '16px',
+                                    height: '16px'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 6'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_ULMA_TOOLBAR
+                            }]
+                        }
+                    ]
+                },
+                {
+                    type: 'button',
+                    appearance: 'text',
+                    label: {
+                        icon: {
+                            source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_CARGAR_REPCON.svg',
+                            width: '16px',
+                            height: '16px'
+                        },
+                        tip: {
+                            value: 'Botón 1',
+                            delay: 0,
+                            position: 'bottom'
+                        }
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'doNothing',
+                        payload: {
+                            message: 'Botón 1'
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                            ]
+                        },
+                        targetBusId: BUSID_ULMA_TOOLBAR
+                    }]
+                },
+                {
+                    type: 'button',
+                    appearance: 'text',
+                    label: {
+                        icon: {
+                            source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_CARGAR_EXCEL_MATERIALES_ESTANDAR.svg',
+                            width: '16px',
+                            height: '16px'
+                        },
+                        tip: {
+                            value: 'Botón 2',
+                            delay: 0,
+                            position: 'bottom'
+                        }
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'doNothing',
+                        payload: {
+                            message: 'Botón 2'
+                        },
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                            ]
+                        },
+                        targetBusId: BUSID_ULMA_TOOLBAR
+                    }]
+                },
+                {
+                    type: 'actions',
+                    hasLayout: 'puedoponerkevinyfunciona',
+                    hasLayoutData: {
+                        hasIcon:  {
+                            source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_PEGAR_MATERIALES.svg',
+                            width: '16px',
+                            height: '16px'
+                        }
+                    },
+                    actions: [
+                        {
+                            type: 'button',
+                            enabled: false,
+                            label: {
+                                icon: {
+                                    source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_RESETEAR_COLUMNAS.svg',
+                                    width: '16px',
+                                    height: '16px'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 5'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_ULMA_TOOLBAR
+                            }]
+                        },
+                        {
+                            type: 'button',
+                            label: {
+                                icon: {
+                                    source: '/repcon/f_get/repository/testapp/ulmabuttons/Lista_Materiales_SELECCIONAR_TODOS.svg',
+                                    width: '16px',
+                                    height: '16px'
+                                }
+                            },
+                            events: [{
+                                type: 'click',
+                                method: 'log',
+                                payload: {
+                                    message: 'Botón 6'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'function', name: 'sendMessage', context: { delegatedTo: 'builderweb' } }
+                                    ]
+                                },
+                                targetBusId: BUSID_ULMA_TOOLBAR
+                            }]
+                        }
+                    ]
+                }
+            ]
+        }        
+    },
+
+    IN_RPROC = {
+    },
+
+    Obj_class = {
+        type : 'rprocess',
+        in : IN_RPROC,
+        busId: BUS_RPROC,
+        hasChannel: CHANNEL_RPROC,
+        hasKw: rproc__ktoolbar_ulma,
+        hasDsca: 'Botonera ULMA',
+        hasIcon: 'group',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_ktoolbar,
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,Obj_out).
+
+'staber_ktoolbar::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_ktoolbar,
+        hasDsca: 'ktoolbar (Ejemplos) prueba',
+        hasIcon: 'list',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+        hasERCPart:[
+            rproc__ktoolbar_override,
+            rproc__ktoolbar_configuration,
+            rproc__ktoolbar_kpivotgrid,
+            rproc__ktoolbar_event_enabled,
+            rproc__ktoolbar_grouped_buttons,
+            rproc__ktoolbar_ulma
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).

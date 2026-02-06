@@ -1,0 +1,32 @@
+{
+    "data": [{
+            "id": 2,
+            "title": "History",
+            "start": 1646902800000,
+            "end": 1646906400000,
+            "event": "event__0"
+        },
+        {
+            "id": 3,
+            "title": "Produccion",
+            "start": 1647298800000,
+            "end": 1647298800000,
+            "isAllDay": true,
+            "event": "event__1"
+        }
+    ],
+    "resources": [{
+        "field": "event",
+        "dataSource": [{
+                "text": "Histórico",
+                "value": "event__0",
+                "color": "#FFA726"
+            },
+            {
+                "text": "Programación",
+                "value": "event__1",
+                "color": "#EF5350"
+            }
+        ]
+    }]
+}

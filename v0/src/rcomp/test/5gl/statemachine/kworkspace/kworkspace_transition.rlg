@@ -1,0 +1,15 @@
+
+/* Estados de la máquina */
+'kworkspace_transition::transition_init'(Transition_init):-
+    Transition_init = {
+        type: 'transition',
+        stateTo: 'state_browser',
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                { type: 'method',   name: 'getUserContextInfo', module: 'SessionContext'},
+                { type: 'function', name: 'prepare_security_root_search', context: {delegatedTo: '$.hasAgent'}},
+                { type: 'function', name: 'staber_pSearch', context: {delegatedTo: '$.hasAgent'}}
+            ]
+        }
+    }.

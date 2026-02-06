@@ -1,0 +1,463 @@
+﻿/**staber_k
+@descr	staber_kstatusview <br>
+		staber_kstatusview
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kstatusview') :-
+	class +$ 'staber_kstatusview' d ( es,'Patrón rproc para kstatusview') sc function,
+    'staber_kstatusview::usecase__001'(_, _, _, _),
+    'staber_kstatusview::imageLogo'(_, _, _, _),
+    'staber_kstatusview::folders'(_, _, _, _).
+
+'kstatusviewSelectedOptionMessage'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_get(value, Obj_in, Option),
+    wAddInfoMsgML('Aviso', 'Se ha seleccionado la opcion: <b>?a{1}</b>', [Option],{showTime:3}),
+    Obj_out = Obj_in.
+
+'staber_kstatusview::usecase__001'(_, _OBJ_in, _, OBJ_out) :-
+    CHANNEL_KSTATUSVIEW = 'channel__kstatusview_rprocess',
+    BUS_KSTATUSVIEW = 'bus__kstatusview_rprocess',
+
+    STATUSVIEW_OVERRIDES = [          
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kstatusview::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }         
+    ], 
+
+	Obj_class = {
+        type : 'rprocess',
+        hasChannel: CHANNEL_KSTATUSVIEW,
+        busId: BUS_KSTATUSVIEW,
+        overrides: STATUSVIEW_OVERRIDES,
+        hasKw: 'kstatusview_test_001',
+        hasDlg: true,
+        hasDsca: 'kstatusview_test_001_uiML',
+        hasIcon: 'rocket-line',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        evtPublish: [{topic:'showPending',channel:'channel__notification'}],
+        evtSubscribe: [{topic:'sendMessagesCount',channel:'channel__notification'}],
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kstatusview::rc_gui_out'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    'staber_rdlg::dlg'(DLG1, _),
+    DATA1 = {
+        type: 'label',
+        d: 'Pulse Aceptar para Terminar este ejemplo',
+        icon: 'h4'
+    },
+    OBJ_out = {
+        type: 'assembly',
+        children:
+        [
+            {
+                type: 'r-label',
+                d: 'El label con este icono tiene una navegación a mi perfil por tag configurada.',
+                icon: 'send'
+            },
+            {
+                type: 'r-label',
+                d: 'El label con este icono tiene una invocación de diálogo simple configurada.',
+                icon: 'comment-line'
+            },
+            {
+                type: 'r-label',
+                d: 'El label con este icono tiene una navegación a la página de Semantic-Systems por link configurada.',
+                icon: 'world-line'
+            },
+            {
+                type: 'r-label',
+                d: 'Las notificaciones están configuradas para que cada vez que se haga una notificación o se elimine, el kstatusview escuche esto y y aumente o reduzca el número que sirve de indicador en 1.'
+            },
+            {
+                type: 'r-label',
+                d: ''
+            },
+            {
+                type: 'r-label',
+                d: 'Además de ello, el símbolo de la campana sirve para mostrar todas las notificaciones que han quedado como pendientes (sin cerrar).',
+                icon: 'bell'
+            },
+            {
+                type: 'r-label',
+                d: 'El símbolo de usuario sirve por defecto para mostrar el perfil del usuario logeado.',
+                icon: 'user'
+            },
+            {
+                type: 'r-label',
+                d: 'Para demostrar el funcionamiento de las notificaciones y el kstatusview en conjunto se diponen los siguientes botones:'
+            },
+            {
+                type: 'r-button',
+                classList: [
+                    'floating-button'
+                ],
+                text: 'Notificación caduca',
+                events:[{
+                    type: 'click',
+                    method: 'setNode',
+                    targetBusId: '$.busId',
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { type: 'function', name: 'staber_kstatusView::showtimeMessage', context: { delegatedTo: 'builderweb' } }
+                        ]
+                    }
+                }]
+            },
+            {
+                type: 'r-button',
+                classList: [
+                    'floating-button'
+                ],
+                text: 'Notificación perenne',
+                events:[{
+                    type: 'click',
+                    method: 'setNode',
+                    targetBusId: '$.busId',
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { type: 'function', name: 'staber_kstatusView::noShowtimeMessage', context: { delegatedTo: 'builderweb' } }
+                        ]
+                    }
+                }]
+            },
+            {
+                type : 'kstatusview',
+                busId: 'bus__kstatusview',
+                hasChannel: 'channel__kstatusview',
+                hasNotification: true,
+                hasUser: true,
+                in: {
+                    hasColorBackground: 'yellow',
+                    statusActions: [
+                        {
+                            type: 'r-label',
+                            i18n: 'tip',
+                            tip: 'kStatusView.tagNavigation.tip',
+                            icon: 'send',
+                            position: 'left',
+                            events: [
+                                {
+                                    type: 'click',
+                                    method: 'nav',
+                                    targetBusId: '$.busId',
+                                    payload: {
+                                        hasTag: 'myProfile',
+                                        in: {
+                                            hasKw: '$.in.hasUserConfig.hasKw',
+                                            hasDsca: 'Mi Perfil[{$.in.hasUser}]'
+                                        },
+                                        navOptions: {
+                                            isSession: true
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            type: 'r-label',
+                            position: 'left',
+                            icon: 'comment-line',
+                            text: 'kStatusView.dialogSummon.tip',
+                            i18n: ['tip', 'text'],
+                            tip: 'kStatusView.dialogSummon.tip',
+                            events: [
+                                {
+                                    type: 'click',
+                                    method: 'log',
+                                    targetBusId: '$.busId',
+                                    payload:{
+                                        campo1:'Dato aceptado'
+                                    },
+                                    p_exec: {
+                                        type: 'sequence',
+                                        hasProcess: [
+                                            { type: 'method', in: { dlg_data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: '$.busId'}
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            type: 'r-label',
+                            position: 'left',
+                            icon: 'world-line',
+                            text: 'kStatusView.linkNavigation.tip',
+                            i18n: ['tip', 'text'],
+                            tip: 'kStatusView.linkNavigation.tip',
+                            events: [
+                                {
+                                    type: 'click',
+                                    method: 'log',
+                                    targetBusId: 'bus__kstatusview',
+                                    payload:{
+                                        url:'http://www.semantic-systems.com'
+                                    },
+                                    p_exec: {
+                                        type: 'sequence',
+                                        hasProcess: [
+                                            { type: 'method', name: 'openURL', busId: 'bus__kstatusview'}
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                evtPublish: [{topic:'showPending',channel:'channel__notification'}],
+                evtSubscribe: [{topic:'sendMessagesCount',channel:'channel__notification'}]
+            }
+        ]
+    }.
+
+'staber_kstatusView::showtimeMessage'(Ctx, Obj_in, Ctx, Obj_out):-
+    wAddInfoMsgML('Aviso', 'Notificación con tiempo limitado', [],{showTime:3}),
+    Obj_out = Obj_in.
+
+'staber_kstatusView::noShowtimeMessage'(Ctx, Obj_in, Ctx, Obj_out):-
+    wAddInfoMsgML('Aviso', 'Notificación que no desaparece sola', []),
+    Obj_out = Obj_in.
+
+'staber_kstatusview::imageLogo'(_, _, _, ObjOut):-
+    newKw('staber_kstatusview__imageLogo_busId', BusId ),
+    newKw('staber_kstatusview__imageLogo_channel', Channel ),
+    newKw('staber_kstatusview__imageLogo_statusView_busId', StatusviewBusId ),
+    newKw('staber_kstatusview__imageLogo_statusView_channel', StatusviewChannel ),
+    newKw('staber_kstatusview__imageLogo_ktoolbar_busId', KtoolbarBusId ),
+    Overrides = [          
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kstatusview::imageLogo_rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }         
+    ], 
+	ObjMain = {
+        type : 'rprocess',
+        hasChannel: Channel,
+        busId: BusId,
+        in: {
+            statusviewBusId: StatusviewBusId,
+            statusviewChannel: StatusviewChannel,
+            ktoolbarBusId: KtoolbarBusId
+        },
+        hasDlg: true,
+        overrides: Overrides,
+        hasKw: 'kstatusview_test_imageLogo',
+        hasDsca: 'kstatusview_test_imageLogo_uiML',
+        hasIcon: 'rocket-line',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,ObjMain,_,ObjOut).
+
+'staber_kstatusview::imageLogo_rc_gui_out'(Ctx, ObjIn, Ctx, ObjOut):-
+    'staber_rdlg::dlg'(DLG1, _),
+    DATA1 = {
+        type: 'label',
+        d: 'Pulse Aceptar para Terminar este ejemplo',
+        icon: 'h4'
+    },
+    obj_get(busId, ObjIn, ParentBusId),
+    obj_get(in, ObjIn, In),
+    obj_get('statusviewBusId', In, StatusviewBusId ),
+    obj_get('statusviewChannel', In, StatusviewChannel ),
+    obj_get('ktoolbarBusId', In, KtoolbarBusId ),
+    
+    DfStatusActionsCount = 1,
+    DfHasColorBackground = grey,
+    obj_get('hasColorBackground', In, HasColorBackground, DfHasColorBackground),
+    obj_get('statusActionsCount', In, StatusActionsCount, DfStatusActionsCount),
+
+
+    (HasColorBackground == DfHasColorBackground ->
+        NewColorBackground = 'purple'
+    ;   NewColorBackground = DfHasColorBackground
+    ),
+    DfStatusActions = [
+        {
+            type: 'r-label',
+            position: 'left',
+            icon: 'world-line',
+            text: 'kStatusView.linkNavigation.tip',
+            i18n: ['tip', 'text'],
+            tip: 'kStatusView.linkNavigation.tip',
+            events: [
+                {
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: StatusviewBusId,
+                    payload:{
+                        url:'http://www.semantic-systems.com'
+                    },
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { type: 'method', name: 'openURL', busId: StatusviewBusId}
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    ModifiedStatusActions = [
+        {
+            type: 'r-label',
+            i18n: 'tip',
+            tip: 'kStatusView.tagNavigation.tip',
+            icon: 'send',
+            position: 'left',
+            events: [
+                {
+                    type: 'click',
+                    method: 'nav',
+                    targetBusId: '$.busId',
+                    payload: {
+                        hasTag: 'myProfile',
+                        in: {
+                            hasKw: '$.in.hasUserConfig.hasKw',
+                            hasDsca: 'Mi Perfil[{$.in.hasUser}]'
+                        },
+                        navOptions: {
+                            isSession: true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            type: 'r-label',
+            position: 'left',
+            icon: 'comment-line',
+            text: 'kStatusView.dialogSummon.tip',
+            i18n: ['tip', 'text'],
+            tip: 'kStatusView.dialogSummon.tip',
+            events: [
+                {
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: '$.busId',
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { type: 'method', in: { dlg_data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: ParentBusId}
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    (StatusActionsCount == DfStatusActionsCount ->
+        RenderStatusActions = DfStatusActions,
+        NewStatusActionsCount = 2
+    ;   RenderStatusActions = ModifiedStatusActions,
+        NewStatusActionsCount = 1
+    ),
+    ObjKtoolbar = {
+        type: 'ktoolbar',
+        do_exec: true,
+        busId: KtoolbarBusId,
+        in: {
+            actions: [
+                {
+                    type: 'button',
+                    appearance: 'line',
+                    label: {
+                        icon: 'perspective8',
+                        d: 'Color'
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'set_pv_exec',
+                        targetBusId: ParentBusId,
+                        payload: {
+                            property: 'hasColorBackground',
+                            value: NewColorBackground
+                        }
+                    }]      
+                },
+                {
+                    type: 'button',
+                    appearance: 'line',
+                    label: {
+                        icon: 'menu2',
+                        d: 'Actions'
+                    },
+                    events: [{
+                        type: 'click',
+                        method: 'set_pv_exec',
+                        targetBusId: ParentBusId,
+                        payload: {
+                            property: 'statusActionsCount',
+                            value: NewStatusActionsCount
+                        }
+                    }]      
+                }
+            ]
+        }
+    },
+    ObjKstatusView = {
+        type : 'kstatusview',
+        do_exec: true,
+        hasChannel: StatusviewChannel,
+        busId: StatusviewBusId,
+        hasNotification: true,
+        hasUser: true,
+        hasFooterLogo: true,
+        in:{
+            statusActions: RenderStatusActions,
+            hasColorBackground: HasColorBackground
+        },
+        evtPublish: [{topic:'showPending',channel:'channel__notification'}],
+        evtSubscribe: [{topic:'sendMessagesCount',channel:'channel__notification'}]
+    },
+    ObjOut = {
+        type: 'assembly',
+        children:[ObjKtoolbar, ObjKstatusView]
+    }.
+
+'kstatusView_color_change'(_, ObjIn, _, ObjOut):-
+    obj_get('hasColorBackground', ObjIn, HasColorBackground, false),
+    ( HasColorBackground == 'grey' ->
+        ObjOut = {
+            property: 'hasColorBackground',
+            value: 'purple'
+        }
+    ;   ObjOut = {
+            property: 'hasColorBackground',
+            value: 'grey'
+        }
+    ).
+
+'staber_kstatusview::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kstatusview,
+        hasDsca: 'kstatusview: Componente Visualización de Estado',
+        hasIcon: 'w3c',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            kstatusview_test_001,
+            kstatusview_test_imageLogo
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).

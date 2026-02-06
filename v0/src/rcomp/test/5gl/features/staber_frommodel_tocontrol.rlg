@@ -1,0 +1,676 @@
+﻿/**
+@descr	staber_frommodel_tocontrol <br>
+		staber_frommodel_tocontrol
+@author ccp
+@date	2024_01_11
+**/
+rc_class('staber_frommodel_tocontrol') :-
+	class +$ 'staber_frommodel_tocontrol' d ( es,'Comportamientos máquina de estados según configuración') sc function,
+    'staber_frommodel_tocontrol::allowcreation'(_, _, _, _),
+    'staber_frommodel_tocontrol::url_with_symbols'(_, _, _, _),
+    'staber_frommodel_tocontrol::inv_properties'(_, _, _, _),
+    'staber_frommodel_tocontrol::all_properties_kdetail_editable'(_, _, _, _),
+    'staber_frommodel_tocontrol::all_properties_kform_editable'(_, _, _, _),    
+    'staber_kdetail::formulario_contactos_agrupaciones_edicion'(_, _, _, _),
+    'staber_frommodel_tocontrol::folders'(_, _, _, _).
+
+'staber_frommodel_tocontrol::allowcreation'(_, _ObjIn, _, ObjOut):-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('bus__kdetail', BUSID_kdetail),
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        hasEvent: 'e_edit',
+        template: {
+            type: assembly,
+            cols: 1,    
+            width: '50%',
+            label: {
+                d: 'Renderización de listas'
+            },       
+            children: [
+                {
+                    arc: 'contact:hasBirthCountry',
+                    label: {
+                        d: 'Campo con posibilidad de creación, sin permiso de opciones y cardinalidad uno'
+                    }
+                },
+                {
+                    arc: 'contact:hasResidenceCountry',
+                    label: {
+                        d: 'Campo con posibilidad de creación, con permiso de opciones y cardinalidad uno'
+                    }
+                    % label: {
+                    %     d: 'Campo con posibilidad de creación, con permiso de opciones y cardinalidad uno',
+                    %     tip: {
+                    %         label: {s
+                    %             icon: 'info',
+                    %             d: 'Campo con posibilidad de creación, con permiso de opciones y cardinalidad uno',
+                    %             size: 'h4'
+                    %         },
+                    %         style: {
+                    %             border: '2px solid #2196F3'
+                    %         },
+                    %         delay: 0,
+                    %         position: 'bottom'
+                    %     }
+                    % }
+                },
+                {
+                    arc: 'contact:hasVacationCountry',
+                    label: {
+                        d: 'Campo con posibilidad de creación, sin permiso de opciones y cardinalidad mayor a uno'
+                    }
+                },
+                {
+                    arc:  'contact:hasVisitedCountry',
+                    label: {
+                        d: 'Campo sin posibilidad de creación, con permiso de opciones y cardinalidad uno'
+                    }
+                },                              
+                {
+                    arc:  'contact:hasFathersCountry',
+                    label: {
+                        d: 'Campo sin posibilidad de creación, sin permiso de opciones y cardinalidad uno'
+                    }
+                },
+                {
+                    arc:  'contact:hasMothersCountry',
+                    label: {
+                        d: 'Campo sin posibilidad de creación, sin permiso de opciones y cardinalidad mayor a uno'
+                    }
+                },
+                {
+                    arc:  'contact:hasPreferredCountry',
+                    label: {
+                        d: 'Campo sin posibilidad de creación, con permiso de opciones y cardinalidad mayor a uno'
+                    }
+                }                                 
+            ]          
+        }
+    },
+    Obj_class = {
+        type: 'kdetail',
+        busId: BUSID_kdetail,
+        hasNavbar: true,
+        do_exec: true,
+        in: IN
+    },
+    Title =  'Comportamiento en propiedades con posibilidad de creación (allowCreation)',
+    OBJ = {
+        type: 'rprocess',
+        hasKw: allowCreation_test,
+        hasDsca: Title,
+        hasIcon: 'zoom',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_class
+    },
+    create_rprocess(_,OBJ,_,ObjOut).
+
+'staber_frommodel_tocontrol::url_with_symbols'(_, _, _, OBJ_out):-
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    newKw('busid_kform_with_symbol_', BUSID),
+    Help_OBJ = {
+        type: help,
+        busId: helpBusId
+    },
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_005',
+        template:{
+            type: assembly,
+            cols: 1,
+            children:[
+                {
+                    arc: hasIcon,
+                    hasHelp: true,
+                    url: '/repcon/f_get/repository/data/test_5gl_server/avatar1 +.png',
+                    multiple: false,
+                    classList: ['user', 'lite-view'],
+                    appearance: 'wide',
+                    mimetype: 'app/img'
+                },
+                {
+                    label:{
+                        d: 'Icono en combobox'
+                    },
+                    type: combobox,
+                    elements: [
+                        {
+                            label: {
+                                d: 'Opción 1',
+                                % icon: '/repcon/f_get/repository/data/test_5gl_server/avatar1 +.png'
+                                icon: '/repcon/f_get/repository/data/test_5gl_server/avatar1 +.png'
+                            }
+                        },
+                        {
+                            label: {
+                                d: 'Opción 2',
+                                % icon: '/repcon/f_get/repository/data/test_5gl_server/avatar1 +.png'
+                                icon: '/repcon/f_get/repository/data/test_5gl_server/avatar2.png'
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: label,
+                    size: h4,
+                    d: 'Imagen con + en source'
+                },
+                {
+                    type: image,
+                    source: '/repcon/f_get/repository/data/test_5gl_server/avatar1 +.png'
+                },
+                {
+                    type: label,
+                    size: h4,
+                    d: 'Html con + en link'
+                },
+                {
+                    label:{
+                        d: 'Propiedad html con link a +'
+                    },
+                    type: html,
+                    layout: frame,
+                    link: '/repcon/f_get/repository/data/test_5gl_server/avatar1 +.png'
+                }
+            ]
+        }
+    },         
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: { options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    addHelp( 'testapp:contact', 'hasIcon',
+        es,
+        [ title( 'Ejemplo de imagen con + en ayudas'),
+        image('/data/test_5gl_server/avatar1 +.png')
+    ]),
+    OBJ_form = {
+        type: 'kform',
+        busId: BUSID,
+        in: IN,
+        proc: PROC
+    },
+    RPROC = {
+        type: rprocess,
+        hasKw: form_url_with_symbols,
+        hasDsca: [('es', 'Comportamiento de URL con símbolos')],
+        hasIcon: 'add',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: {
+            type: assembly,
+            children: [OBJ_form, Help_OBJ]
+        }
+    },
+    create_rprocess(_,RPROC,_,OBJ_out).
+
+'staber_frommodel_tocontrol::inv_properties'(_, _ObjIn, _, ObjOut):-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('bus__kdetail', BUSID_kdetail),
+    inv_properties_aggrupation(AGGRUPATION),
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_002',
+        hasKwc: 'testapp:contact',
+        hasAggrupation: AGGRUPATION
+    },
+    % Obj_class = {
+    %     type: 'kdetail',
+    %     busId: BUSID_kdetail,
+    %     hasNavbar: true,
+    %     do_exec: true,
+    %     in: IN
+    % },
+    Title =  'Comportamiento de formulario con propiedades inversas',
+    OBJ = {
+        % type: 'rprocess',
+        type: 'kdetail',
+        in: IN,
+        busId: BUSID_kdetail,
+        hasNavbar: true,
+        do_exec: true,
+        hasKw: form_contact_inv_properties,
+        hasDsca: Title,
+        hasIcon: 'zoom',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+        % gui_out: Obj_class
+    },
+    create_rprocess(_,OBJ,_,ObjOut).
+
+
+'staber_frommodel_tocontrol::all_properties_kdetail_editable'(_, _, _, ObjOut):-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('bus__kdetail', BUSID_kdetail1),
+    newKw('bus__kdetail', BUSID_kdetail2),
+    'staber_frommodel_tocontrol::get_all_properties_model'(TEMPLATE1),
+    'staber_frommodel_tocontrol::get_all_properties_control'(TEMPLATE2),
+
+	IN1 = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_010',
+        hasKwc: 'testapp:contact',        
+        hasInitEvent: 'e_edit',
+        showAllProperties: true,
+        applyRules: true,        
+        template: TEMPLATE1
+    },
+    IN2 = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_011',
+        hasKwc: 'testapp:contact',        
+        hasInitEvent: 'e_edit',
+        applyRules: true,
+        showAllProperties: true,   
+        /*     
+        stylesVars: {
+            deleteAction: 'right'
+        },
+        */        
+        template: TEMPLATE2
+    },    
+    Obj_form1 = {
+        type: 'kdetail',
+        busId: BUSID_kdetail1,
+        hasNavbar: true,
+        do_exec: true,
+        in: IN1
+    },  
+    Obj_form2 = {
+        type: 'kdetail',
+        busId: BUSID_kdetail2,
+        hasNavbar: true,
+        do_exec: true,
+        in: IN2        
+    },  
+    
+    Obj_help_info = {
+         type: 'help',
+         classList: ['info-font-icon', 'floating'],
+        busId: 'helpBusId'
+    },
+    Obj_help_assembly= {
+        id: 'assembly_panel_help_info',
+        type: assembly,
+        width: 18,     
+        children: [Obj_help_info]
+    },
+    Obj_form_assembly ={
+        type:'assembly',
+        width: 82,
+        classList: [            
+            'r-separator',
+            'b-group'
+        ],
+        children:[
+            {
+                type: 'assembly',
+                collapsible: true,
+                width: 50,
+                label: {
+                     d: 'Modelo'
+                },  
+                children:[Obj_form1]
+            },        
+            {
+                type: 'assembly',
+                collapsible: true,
+                width: 50,
+                label: {
+                    d: 'Modelo + hasAdd/hasZoom/hasDelete'
+                },   
+                children:[Obj_form2]
+            }
+        ]
+    },
+    Obj_assembly ={
+        type: 'assembly',
+        children: [Obj_form_assembly, Obj_help_assembly]
+    },
+    Title =  'Comportamiento kdetail modelo EDITABLE -> Control',
+    OBJ = {
+        type: 'rprocess',
+        hasKw: allProperties_editable_kdetail_test,
+        hasDsca: Title,
+        hasIcon: 'zoom',
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_assembly
+    },
+    create_rprocess(_,OBJ,_,ObjOut).
+
+
+'staber_frommodel_tocontrol::all_properties_kform_editable'(_, _, _, ObjOut):-
+
+    property +$ 'contact:hasPermissionEmpty'
+        d [( es, 'Tiene Permisos sin stmt pegado' ),  ( en, 'Has permissions withour arc' )]
+        p [
+            domain  ¬> 'testapp:contact' º 16,
+            range   ¬> 'testapp:contactPermission',
+            cardMax ¬> nMax,
+            hasInhType ¬> inhCopy
+    ],
+    
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('bus__kdetail', BUSID_kdetail1),
+    newKw('bus__kdetail', BUSID_kdetail2),
+    'staber_frommodel_tocontrol::get_all_properties_model'(TEMPLATE1),
+    'staber_frommodel_tocontrol::get_all_properties_control'(TEMPLATE2),
+
+	IN1 = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_010',
+        hasKwc: 'testapp:contact',        
+        enabled: true,        
+        showAllProperties: true,
+        applyRules: true,        
+        template: TEMPLATE1
+    },
+    IN2 = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_011',
+        hasKwc: 'testapp:contact',                
+        enabled: true,
+        applyRules: true,
+        showAllProperties: true,
+        /*
+        stylesVars: {
+            deleteAction: 'right'
+        },
+        */
+        template: TEMPLATE2
+    },    
+    Obj_form1 = {
+        type: 'kform',        
+        busId: BUSID_kdetail1,
+        hasDlg: true,
+        hasNavbar: true,
+        do_exec: true,
+        in: IN1
+    },  
+    Obj_form2 = {
+        type: 'kform',
+        busId: BUSID_kdetail2,
+        hasDlg: true,
+        hasNavbar: true,
+        do_exec: true,
+        in: IN2        
+    },  
+    
+    Obj_help_info = {
+         type: 'help',
+         classList: ['info-font-icon', 'floating'],
+        busId: 'helpBusId'
+    },
+    Obj_help_assembly= {
+        id: 'assembly_panel_help_info',
+        type: assembly,
+        width: 18,     
+        children: [Obj_help_info]
+    },
+    Obj_form_assembly ={
+        type:'assembly',
+        width: 82,
+        classList: [            
+            'r-separator',
+            'b-group'
+        ],
+        children:[
+            {
+                type: 'assembly',
+                collapsible: true,
+                width: 50,
+                label: {
+                     d: 'Modelo'
+                },  
+                children:[Obj_form1]
+            },        
+            {
+                type: 'assembly',
+                collapsible: true,
+                width: 50,
+                label: {
+                    d: 'Modelo + hasAdd/hasZoom/hasDelete'
+                },   
+                children:[Obj_form2]
+            }
+        ]
+    },
+    Obj_assembly ={
+        type: 'assembly',
+        children: [Obj_form_assembly, Obj_help_assembly]
+    },
+    Title =  'Comportamiento kform modelo EDITABLE -> Control',
+    OBJ = {
+        type: 'rprocess',
+        hasKw: allProperties_editable_kform_test,
+        hasDsca: Title,
+        hasIcon: 'zoom',
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_assembly
+    },
+    create_rprocess(_,OBJ,_,ObjOut).
+
+'staber_frommodel_tocontrol::get_all_properties_model'(TEMPLATE):-
+    TEMPLATE= {
+        type: assembly,              
+        children:[
+            {
+                type: assembly,                             
+                label: {
+                    d: 'Propiedades Card > 1'
+                },            
+                cols: 2, 
+                children: [
+                    %% No debe aparecer porque es inhCopy y no tiene stmt pegado
+                    {  
+                        arc: 'contact:hasPermissionEmpty'
+                    },
+                    {
+                        arc: 'contact:hasVacationCountry',
+                        hasHelp: true
+                    },
+                     {
+                        arc: 'contact:hasVisitedCountry',
+                        hasHelp: true
+                    },
+                     {
+                        arc: 'contact:hasRangeStringCardN',                      
+                        hasHelp: true
+                    },
+                    {
+                        arc: 'contact:hasPreferredCountry',
+                        hasHelp: true
+                    },
+                    {
+                        arc: 'contact:hasAddress',
+                        hasHelp: true
+                    }                    
+                ]
+            },
+            {
+                type: assembly,                             
+                label: {
+                    d: 'Propiedades Card = 1'
+                },            
+                cols: 2, 
+                children: [                    
+                    {
+                        % allowCreation: false , allowOptions:false
+                        arc: 'contact:hasFathersCountry',
+                        hasHelp: true
+                    },
+                    {
+                        % allowCreation: false, allowOptions: true
+                        arc: 'contact:hasMothersCountry',
+                        hasHelp: true
+                    },
+                    {
+                        % allowCreation: true , allowOptions: false
+                        arc: 'contact:hasBirthCountry',
+                        hasHelp: true
+                    },
+                    {
+                        % allowCreation: true , allowOptions: true
+                        arc: 'contact:hasResidenceCountry',
+                        hasHelp: true
+                    }
+                    
+                ]
+            }
+            
+        ]          
+    }.
+
+
+'staber_frommodel_tocontrol::get_all_properties_control'(TEMPLATE):-
+    TEMPLATE= {
+        type: assembly,              
+        children:[
+            {
+                type: assembly,                             
+                label: {
+                    d: 'Propiedades Card > 1'
+                },            
+                cols: 2, 
+                children: [
+                    {
+                        arc: 'contact:hasVacationCountry',
+                        label: {
+                            d : 'contact:hasVacationCountry_ui',
+                            i18n: 'd'
+                        },
+                        hasAdd: true                        
+                    },
+                     {
+                        arc: 'contact:hasVisitedCountry',
+                        hasAdd: true,
+                        hasNumberLines: 5
+                    },
+                    {
+                        arc: 'contact:hasRangeStringCardN',
+                        hasAdd: true,                             
+                        hasZoom: false,              
+                        hasNumberLines: 5
+                    },
+                    {
+                        arc: 'contact:hasPreferredCountry',
+                        hasAdd: true
+                    },
+                    {
+                        arc: 'contact:hasAddress',
+                        hasAdd: true
+                    }
+                ]
+            },
+            {
+                type: assembly,                             
+                label: {
+                    d: 'Propiedades Card = 1'
+                },            
+                cols: 2, 
+                children: [                    
+                    {
+                        % allowCreation: false , allowOptions:false
+                        arc: 'contact:hasFathersCountry',
+                        hasReset: true,
+                        hasZoom: true
+                        
+                    },
+                    {
+                        % allowCreation: false, allowOptions: true
+                        arc: 'contact:hasMothersCountry',
+                        hasZoom: true
+                    },
+                    {
+                        % allowCreation: true , allowOptions: false
+                        arc: 'contact:hasBirthCountry',
+                        hasZoom: true,
+                        hasAdd: false,
+                        hasReset:true
+                    },
+                    {
+                        % allowCreation: true , allowOptions: true
+                        arc: 'contact:hasResidenceCountry',
+                        hasZoom: true
+                    }
+                    
+                ]
+            }
+            
+        ]          
+    }.
+
+'staber_kdetail::formulario_contactos_agrupaciones_edicion'(_, _, _, OBJ_out):-
+
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('bus__kdetail_form_aggrupations_edit_', BUSID),
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_011',
+        hasKwc: 'testapp:contact',
+        hasCKDIStatusFrom: ckdiStatusD,
+        hasAggrupationLegacy: true,
+        showAllProperties: true
+    },
+
+    OBJ_form = {
+        type: 'kdetail',
+        in: IN,
+        busId: BUSID,
+        do_exec: true,
+        hasDlg: true,
+        hasKw: kdetail_contacto_path_con_clase,
+        hasDsca: [('es', 'Formulario de contacto con agrupaciones con edición')],
+        hasIcon: 'group',
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_frommodel_tocontrol::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__rendering_controls_bymodel,
+        isRoot: false,
+        hasIcon: 'list-alt',
+        hasDsca: 'Renderización de controles según su modelo de la propiedad',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[          
+            allowCreation_test,
+            form_url_with_symbols,
+            form_contact_inv_properties,
+            allProperties_editable_kdetail_test,
+            allProperties_editable_kform_test,
+            kdetail_contacto_path_con_clase
+        ]
+	},	
+	create_rprocess(_, Conf_folder, _, _).

@@ -1,0 +1,1260 @@
+﻿/**
+@descr	staber_kmgt <br>
+		staber_kmgt
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kmgt') :-
+	class +$ 'staber_kmgt' d ( es,'Patrón rproc para kmgt') sc function,
+     % configuración contra modelo propio testapp:contacto en Default
+    'staber_kmgt::usecase__000'(_, _, _, _),
+    %% Calco del kmgt 000 pero usando configuración en lugar de dataset
+    'staber_kmgt::usecase__configuration_navigation'(_, _, _, _),
+    % configuración contra modelo propio testapp:contacto con dataset__test_5gl_server
+    'staber_kmgt::usecase__001'(_, _, _, _),
+    % control de estados de inicio del area de detalle
+    'staber_kmgt::usecase__004'(_, _, _, _),
+    'staber_kmgt::usecase__005'(_, _, _, _),
+    'staber_kmgt::usecase__015'(_, _, _, _),
+    % configuración contra modelo propio testapp:contacto en dataset__test_5gl_server
+    'staber_kmgt::usecase__006'(_, _, _, _),
+    'staber_kmgt::usecase__007'(_, _, _, _),
+    'staber_kmgt::usecase__008'(_, _, _, _),
+    'staber_kmgt::usecase__009'(_, _, _, _),
+    'staber_kmgt::usecase__013'(_, _, _, _),
+    'staber_kmgt::usecase__014'(_, _, _, _),
+    % AccessConditions
+    'staber_kmgt::usecase__010'(_, _, _, _),
+    'staber_kmgt::usecase__011'(_, _, _, _),
+    % cambio de estados del area de detalle tras acción extra
+    'staber_kmgt::usecase__016'(_, _, _, _),
+    'staber_kmgt::with_layout_navigation'(_, _, _, _),
+    'staber_kmgt::folders'(_, _, _, _).
+
+'staber_kmgt::usecase__000'(_, OBJ_in, _, OBJ_proc) :-    
+    obj_get(isSession, OBJ_in, Session, true),
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('kmgt_test_000_', BusId),
+    Extra_Actions ={
+        state_edit:[
+            {
+                type: 'es6button',
+                icon: 'navigate',
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events: [
+                    {
+                        type: 'click',
+                        method: 'refresh_gui',
+                        targetBusId: '$.busId',
+
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'function',      
+                                    in: { hasKw: 'testapp:contact' },                             
+                                    name: 'staber_test_fake_call',
+                                    context: {
+                                        delegatedTo: '$.hasAgent'
+                                    }
+                                },
+                                {
+                                    type: 'method',
+                                    name: 'merge_in',
+                                    busId: '$.busId'
+                                },    
+                                {
+                                    type: 'method',                                    
+                                    name: 'navigateTo',
+                                    busId: '$.busId'
+                                }     
+                            ]
+                        }
+                    }
+                ]            
+            }
+        ],
+        state_noedit:[
+            {
+                type: 'es6button',
+                icon: 'print',
+                enabled: false,
+                classList:[
+                    "text-button"
+                ]
+            }
+        ]
+    },
+    ACTIONS = [
+		{
+			label:{
+				icon: 'send'
+			},
+			collapse:false,
+			events:[{
+				type:'click',
+				method:'openInBrowser',
+				targetBusId : BusId
+			}]
+		}
+	],
+	IN = {
+        hasTitle: 'Contactos modelo de Tests',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',
+        selectable: true,
+        collapsible: {
+            floating: true
+        },
+        hasArea: {
+            detail: {
+                navigationFilter: 'all',
+                showAllProperties: false,
+                extraAction: Extra_Actions,
+                allowNavigation: false
+            },
+            result: {                
+                includedProperties:['hasIcon','contact:hasIdPhoto' ,'contact:hasName', 'contact:hasEmail', 'contact:hasProfessionalProfile','contact:hasBirthCountry', 'contact:hasAddress'],
+                navigableProperties: ['contact:hasIdPhoto','resourcePath', 'remoteURL', 'contact:hasBirthCountry', 'contact:hasAddress'],                
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            class: 'user',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+                },
+            search: {
+                fieldsToSearchFromSchema: true,
+                isCollapsible: true
+            }
+        }
+    },   
+    Title =  'Contactos: dataset Default',
+    OBJ_proc = {
+        type: 'kmgt',
+        busId: BusId,
+        in: IN,
+        hasKw: kmgt_test_000,
+        hasDsca: Title,
+        hasIcon: 'document',
+        isRoot: false,
+        isSession: Session,
+        actions: ACTIONS,
+        hasNavbar: true,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_proc,_,_).
+
+/* Ejemplo de 5GL base  con configuración*/
+'staber_kmgt::usecase__configuration_navigation'(_, _, _, Obj_proc) :-
+    newKw('channel__mainrprocess_', CHANNEL_MAIN),
+    newKw('busid__mainrprocess_', BUSID_MAIN),
+
+    newKw('channel__kmgt_configuration_', CHANNEL_KMGT),
+    newKw('busid__kmgt_configuration_', BUSID_KMGT),
+
+    KWC = 'testapp:contact',
+
+    ResultArea = {
+        selectable: true,
+        schema : {
+            data: [
+                {
+                    label: {
+                        d: 'Nombre'
+                    },
+                    arc: 'contact:hasName',
+                    sorted: true
+                },
+                {
+                    label: {
+                        d: 'Email'
+                    },
+                    arc: 'contact:hasEmail'
+                }
+            ]
+        },
+        queryExecFunction: 'testContactQueryExecFunction',
+        mapFunction: 'testContactMapFunction'
+    },
+
+    SearchArea = {
+        fieldsToSearchFromSchema: true,
+        isCollapsible: true
+    },
+
+	IN = {
+        hasAgent: 'builderweb',
+        hasKw: KWC,
+        hasKwc: KWC,
+        hasModule:KWC,
+        hasLayout: 'searchResult',
+        hasLayoutNavigation: true,
+        hasConfiguration: 'configuration__testapp',
+        hasArea: {
+            result: ResultArea,
+            search: SearchArea
+        }
+    },
+
+    Obj_kmgt = {
+        type: 'kmgt',
+        busId: BUSID_KMGT,
+        hasChannel: CHANNEL_KMGT,
+        in: IN
+    },
+
+    Obj_details = {
+        type: 'list',
+        id: 'list-usecase__configuration_navigation',
+        enabled: false,
+        label: {
+            d: 'Mantenimiento de contactos con las siguientes características:'                        
+        },
+        elements: [
+            {
+                label: {
+                    d: 'Con configuración -> hasConfiguration:configuration__testapp'
+                }                
+            },
+            {
+                label: {
+                    d: 'Con navegación a ficha detalle'
+                }                
+            },
+            {
+                label: {
+                    d: 'Consulta REMQL con queryExecFunction y mapFunction'
+                }                
+            }
+        ]
+    },
+
+    Obj_out = {
+        type: 'assembly',
+        children: [
+            Obj_details,     
+            Obj_kmgt
+        ]
+    },
+
+    Obj_proc = {
+        type : 'rprocess',
+        hasChannel: CHANNEL_MAIN,
+        busId: BUSID_MAIN,
+        gui_out: Obj_out,
+        hasKw: kmgt_test_000_config,
+        hasDsca: [('es', 'Mantenimiento de contactos contra configuración y con navegación')],
+        hasIcon: 'document',
+        isDirRoot: false,
+        isSession: true,
+        hasNavbar: true,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+
+    create_rprocess(_,Obj_proc,_,_).
+
+'staber_kmgt::usecase__001'(_, _OBJ_in, _, OBJ_proc) :-
+    % I_config = 'configuration__staber_testapp_server',
+    obj_get(hasNavbar, OBJ_in, Navbar, true),
+    obj_get(isSession, OBJ_in, Session, true),
+    % I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb', 
+    newKw('kmgt_test_001_', BusId),
+	IN = {
+        hasAgent: I_agent,
+        hasConfiguration: 'configuration_testapp',
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',        
+        selectable: true,
+        hasArea: {
+            detail: {
+                hasAccessCondition: {
+                    kdetail__new: false,
+                    kdetail__delete: false
+                }, 
+                navigationFilter: 'all',
+                showAllProperties: false,
+                allowNavigation: false
+            },
+            result: {
+                includedProperties:['hasIcon','contact:hasName', 'contact:hasEmail'],
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            class: 'user',
+                            arc: 'contact:hasName',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+            },
+            search: {
+                fieldsToSearchFromSchema: true
+            }
+        },
+        resizable: true
+    },
+    Title =  'Mantenimiento de contactos',
+    OBJ_proc = {
+        type: 'kmgt',
+        busId: BusId,
+        in: IN,
+        hasKw: kmgt_test_001,
+        hasDsca: Title,
+        hasIcon: 'group',
+        isSession: Session,
+        hasNavbar: Navbar,
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        hasAccessPrivilege: 'all'        
+    },
+    create_rprocess(_,OBJ_proc,_,_).
+
+'staber_kmgt::usecase__004'(_, OBJ_in, _, OBJ_out):-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+	IN = {
+        hasTitle: 'Contactos de aplicación test',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp:contact',
+        % applyRules: true,
+        hasLayout: 'resultDetail',
+        hasArea: {
+            result:{
+                selectable: true
+            }
+        }
+    },   
+    Title =  'Contactos: permisos de consulta',
+    OBJ_in = {
+        type: 'kmgt',
+        in: IN,
+        hasKw: kmgt_test_004,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isRoot: false,
+        isSession: true,
+        hasNavbar: true,        
+        % security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+'staber_kmgt::usecase__005'(_, OBJ_in, _, OBJ_out):-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+	IN = {
+        hasTitle: 'Contactos de aplicación test',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp:contact',
+        hasInitState: 'state_resultDetail',
+        hasLayout: 'resultDetail',
+        hasArea: {
+            result:{
+                selectable: true
+            },
+            detail: {
+                hasTag: 'instance',
+                hasEvent: 'e_new'
+            }
+        }
+    },   
+    Title =  'Contactos: Iniciar con nueva instancia',
+    OBJ_in = {
+        type: 'kmgt',
+        in: IN,
+        hasKw: kmgt_test_005,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isSession: true,
+        hasNavbar: true,        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+'staber_kmgt::usecase__005'(_, OBJ_in, _, OBJ_out):-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+	IN = {
+        hasTitle: 'Contactos de aplicación test',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp:contact',
+        % applyRules: true,
+        hasLayout: 'resultDetail',
+        hasArea: {
+            result:{
+                selectable: true
+            },
+            detail: {
+                hasTag: 'instance',
+                hasEvent: 'e_new'
+            }
+        }
+    },   
+    Title =  'Contactos: Iniciar con nueva instancia',
+    OBJ_in = {
+        type: 'kmgt',
+        in: IN,
+        hasKw: kmgt_test_005,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isRoot: false,
+        isSession: true,
+        hasNavbar: true,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+'staber_kmgt::usecase__006'(_, OBJ_in, _, OBJ_out):-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+	IN = {
+        hasTitle: 'Contactos de aplicación test',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp_contacto_001',
+        % applyRules: true,
+        hasLayout: 'resultDetail',
+        hasArea: {
+            result:{
+                selectable: true
+            },
+            detail: {
+                hasTag: 'instance',
+                hasEvent: 'e_edit'
+            }
+        }
+    },   
+    Title =  'Contactos: layout: resultDetail Iniciando en estado de edición',
+    OBJ_in = {
+        type: 'kmgt',
+        in: IN,
+        hasKw: kmgt_test_006,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isSession: true,
+        hasNavbar: true,        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+'staber_kmgt::usecase__013'(_, OBJ_in, _, OBJ_out):-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+	IN = {
+        classList: ['hideScroll'],
+        hasTitle: 'Botón siempre visible',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp:contact',
+        selectable: true,
+        collapsible: {
+            fixed: true
+        },
+        hasArea: {
+            detail: {
+                showAllProperties: true
+            }
+        }
+    },   
+    Title =  'Collapsible con botón siempre visible',
+    OBJ_in = {
+        type: 'kmgt',
+        in: IN,
+        hasKw: kmgt_test_013,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isSession: true,
+        hasNavbar: true,        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+'staber_kmgt::usecase__014'(_, OBJ_in, _, OBJ_out):-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+	IN = {
+        classList: ['hideScroll'],
+        hasTitle: 'Botón flotante siempre visible',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp:contact',
+        selectable: true,
+        collapsible: {
+            floating: true,
+            fixed: true
+        },
+        hasArea: {
+            detail: {
+                showAllProperties: true
+            }
+        }
+    },   
+    Title =  'Collapsible con botón flotante siempre visible',
+    OBJ_in = {
+        type: 'kmgt',
+        in: IN,
+        hasKw: kmgt_test_014,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isSession: true,
+        hasNavbar: true,        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+'staber_kmgt::usecase__007'(_, OBJ_in, _, OBJ_out):-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+	IN = {
+        hasTitle: 'Collapsible',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp:contact',
+        selectable: true,
+        collapsible: true
+    },   
+    Title =  'Collapsible',
+    OBJ_in = {
+        type: 'kmgt',
+        in: IN,
+        hasKw: kmgt_test_007,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isSession: true,
+        hasNavbar: true,        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+    'staber_kmgt::usecase__008'(_, OBJ_in, _, OBJ_out):-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+	IN = {
+        hasTitle: 'Collapsible con botón flotante',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp:contact',
+        selectable: true,
+        collapsible: {
+            collapsed: false,
+            floating: true
+        }
+    },   
+    Title =  'Collapsible con botón flotante',
+    OBJ_in = {
+        type: 'kmgt',
+        in: IN,
+        hasKw: kmgt_test_008,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isSession: true,
+        hasNavbar: true,        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+'staber_kmgt::usecase__009'(_, OBJ_in, _, OBJ_out):-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+	IN = {
+        hasTitle: 'Cerrado botón flotante',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp:contact',
+        selectable: true,
+        collapsible: {
+            collapsed: true,
+            floating: true
+        }
+    },   
+    Title =  'Collapsible cerrado con botón flotante',
+    OBJ_in = {
+        type: 'kmgt',
+        in: IN,
+        hasKw: kmgt_test_009,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isSession: true,
+        hasNavbar: true,        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+
+'staber_kmgt::usecase__010'(_, OBJ_in, _, OBJ_out):-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+    Title =  'Mantenimiento de contactos limitando acciones por configuración',
+	IN = {
+        hasTitle: Title,
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp:contact',        
+        hasLayout: 'resultDetail',
+        hasArea: {
+            result:{
+                selectable: true,
+                includedProperties:['hasIcon','contact:hasName', 'contact:hasEmail'],
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            class: 'user',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+            }
+        }
+    },       
+    ACCESSCONDITION_OVERRIDES = [           
+         {
+            type: 'setAccessPrivilege',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::usecase__010::setAccessPrivilege', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],      OBJ_in = {
+        type: 'kmgt',
+        in: IN,
+        hasKw: kmgt_test_010,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP,permissionProfile__administrator_tds],          
+        overrides: ACCESSCONDITION_OVERRIDES            
+        
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+'staber_kmgt::usecase__010::setAccessPrivilege'(Ctx, _Obj_in, Ctx, Obj_out):-
+    Obj_out = {
+          hasAccessPrivilege: ['all'],
+          hasAccessCondition:{
+                kdetail__new: false,
+                kdetail__delete: false
+        } 
+
+    }.
+
+'staber_kmgt::usecase__011'(_, _OBJ_in, _, OBJ_out):-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',    
+    Title =  'Mantenimiento de contacto con override para toolbar y navegación por layout',
+    TOOLBAR_OVERRIDES = [
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function',
+                        name: 'staber_kmgt::rc_gui_out::toolbar', 
+                        context: { delegatedTo: 'builderweb' } 
+                    }
+                ]
+            }
+        }         
+    ],
+	IN = {
+        hasTitle: Title,
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasConfiguration: 'configuration__testapp',  
+        hasKw: 'testapp:contact',        
+        hasKwc: 'testapp:contact',        
+        searchLayout: 'basic',
+        hasLayout: 'searchResult',
+        hasLayoutNavigation: true,
+        hasArea:{
+            search: {
+                fieldsToSearchFromSchema: true,
+                isCollapsible: true
+            },
+            result:{
+                includedProperties:['hasIcon','contact:hasName', 'contact:hasEmail'],
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            class: 'user',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                },
+                selectable: true
+            }
+        }
+    },  
+    OBJ_in = {
+        type: 'kmgt',
+        busId: 'kmgt_test_011_busid',
+        hasChannel: 'kmgt_test_011_channel',
+        in: IN,
+        hasKw: kmgt_test_011,
+        hasDsca: Title,
+        hasIcon: 'user',
+        isSession: true,
+        hasNavbar: true,        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        hasAppOverride:{
+            toolbar : TOOLBAR_OVERRIDES
+        }
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+    
+'staber_kmgt::usecase__015'(_, OBJ_in, _, OBJ_proc) :-
+    obj_get(hasNavbar, OBJ_in, Navbar, true),
+    obj_get(isSession, OBJ_in, Session, true),
+    I_dataset = 'Default',
+    I_agent = 'builderweb', 
+    newKw('kmgt_test_015_', BusId),
+	IN = {
+        hasTitle: 'Contactos: template con hasIcon',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_015',
+        hasKwc: 'testapp:contact',        
+        selectable: true,
+        collapsible: {
+            floating: true
+        },
+        hasArea: {
+            detail: {
+                navigationFilter: 'all',
+                template: {
+                    type: 'assembly',
+                    children: [
+                        {
+                            arc: 'hasImage',
+                            classList: ['user', 'lite-view']
+                        },
+                        {
+                            arc: 'contact:hasName',
+                            hasIcon: 'user-line'
+                        },
+                        {
+                            arc: 'contact:hasPhoneNumber',
+                            inputtype: 'tel',
+                            hasIcon: 'phone-line'
+                        },
+                        {
+                            arc: 'contact:hasEmail',
+                            hasIcon: 'email-line',
+                            inputtype: 'mailto'
+                        },
+                        {
+                            arc: 'contact:hasFileAttachment',
+                            mimetype: 'app/doc',
+                            classList: ['tag-list']
+                        }
+                    ]
+                }
+            },
+            result: {                
+                includedProperties:['hasIcon','contact:hasName', 'contact:hasEmail'],                
+                schema : {
+                    data: [   
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            class: 'user',
+                            sorted: true
+                        },                
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'                                       
+                        }                    
+                    ]
+                }                 
+            },
+            search: {
+                fieldsToSearchFromSchema: true
+            }
+        }
+    },   
+    Title =  'Contactos: template con hasIcon',
+    OBJ_proc = {
+        type: 'kmgt',
+        busId: BusId,
+        in: IN,
+        hasKw: kmgt_test_015,
+        hasDsca: Title,
+        hasIcon: 'reports',
+        isRoot: false,
+        isSession: Session,
+        hasNavbar: Navbar,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_proc,_,_).
+
+'staber_kmgt::usecase__016'(_, OBJ_in, _, OBJ_proc) :-
+    obj_get(isSession, OBJ_in, Session, true),
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('kmgt_test_016_', BusId),
+    Extra_Actions ={
+        state_noedit:[
+            {
+                type: 'es6button',
+                icon: 'copy',
+                tip: 'Duplicar',
+                enabled: true,
+                classList: ['text-button'],
+                events: [{
+                    type: 'click',
+                    method: 'refresh_gui',
+                    targetBusId: '$.busId',
+                    payload: {
+                        hasKw: '$.in.hasKw',
+                        hasKwc: '$.in.hasKwc',                          
+                        hasDataset: '$.in.hasDataset',
+                        hasChannel: '$.hasChannel',
+                        hasConfiguration: '$.in.hasConfiguration',
+                        hasSessionContext: '$.in.hasSessionContext'
+                    },
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { type: 'method', name: 'exec_stateMachine', busId: '$.busId', in: { hasEvent: 'e_edit' } }
+                        ]
+                    }
+                }]
+            }
+        ]
+    },
+	IN = {
+        hasTitle: 'Contactos modelo de Tests',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',        
+        selectable: true,
+        collapsible: {
+            floating: true
+        },
+        hasArea: {
+            detail: {
+                navigationFilter: 'all',
+                showAllProperties: false,
+                extraAction: Extra_Actions
+            },
+            result: {                
+                includedProperties:['hasIcon','contact:hasName', 'contact:hasEmail'],
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            class: 'user',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+            },
+            search: {
+                fieldsToSearchFromSchema: true,
+                isCollapsible: true
+            }
+        }
+    },   
+    Title =  'Mantenimiento de contactos con acción extra de cambio de estado a modo edición',
+    OBJ_proc = {
+        type: 'kmgt',
+        busId: BusId,
+        in: IN,
+        hasKw: kmgt_test_016,
+        hasDsca: Title,
+        hasIcon: 'document',
+        isRoot: false,
+        isSession: Session,
+        hasNavbar: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_proc,_,_).
+
+'staber_kmgt::with_layout_navigation'(_, _OBJ_in, _, OBJ_proc) :-
+    I_agent = 'builderweb',
+
+    newKw('channel__maintenance_contact_navigation', CHANNEL_RPROC),  
+    newKw('busid__maintenance_contact_navigation', BUS_RPROC),
+
+    newKw('channel__kmgt_test_navigation_', CHANNEL_KMGT),
+    newKw('busid__kmgt_test_navigation_', BUSID_KMGT),
+
+    IN = {
+        hasAgent: I_agent,
+        hasConfiguration: 'configuration__testapp',  
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',        
+        
+        
+        hasLayout: 'searchResult',        
+        hasLayoutNavigation: true,
+        searchLayout: 'basic',
+        
+        selectable: true,
+
+        hasArea: {
+            detail: {
+                hasAggrupationLegacy: true,
+                navigationFilter: 'all',
+                showAllProperties: true
+            },
+            result: {                
+                includedProperties: [
+                    'hasIcon',
+                    'contact:hasName', 
+                    'contact:hasEmail'
+                ],
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            class: 'user'
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                },
+                hasCustomization: {
+                    hasCustomizationId: "kmgt_test_navigation_customization",
+                    refreshPivot: false,
+                    columns: true
+                }
+            },
+            search: {
+                fieldsToSearchFromSchema: true,
+                isCollapsible: false
+            }
+
+        }
+    },
+
+    Title =  'Mantenimiento de contactos con navegación a la ficha',
+    OBJ_kmgt = {
+        type: 'kmgt',
+        busId: BUSID_KMGT,
+        hasChannel: CHANNEL_KMGT,
+        in: IN,
+        hasNavbar: true
+    },
+
+    OBJ_proc = {        
+        type : 'rprocess',
+        busId: BUS_RPROC,
+        hasChannel: CHANNEL_RPROC,
+        hasKw: kmgt_test_navigation,
+        hasDsca: Title,
+        hasIcon: 'group2',        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: OBJ_kmgt,
+        isSession: true
+    },
+    create_rprocess(_,OBJ_proc,_,_).
+
+% GUI_OUT PREDICATES
+'staber_kmgt::rc_gui_out::toolbar'(Ctx_in, Obj_in, Ctx_in, Obj_out):-
+    % obj_get(hasChannel, Obj_in, MyChannel),
+    obj_get(busId, Obj_in, MyBus),
+    Obj_out = {
+        type: 'assembly',
+        id: 'buttons_assembly',
+        children: [
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    icon: 'add',
+                    d: 'Nuevo contacto'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: MyBus,                                         
+                    p_exec: {
+                        % type: 'sequence',
+                        % hasProcess: [            
+                        %     { type: 'method', name: 'publish', module: 'PubSub', 
+                        %         in: { 
+                        %             publish:[
+                        %                 { topic: 'newNode', channel: MyChannel} 
+                        %             ]
+                        %         }
+                        %     }                        
+                        % ]
+                        type: 'sequence',
+                        hasProcess: [
+                            {
+                                type: 'method',
+                                name: 'newNode',
+                                busId: 'kmgt_test_011_busid'
+                            }   
+                        ]
+                    }
+                }]
+            },             
+            {
+                type: 'button',                
+                appearance: 'line',                
+                label: {
+                    icon: 'print',
+                    d: 'Imprimir '
+                },   
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: MyBus,     
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [    
+                            {
+                                type: 'method',
+                                in: {                                 
+                                    schemaFilter: '$.in.schemaFilter',
+                                    searchType: 'rem'
+                                },
+                                name: 'schemaToQuery',
+                                module: 'QueryFilterService'
+                            },                            
+                            { 
+                                type: 'function', 
+                                % in: {'CCP Custom message'},  
+                                name: 'staber_kmgt::doAction', 
+                                context: { delegatedTo: 'builderweb' } 
+                            }
+                        ]
+                    }   
+                }]                 
+            }                             
+        ]
+    }.
+
+'staber_kmgt::rc_gui_out::toolbar_fake'(Ctx_in, _Obj_in, Ctx_in, Obj_out):-
+    Obj_out = {
+        type: 'assembly',
+        id: 'buttons_assembly',
+        children: [
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    icon: 'add',
+                    d: 'Nuevo contacto'
+                }
+            }                            
+        ]
+    }.
+
+'staber_kmgt::rc_gui_out::getSchemaControls'(_OBJ_ctx, _OBJ_in, _OBJ_ctx, OBJ_out) :-
+    OBJ_out = {
+        data:[
+            {
+                label: {
+                    d: 'Nombre de usuario'
+                },
+                arc: 'hasDsca'                
+            },
+            {
+                label: {
+                    d: 'Edad'
+                },
+                arc: 'contact:hasAge',
+                inputtype: 'integer'
+            }         
+        ]
+    }.
+
+% AUX PREDICATES
+'staber_kmgt::doAction'(Ctx, Obj_in, Ctx, Obj_out):-
+    wAddInfoMsgML('Aviso1', 'Se ha imprimido, <b>?a{1}</b>, <b>?a{2}</b>', ['CCP'], {showTime:10}),
+    wAddInfoMsgML('Aviso2', 'Se ha imprimido, <b>?a{1}</b>, <b>?a{2}</b>', ['CCP']),
+    wAddInfoMsgML('Aviso3', 'Se ha imprimido, <b>?a{1}</b>, <b>?a{2}</b>', ['CCP']),
+    wAddInfoMsgML('Aviso4', 'Se ha imprimido, <b>?a{1}</b>, <b>?a{2}</b>', ['CCP']),
+    wAddInfoMsgML('Aviso5', 'Se ha imprimido, <b>?a{1}</b>, <b>?a{2}</b>', ['CCP'],{showTime:5}),
+    wAddInfoMsgML('Aviso6', 'Se ha imprimido, <b>?a{1}</b>, <b>?a{2}</b>', ['CCP'],{showTime:3}),
+    wAddInfoMsgML('Aviso7', 'Se ha imprimido, <b>?a{1}</b>, <b>?a{2}</b>', ['CCP']),
+    wAddInfoMsgML('Aviso8', 'Se ha imprimido, <b>?a{1}</b>, <b>?a{2}</b>', ['CCP'],{showTime:3}),
+    Obj_out = Obj_in.
+
+% REM AUX PREDICATES
+% queryExecFunction
+testContactQueryExecFunction(Obj_ctx, Obj_in, QueryIn, LpageKws, Count) :-
+    trace_error( 'REMQL: testContactQueryExecFunction'),
+    get_5gl_edit_location_dataset( Obj_in, Location, Dataset),
+    get_ctx_token( Obj_ctx, Token),
+    executeStaberRemoteRemQuery( Location, Dataset, QueryIn, Token, Resultset_lst),
+
+    findall(
+        OneKw,
+        member([OneKw | _], Resultset_lst),
+        LKwsDup
+    ),
+
+    % Esta comprobación quias no sea necesaria.
+    removeDuplicates(LKwsDup, LKws),
+    length( LKws, Count),
+    obj_fetch( page, Obj_in, Page),
+    obj_fetch( limit, Obj_in, Limit),
+
+    split_list( LKws, Limit, LLKws),
+    ( nth0( Page, LLKws, LpageKws) ->
+        true
+    ;
+        LpageKws = []
+    ).
+
+% mapFunction
+testContactMapFunction(Ctx_in, Obj_in, Ctx_in, Obj_out) :-
+    trace_error( 'REMQL: testContactMapFunction'),
+    'map_rson'(Ctx_in, Obj_in, Ctx_in, Obj_out).
+
+'staber_kmgt::folders'(_, _, _, _):-
+    Title2 =  'kmgt  Collapsible',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_kmgt_collapsible,
+            hasDsca: Title2,
+            hasIcon: 'folder-line',
+            isRoot: false,
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [
+                kmgt_test_007,
+                kmgt_test_008,
+                kmgt_test_009,            
+                kmgt_test_014
+            ]
+    },_,_),
+     Title =  'kmgt  [Instancias]',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_kmgt,
+            hasDsca: Title,
+            hasIcon: 'instancia-line',
+            isRoot: false,
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [
+                        kmgt_test_000,
+                        kmgt_test_000_config,
+                        kmgt_test_001,
+                        kmgt_test_004,
+                        kmgt_test_005,
+                        kmgt_test_006,
+                        kmgt_test_010,
+                        kmgt_test_011,
+                        kmgt_test_015,
+                        kmgt_test_016,
+                        folder__repositorioTests_kmgt_collapsible
+            ]
+    },_,_).
+
+
+
+    

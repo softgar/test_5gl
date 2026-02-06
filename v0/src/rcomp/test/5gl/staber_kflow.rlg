@@ -1,0 +1,275 @@
+﻿/**
+@descr	staber_kflow <br>
+		staber_kflow
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kflow') :-
+	class +$ 'staber_kflow' d ( es,'Patrón rproc') sc function,
+    /*
+    property +$ 'hasPhaseSequence' d [(es, 'Secuencia de Ejecución de Fase'), ( en, '' )]
+    p [ domain ¬> 'phase',
+        range ¬> clob,
+        cardMin ¬> 1,
+        cardMax ¬> 1,
+        hasInhType ¬> inhNoCopy,
+        hasWWWControl ¬> 'jsonEditor'
+    ],
+      property +$ 'hasPhaseDiagram' d [(es, 'Diagrama de Ejecución de Fase'), ( en, '' )]
+    p [ domain ¬> 'phase',
+        range ¬> clob,
+        cardMin ¬> 1,
+        cardMax ¬> 1,
+        hasInhType ¬> inhNoCopy
+    ],
+    */
+    'staber_kflow::usecase__001'(_, _, _, _),
+    'staber_kflow::usecase__002'(_, _, _, _),
+    'staber_kflow::folders'(_, _, _, _).
+
+
+'staber_kflow::folders'(_, _, _, _):-    
+     Title =  'kflow  (Model Manager)',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_kflow,            
+            hasDsca: Title,            
+            hasIcon: 'graph',
+            isRoot: false, 
+            hasERCPart: [
+                kflow_test_001,
+                kflow_test_002
+            ],     
+            security_edit: [permissionProfile__repositorioTests_KRP], 
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },_,_).
+
+'staber_kflow::usecase__001'(_, _OBJ_in, _, OBJ_out) :-
+    dataset *$ dataset__process_test p [hasUrl ¬> url $ 'dataset__process_test'],
+    I_dataset = 'dataset__process_test',
+    I_agent = 'builderweb',     
+    RESULT_OVERRIDES = [
+        {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kflow::phases::result::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],    
+    Extra_Actions ={
+        state_noedit:[
+            {
+                type: 'es6button',
+                icon: 'connect',
+                enabled: true,
+                classList:[
+                    "text-button"
+                ],
+                events: [
+                    {
+                        type: 'click',
+                        method: 'refresh_gui',
+                        targetBusId: '$.busId',
+
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                {
+                                    type: 'function',      
+                                    in: { hasKw: 'testapp:contact' },                             
+                                    name: 'staber_test_fake_call',
+                                    context: {
+                                        delegatedTo: '$.hasAgent'
+                                    }
+                                },
+                                {
+                                    type: 'method',
+                                    name: 'merge_in',
+                                    busId: '$.busId'
+                                },    
+                                {
+                                    type: 'method',                                    
+                                    name: 'navigateTo',
+                                    busId: '$.busId'
+                                }     
+                            ]
+                        }
+                    }
+                ]            
+            }
+        ]       
+    },
+    IN = {
+        hasArea:{
+            detail: {
+                navigationFilter: 'all',
+                showAllProperties: false,
+                extraAction: Extra_Actions
+            },
+            search: {
+                hiddenButtons :['case', 'fullWord']
+            }                
+        },
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'p_workflow',
+        searchType: 'rql',
+        searchLayout: 'basic'
+    },
+    Title = 'Mantenimientos Workflows',    
+    
+	OBJ_out = {
+            type: 'kmgt',            
+            in: IN,
+            hasKw: kflow_test_001,            
+            hasDsca: Title,            
+            hasIcon: 'graph',
+            isRoot: false,  
+            hasNavbar: true,            
+            hasAppOverride:{               
+                result : RESULT_OVERRIDES
+            },
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+
+
+'staber_kflow::phases::result::rc_gui_out'(CTX, OBJ_in, CTX, OBJ_out):-
+    obj_get(in:layoutType, OBJ_in,  Layout, 'kpivotgrid'),
+    newKw(canal__,CHANNEL_KPIVOTGRID_DEFAULT),
+    newKw('bus__',BUS_PIVOT_default),
+    obj_get(in:hasAgent, OBJ_in,  I_agent, 'builderweb'),
+    obj_get(in:hasChannel, OBJ_in,  CHANNEL_KPIVOTGRID, CHANNEL_KPIVOTGRID_DEFAULT),
+    obj_get(in:busId, OBJ_in,  BUS_PIVOT, BUS_PIVOT_default),
+    obj_get(in:cols, OBJ_in,  Cols, 4),    
+    obj_get(in:backButton, OBJ_in,  BackButton, false),
+    obj_get(in:hasTemplate, OBJ_in,  Template, {}),
+    I_dataset = dataset__process_test,    
+
+	Table_Schema = [        
+        {
+            label: {
+                d: 'Keyword'
+            },
+            arc: 'hasKw',
+            selectable: true,
+            sorted: true,
+            filter: true,
+            enabled: false
+        },
+        {
+            label: {
+                d: 'Descripción'
+            },
+            arc: 'hasDsca',
+            selectable: true,
+            sorted: true,
+            filter: true,
+            enabled: false
+        }      
+	],
+    IncludedProperties = ['hasDsca', 'hasKw'],
+    NavigableProperties =['process:composedOf'],
+
+    concatConstants([
+        '?hasDataset @ ( \n',
+        '?I type ?hasClass.\n',
+        'like_ci(?hasKw, ?I). \n',
+        'get_dsca(?I, ?D). \n',
+        'like_ci(?hasDsca, ?D). \n',
+        '?pointer = {navigableProperties: ?hasNavigableProperties, includedProperties:?hasIncludedProperties,hasDataset:?hasDataset,hasKw:?I}. \n',
+        'rg_obj_get(_,?pointer,_,?OUT). \n'
+
+    ],DOC_S_CODE),
+	concatConstants([
+        '?hasDataset @ ( \n',
+        '?hasInstance ?hasProperty ?I.\n',
+        'like_ci(?hasKw, ?I). \n',
+        'get_dsca(?I, ?D). \n',
+        'like_ci(?hasDsca, ?D). \n',
+        '?pointer = {hasInstance: ?hasInstance, navigableProperties: ?hasNavigableProperties, includedProperties:?hasIncludedProperties,hasDataset:?hasDataset,hasKw:?I}. \n',
+        'rg_obj_get(_,?pointer,_,?OUT). \n'
+    ],DOC_S_NAV),   
+    IN_NAV_PHASE= {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasInstance: 'pworkflow',
+        hasProperty: 'process:composedOf',
+        hasKw: '*',
+        hasIDI: '*',
+        hasDsca: '*',    
+        enabled: true,
+        rows: 20,
+        limit: 1000,
+        persistence: 'remote',
+        resizable: true,
+        pagination:true,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Table_Schema,  
+        code :  DOC_S_NAV
+
+    },
+    % En este ejemplo no es necesario gui_in, ni gui_out porque al meter type: krpsearch se sobrecarga por extension en JS
+    NAV = [{ hasProperty: 'process:composedOf',  in: IN_NAV_PHASE }  
+    ],    
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasClass: 'p_workflow',
+        hasKw: '*',
+        hasIDI: '*',
+        hasDsca: '*',
+        code: DOC_S_CODE,
+        rootElement: true,
+        expanded: false,
+        enabled: true,
+        limit: 20,
+        persistence : 'remote',
+        schemaHeader: true,
+        resizable: true,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Table_Schema, 
+        backButton: BackButton,
+        cols: Cols,
+        hasTemplate: Template
+    
+    },
+	OBJ_out = {
+            in : IN,
+            nav: NAV,      
+            type : Layout,
+            do_exec:true,          
+            hasChannel: CHANNEL_KPIVOTGRID,
+            busId: BUS_PIVOT,
+            proc: { type: 'function', name: 'rql', context: { delegatedTo: I_agent } },
+            evtPublish: [{topic:'setNode',channel:CHANNEL_KPIVOTGRID}]
+    }.
+
+
+
+
+'staber_kflow::usecase__002'(_, _OBJ_in, _, OBJ_out) :-
+    IN = {},
+    GUI_out = {
+        type: 'flow'
+    },
+    Title =  'kflow  (Example)',
+	OBJ_out = {
+            type: 'rprocess',            
+            in: IN,
+            hasKw: kflow_test_002,            
+            hasDsca: Title,            
+            hasIcon: 'graph',
+            gui_out : GUI_out,
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,OBJ_out,_,_).

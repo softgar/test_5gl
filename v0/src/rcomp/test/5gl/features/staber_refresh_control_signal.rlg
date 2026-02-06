@@ -1,0 +1,57 @@
+﻿/**staber_k
+@descr	staber_refresh_control_signal <br>
+		staber_refresh_control_signal
+@author opr
+@date	2024_04_04
+**/
+rc_class('staber_refresh_control_signal') :-
+	class +$ 'staber_refresh_control_signal' d ( es,'Gestion de foco en controles y formularios') sc function,
+    'staber_refresh_control_signal::simple_signal'(_, _, _, _),
+    'staber_refresh_control_signal::folders'(_, _, _, _).
+
+'staber_refresh_control_signal::simple_signal'(_, _OBJ_in, _, OBJ_out) :-
+    Obj_controls = {  
+        type: 'assembly',       
+        children: [            
+            {
+                type:'ksignal',
+                in: {
+                    topicToProperty: {
+                        'v2/company/repconasua/factory/asua/machine/FAULKNER/indicator/TAJADERA': 'pesaje1',
+                        'v2/company/repconasua/factory/asua/machine/FAULKNER/indicator/TAJADERA2': 'pesaje2'
+                    },
+                    pesaje1: '',
+                    pesaje2: ''
+                }         
+            }
+        ]
+    },
+    Obj_class = {
+        type: 'rprocess',
+        hasKw: staber_simple_signal,           
+        hasDsca: 'Refresco de label desde señal red-node',
+        hasIcon: 'posicion',
+        isRoot: false, 
+        isSession: true,
+        hasNavbar: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_controls
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_refresh_control_signal::folders'(_, _, _, _):-
+    Title = 'Test para refresco de controles en tiempo real desde señales externas',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_refresh_controls_signal,
+        hasDsca: Title,
+        hasIcon: 'posicion',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            staber_simple_signal
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

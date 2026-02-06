@@ -1,0 +1,230 @@
+'kdetail_state_toolbar::state_init'(State_init):-
+    State_init = {
+        type: "assembly",
+        children: [
+            {
+                type: "es6button",
+                icon: "add",
+                enabled: true,
+                classList: [
+                    "text-button"
+                ],
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.hasArea.detail.busId",
+                    payload: { hasEvent: 'e_new' }
+                }]
+            },
+            {
+                type: "es6button",
+                icon: "pencil",
+                enabled: false,
+                classList: [
+                    "text-button"
+                ],
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.hasArea.detail.busId",
+                    payload: { hasEvent: 'e_edit' }
+                }]
+            },
+            {
+                type: "es6button",
+                icon: "floppy",
+                enabled: false,
+                classList: [
+                    "text-button"
+                ],
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.hasArea.detail.busId",
+                    payload: { hasEvent: 'e_save' }
+                }]
+            },
+            {
+                type: "es6button",
+                icon: "unlock",
+                enabled: false,
+                classList: [
+                    "text-button"
+                ],
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.hasArea.detail.busId",
+                    payload: { hasEvent: 'e_unlock' }
+                }]
+            },
+            {
+                type: "es6button",
+                icon: "trash",
+                enabled: false,
+                classList: [
+                    "text-button"
+                ],
+                events: [{
+                    type: "click",
+                    method: "exec_stateMachine",
+                    targetBusId: "$.hasArea.detail.busId",
+                    payload: { hasEvent: 'e_delete' }
+                }]
+            }
+        ]
+    }.
+
+'kdetail_state_toolbar::state_edit'(State_edit):-
+    State_edit = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'es6button',
+                icon: 'add',
+                enabled: true,
+                classList: [
+                    'text-button'
+                ],
+                events: [{
+                    type: 'click',
+                    method: 'exec_stateMachine',
+                    targetBusId: '$.hasArea.detail.busId',
+                    payload: { hasEvent: 'e_new' }
+                }]
+            },
+            {
+                type: 'es6button',
+                icon: 'pencil',
+                enabled: false,
+                classList: [
+                    'text-button'
+                ],
+                events: [{
+                    type: 'click',
+                    method: 'exec_stateMachine',
+                    targetBusId: '$.hasArea.detail.busId',
+                    payload: { hasEvent: 'e_edit' }
+                }]
+            },
+            {
+                type: 'es6button',
+                icon: 'floppy',
+                enabled: true,
+                classList: [
+                    'text-button'
+                ],
+                events: [{
+                    type: 'click',
+                    method: 'exec_stateMachine',
+                    targetBusId: '$.hasArea.detail.busId',
+                    payload: { hasEvent: 'e_save' }
+                }]
+            },
+            {
+                type: 'es6button',
+                icon: 'unlock',
+                enabled: true,
+                classList: [
+                    'text-button'
+                ],
+                events: [{
+                    type: 'click',
+                    method: 'exec_stateMachine',
+                    targetBusId: '$.hasArea.detail.busId',
+                    payload: { hasEvent: 'e_unlock' }
+                }]
+            },
+            {
+                type: 'es6button',
+                icon: 'trash',
+                enabled: true,
+                classList: [
+                    'text-button'
+                ],
+                events: [{
+                    type: 'click',
+                    method: 'exec_stateMachine',
+                    targetBusId: '$.hasArea.detail.busId',
+                    payload: { hasEvent: 'e_delete' }
+                }]
+            }
+        ]
+    }.
+
+'kdetail_state_toolbar::state_noedit'(State_noedit):-
+    State_noedit = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'es6button',
+                icon: 'add',
+                enabled: true,
+                classList: [
+                    'text-button'
+                ],
+                events: [{
+                    type: 'click',
+                    method: 'exec_stateMachine',
+                    targetBusId: '$.hasArea.detail.busId',
+                    payload: { hasEvent: 'e_new' }
+                }]
+            },
+            {
+                type: 'es6button',
+                icon: 'pencil',
+                enabled: true,
+                classList: [
+                    'text-button'
+                ],
+                events: [{
+                    type: 'click',
+                    method: 'exec_stateMachine',
+                    targetBusId: '$.hasArea.detail.busId',
+                    payload: { hasEvent: 'e_edit' }
+                }]
+            },
+            {
+                type: 'es6button',
+                icon: 'floppy',
+                enabled: false,
+                classList: [
+                    'text-button'
+                ],
+                events: [{
+                    type: 'click',
+                    method: 'exec_stateMachine',
+                    targetBusId: '$.hasArea.detail.busId',
+                    payload: { hasEvent: 'e_save' }
+                }]
+            },
+            {
+                type: 'es6button',
+                icon: 'unlock',
+                enabled: false,
+                classList: [
+                    'text-button'
+                ],
+                events: [{
+                    type: 'click',
+                    method: 'exec_stateMachine',
+                    targetBusId: '$.hasArea.detail.busId',
+                    payload: { hasEvent: 'e_unlock' }
+                }]
+            },
+            {
+                type: 'es6button',
+                icon: 'trash',
+                enabled: false,
+                classList: [
+                    'text-button'
+                ],
+                events: [{
+                    type: 'click',
+                    method: 'exec_stateMachine',
+                    targetBusId: '$.hasArea.detail.busId',
+                    payload: { hasEvent: 'e_delete' }
+                }]
+            }
+        ]
+    }.

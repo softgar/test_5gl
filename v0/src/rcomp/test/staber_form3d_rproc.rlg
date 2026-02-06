@@ -1,0 +1,481 @@
+﻿/**
+@descr	staber_form3d_rproc <br>
+		staber_form3d_rproc
+@author ccp
+@date	2024_02_28
+**/
+rc_class('staber_form3d_rproc') :-
+
+	class +$ 'staber_form3d_rproc' d ( es,'Ejemplos RDlg') sc function,
+    'staber_form3d::demomode'(_, _, _, _),
+    'staber_form3d::simplescenario'(_, _, _, _),
+    % 'staber_form3d::customcustomization'(_, _, _, _),
+    % 'staber_form3d::addgeometryfrombutton'(_, _, _, _),
+    % 'staber_form3d::formwithinteractiongraphicsengine'(_, _, _, _),
+    'staber_form3d_rproc_pattern::folders'(_, _, _, _).
+
+'staber_form3d::demomode'(_, _OBJ_in, _, OBJ_out) :-
+    Title = 'Escenario simple para inicialización de formulario 3D en modo DEMO (en desarrollo)',
+
+    OBJ_form = {
+        type: 'form3d',
+        busId: 'bus__form3d_demomode',
+        events: [
+             {
+                type: "function",
+                name: "new_rc3d",
+                in: {
+                    deploy: "deploy__wasm"
+                },
+                context: { delegatedTo: 'builderweb' } 
+            },
+            {
+                type: 'init',
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        { 
+                            type: 'function', 
+                            name: 'Start', 
+                            in: {
+                                demo: true,
+                                plugins:['r3d_placement', 'r3d_physics', 'r3d_animations'],
+                                scenes:['california','robot_arm']
+                            },                     
+                            context: {
+                                delegatedTo: {
+                                    ras: {
+                                        path: '/staber/Execute',
+                                        transport: 'http'
+                                    },
+                                    implementedBy: 'C',
+                                    module: 'r3d_staber_agent',
+                                    logicalAgent: 'testapp'
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ_form,
+        hasKw: testapp_form3d_demomode,
+        hasDsca: Title,
+        hasIcon: 'clipboard-ok',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_form3d::simplescenario'(_, _OBJ_in, _, OBJ_out) :-
+    Title = 'Escenario simple para inicialización de formulario 3D (en desarrollo)',
+    OBJ_form = {
+        type: 'form3d',
+        busId: 'bus__form3d_simplescenario',
+        events: [            
+            {
+                type: 'init',
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        {
+                            type: "function",
+                            name: "new_rc3d",
+                            in: {
+                                deploy: "deploy__wasm"
+                            },
+                            context: { delegatedTo: 'builderweb' }
+                        },                
+                        { 
+                            type: 'function', 
+                            name: 'Start', 
+                            in: {
+                                demo: false                    
+                            },                     
+                            context: {
+                                delegatedTo: {
+                                    ras: {
+                                        path: '/staber/Execute',
+                                        transport: 'http'
+                                    },
+                                    implementedBy: 'C',
+                                    module: 'r3d_staber_agent',
+                                    logicalAgent: 'testapp'
+                                }
+                            }
+                        }
+                        
+                    ]
+                }
+            }
+        ]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ_form,
+        hasKw: testapp_form3d_simplescenario,
+        hasDsca: Title,
+        hasIcon: 'clipboard-ok',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+% 'staber_form3d::customcustomization'(_, _OBJ_in, _, OBJ_out) :-
+%     Title = 'Escenario para la personalización del motor gráfico (en desarrollo)',
+%     IN = {
+%         camera: {
+% 		    type: 'top' 
+%         }   
+%     },
+%     OBJ_form = {
+%         type: 'form3d',
+%         busId: 'bus__form3d_simplescenario',
+%         in: IN,
+%         events: [
+%             {
+%                 type: 'init',
+%                 p_exec: {
+%                     type: 'sequence',
+%                     hasProcess: [                
+%                         { 
+%                             type: 'function', 
+%                             name: 'Start', 
+%                             in: {
+%                                 demo: false                    
+%                             },                     
+%                             context: {
+%                                 delegatedTo: {
+%                                     ras: {
+%                                         path: '/staber/Execute',
+%                                         transport: 'http'
+%                                     },
+%                                     implementedBy: 'C',
+%                                     module: 'r3d_staber_agent',
+%                                     logicalAgent: 'testapp'
+%                                 }
+%                             }
+%                         },
+%                         { type: 'function', name: 'add_3D_scene_robot_arm', context: { delegatedTo: 'builderweb' } }        
+%                     ]
+%                 }
+
+%             }
+%         ]
+%     },
+%     Rproc = {
+%         type: 'rprocess',
+%         gui_out: OBJ_form,
+%         hasKw: testapp_form3d_customcustomization,
+%         hasDsca: Title,
+%         hasIcon: 'clipboard-ok',
+%         isRoot: false,
+%         security_edit: [permissionProfile__repositorioTests_KRP],
+%         security_view: [permissionProfile__repositorioTests_KRP]
+%     },
+%     create_rprocess(_,Rproc,_,OBJ_out).
+
+% 'staber_form3d::addgeometryfrombutton'(_, _OBJ_in, _, OBJ_out) :-
+%     newKw('bus__execprocess__', BUS_PROCESS),
+%     newKw('bus__form3d__', BUS_GRAPHICS_ENGINE),
+%     newKw('channel', CHANNEL),
+
+%     GUI_OUT = {         
+%         type: 'assembly',
+%         block: true,
+%         cols: 2,     
+%         children: [
+%             {
+%                 type: 'assembly',
+%                 children: [
+%                      {                
+%                         type: 'button',                
+%                         label: { icon: 'key', d: 'Añadir geometria ROBOT ARM' },                
+%                         events: [{
+%                             type: 'click',
+%                             method: 'log',                            
+%                             targetBusId: BUS_PROCESS,
+%                             p_exec: {
+%                                 type: 'sequence',
+%                                 hasProcess: [
+%                                     { type: 'function', name: 'add_3D_scene_robot_arm', context: { delegatedTo: 'builderweb' } }        
+%                                 ]
+%                             }
+%                         }]
+%                     },
+%                     {                
+%                         type: 'button',                
+%                         label: { icon: 'key', d: 'Añadir geometria IZZ MESH' },                
+%                         events: [{
+%                             type: 'click',
+%                             method: 'log',                            
+%                             targetBusId: BUS_PROCESS,
+%                             p_exec: {
+%                                 type: 'sequence',
+%                                 hasProcess: [
+%                                     { type: 'function', name: 'add_3D_scene_mitsuba', context: { delegatedTo: 'builderweb' } }        
+%                                 ]
+%                             }
+%                         }]
+%                     }
+%                 ]
+%             },           
+%             {
+%                 type: 'form3d',
+%                 busId: BUS_GRAPHICS_ENGINE,
+%                 events: [
+%                     {
+%                         type: 'init',
+%                         p_exec: {
+%                             type: 'sequence',
+%                             hasProcess: [                
+%                                 { 
+%                                     type: 'function', 
+%                                     name: 'Start', 
+%                                     in: {
+%                                         demo: false                    
+%                                     },                     
+%                                     context: {
+%                                         delegatedTo: {
+%                                             ras: {
+%                                                 path: '/staber/Execute',
+%                                                 transport: 'http'
+%                                             },
+%                                             implementedBy: 'C',
+%                                             module: 'r3d_staber_agent',
+%                                             logicalAgent: 'testapp'
+%                                         }
+%                                     }
+%                                 }   
+%                             ]
+%                         }
+
+%                     }
+%                 ]
+%             }
+%         ]   
+%     },      
+    
+%     Title = 'Escenario con interacción entre formulario y motor gráfico (en desarrollo)', 
+%     OBJ_out = {        
+%         type: 'rprocess',        
+%         busId: BUS_PROCESS,
+%         hasChannel: CHANNEL,
+%         hasDsca: Title,
+%         hasKw: testapp_form3d_addgeometryfrombutton,
+%         hasIcon: 'conect',
+%         debug: true,
+%         do_exec: true,
+%         isRoot: false,        
+%         security_edit: [permissionProfile__repositorioTests_KRP],
+%         gui_out: GUI_OUT
+%     },
+%     create_rprocess(_,OBJ_out,_,_).
+
+% 'staber_form3d::formwithinteractiongraphicsengine'(_, _OBJ_in, _, OBJ_out) :-
+%     newKw('bus__execprocess__', BUS_PROCESS),
+%     newKw('bus__form3d__', BUS_GRAPHICS_ENGINE),
+%     newKw('bus__form__', BUS_FORM),
+%     newKw('channel', CHANNEL),
+
+%     % I_dataset = 'Default',
+%     % I_agent = 'builderweb',        
+
+%     GUI_OUT = {         
+%         type: 'assembly',
+%         block: true,
+%         cols: 2,     
+%         children: [
+%             % {
+%             %     type : 'kdetail',
+%             %     busId: BUS_FORM_CONTACT,
+%             %     in : {
+%             %         hasAgent: I_agent,
+%             %         hasDataset: I_dataset,
+%             %         hasKw: 'testapp_contacto_001',
+%             %         hasKwc: 'testapp:contact'
+%             %     }
+%             % },  
+%             {
+%                 type: 'rform',
+%                 busId: BUS_FORM,
+%                 hasDataset: 'Default',
+%                 scope:{
+%                     origin: 'dst',
+%                     query:{
+%                         from: 'root_mitsuba'
+%                     }
+%                 },
+%                 template:{
+%                     type: 'assembly',
+%                     children: [                
+%                         { 
+%                             arc:  'hasDsca',                     
+%                             enabled: false            
+%                         },
+%                         % Show list with three michuba childs
+%                         % {
+%                         %     arc: 'r3d:hasPartG'
+%                         % },
+%                         {
+%                             arc: 'r3d:hasXPosition',
+%                             events: [
+%                                 {
+%                                     type: 'change',
+%                                     method: 'log',
+%                                     targetBusId: BUS_PROCESS,
+%                                     % payload: {
+%                                     %     hasDataset: 'Default',
+%                                     %     root: mitsuba_gold,
+%                                     %     from: mitsuba_gold                                  
+%                                     % },
+%                                     p_exec: {
+%                                         type: 'sequence',
+%                                         hasProcess: [
+%                                             {
+%                                                 type: 'method',
+%                                                 in: {                                                       
+%                                                     stmt: '?STMT',
+%                                                     pattern: {
+%                                                         % For test purposes we are using hardcoded values to translate mitsuba_gold                                                        
+%                                                         % root: '_.stmt.from',
+%                                                         % from: '_.stmt.from',
+%                                                         arc: '_.stmt.arc',
+%                                                         cto: '_.stmt.cto',
+%                                                         orda: '_.stmt.orda',
+%                                                         to: '_.value',
+%                                                         hasDataset: 'Default',
+%                                                         root: mitsuba_gold,
+%                                                         from: mitsuba_gold 
+%                                                     }
+%                                                 },
+%                                                 name: 'map',
+%                                                 module: 'Mapper'
+%                                             },
+%                                             { type: 'function', name: 'builder50_updStmt', context: { delegatedTo: 'builderweb' } },
+%                                             { type: 'function', name: 'refresh_scene', context: { delegatedTo: 'builderweb' } }    
+%                                         ]
+%                                     }
+%                                 }    
+%                             ]
+%                         }
+%                         % ,
+%                         % {
+%                         %     arc: 'r3d:hasYPosition',
+%                         %     events: [
+%                         %         {
+%                         %             type: 'change',
+%                         %             method: 'log',
+%                         %             targetBusId: BUS_FORM,
+%                         %             p_exec: {
+%                         %                 type: 'sequence',
+%                         %                 hasProcess: [
+%                         %                     { type: 'method', name: 'refresh_scene_client' }    
+%                         %                 ]
+%                         %             }
+%                         %         }    
+%                         %     ]
+%                         % }                               
+%                     ]
+%                 },
+%                 enabled: true,
+%                 events:[
+%                     {
+%                         type: 'init',
+%                         payload: {navigationFilter: 'all', options:{getSchema: true}, hasDataset: 'Default'},
+%                         p_exec: {
+%                             type: 'sequence',
+%                             hasProcess: [
+%                                 { type: 'function', name: 'add_3D_scene_mitsuba', context: { delegatedTo: 'builderweb' } },     
+%                                 { type: 'function', name : 'get_formInfo', context: { delegatedTo: 'builderweb' }},                                   
+%                                 { type: 'method', name: 'import', module: 'Dataset' }
+%                             ]
+%                         }
+%                     },
+%                     {
+%                         type: 'deleteStmt',    
+%                         method: 'deleteStmt',     
+%                         targetBusId: BUS_FORM,
+%                         p_exec: {
+%                             type: 'sequence',
+%                             hasProcess: [
+%                                { type: 'function', name: 'refresh_scene', context: { delegatedTo: 'builderweb' } }    
+%                             ]
+%                         }
+%                     }                  
+%                 ]
+%             },       
+%             {
+%                 type: 'form3d',
+%                 busId: BUS_GRAPHICS_ENGINE,
+%                 events: [
+%                     {
+%                         type: 'init',
+%                         p_exec: {
+%                             type: 'sequence',
+%                             hasProcess: [                
+%                                 { 
+%                                     type: 'function', 
+%                                     name: 'Start', 
+%                                     in: {
+%                                         demo: false                    
+%                                     },                     
+%                                     context: {
+%                                         delegatedTo: {
+%                                             ras: {
+%                                                 path: '/staber/Execute',
+%                                                 transport: 'http'
+%                                             },
+%                                             implementedBy: 'C',
+%                                             module: 'r3d_staber_agent',
+%                                             logicalAgent: 'testapp'
+%                                         }
+%                                     }
+%                                 }   
+%                             ]
+%                         }
+%                     },
+%                     { type: 'function', name: 'refresh_scene', context: { delegatedTo: 'builderweb' } }    
+%                 ]
+%             }
+%         ]   
+%     },      
+    
+%     Title = 'Escenario con interación entre formulario y motor gráfico (en desarrollo)', 
+%     OBJ_out = {        
+%         type: 'rprocess',        
+%         busId: BUS_PROCESS,
+%         hasChannel: CHANNEL,
+%         hasDsca: Title,
+%         hasKw: testapp_form3d_formwithinteractiongraphicsengine,
+%         hasIcon: 'conect',
+%         debug: false,
+%         do_exec: true,
+%         isRoot: false,        
+%         security_edit: [permissionProfile__repositorioTests_KRP],
+%         gui_out: GUI_OUT
+%     },
+%     create_rprocess(_,OBJ_out,_,_).
+
+'staber_form3d_rproc_pattern::folders'(_, _, _, _):-
+	Conf_folder = {
+		type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_form3d,
+        hasDsca: 'Test Form3d',
+        hasIcon: 'dinamic',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            testapp_form3d_demomode,
+            testapp_form3d_simplescenario,
+            testapp_form3d_customcustomization,
+            testapp_form3d_addgeometryfrombutton,
+            testapp_form3d_formwithinteractiongraphicsengine
+        ]
+	},
+	create_rprocess(_, Conf_folder, _, _).

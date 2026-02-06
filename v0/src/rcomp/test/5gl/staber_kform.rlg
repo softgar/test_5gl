@@ -1,0 +1,1463 @@
+﻿/**
+@descr	staber_kform <br>
+		staber_kform
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kform') :-
+	class +$ 'staber_kform' d ( es,'Patrón rproc para kform') sc function,
+    'staber_kform::usecase__0'(_, _, _, _),
+    'staber_kform::usecase__1'(_, _, _, _),
+    'staber_kform::usecase__1_autotemplate'(_, _, _, _),
+    'staber_kform::usecase__2_autotemplate'(_, _, _, _),
+    'staber_kform::usecase__1_icons'(_, _, _, _),
+    'staber_kform::usecase__3'(_, _, _, _),
+    'staber_kform::usecase__4'(_, _, _, _),
+    'staber_kform::usecase__5'(_, _, _, _),
+    % Agrupaciones en collapsibles
+    'staber_kform::usecase__6'(_, _, _, _),
+    % Agrupaciones en tab
+    'staber_kform::usecase__7'(_, _, _, _),
+    % Agrupaciones en initab
+    'staber_kform::usecase__8'(_, _, _, _),
+    % Agrupaciones por defecto
+    'staber_kform::usecase__9'(_, _, _, _),
+    % Agrupaciones Ejemplo complejo
+    'staber_kform::usecase__10'(_, _, _, _),
+    % Ejemplo anterior usando propiedad template en vez de hasAggrupation
+    'staber_kform::usecase__11'(_, _, _, _),
+    % COMPORTAMIENTOS CONFIGURADOR 5.0
+    'staber_kform::usecase__12'(_, _, _, _),
+    'staber_kform::usecase__13'(_, _, _, _),
+    % Formulario con dos campos representados por LISTA o stmtEditionTabla
+    'staber_kform::usecase__15'(_, _, _, _),
+    % Agrupaciones por defecto (Utilizando la API para crearlas)
+    'staber_kform::usecase__16'(_, _, _, _),
+    % Carpetas Agrupaciones    
+    'staber_kform::usecase__form_table_testappContact'(_, _, _, _),
+    'staber_kform::AgrupationsSim'(_, _, _, _),
+    'staber_kform::AgrupationsApi'(_, _, _, _),
+    'staber_kform::usecase__6_table'(_, _, _, _),
+    'staber_kform::usecase__9_table'(_, _, _, _),
+    'staber_kform::AgrupationsSimTable'(_, _, _, _),
+    'staber_kform::AgrupationFolders'(_, _, _, _),
+
+    % Kform loading a class without instance
+    'staber_kform::usecase__kform_class'(_, _, _, _),
+    % -------------------------
+    'staber_kform::folders'(_, _, _, _).
+    
+
+'staber_kform::usecase__0'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_005',
+        hasCKDIStatusFrom: ckdiStatusK,
+        hasCKDIStatusArc: ckdiStatusK,
+        hasCKDIStatusTo: ckdiStatusK,
+        enabled: false,
+        navigationFilter: 'all',
+        allowNavigation: true
+    },     
+    
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: { options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',
+        in: IN,
+        proc: PROC,
+        do_exec: true,
+        hasKw: formulario_contactos_simple,
+        hasDsca: kform_test_formulario_contactos_simple_uiML,
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasDlg: true,
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+% Creacion de la clase sin instancia para test de carga en kform
+edu :-
+    X = function__edu,
+    (dicc(_,X) -> function --$ X ; true),
+    function *$ X
+.
+
+'staber_kform::usecase__kform_class'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    edu,
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'function__edu',
+        hasCKDIStatusFrom: ckdiStatusK,
+        hasCKDIStatusArc: ckdiStatusK,
+        hasCKDIStatusTo: ckdiStatusK,
+        enabled: true,
+        navigationFilter: 'all',
+        allowNavigation: true
+    },     
+    
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: { options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',
+        in: IN,
+        proc: PROC,
+        do_exec: true,
+        hasKw: usecase_kform_example,
+        hasDsca: 'Kform carga class sin instancia',
+        hasIcon: 'user',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasDlg: true,
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kform::usecase__1'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'dataset__ssa_test',
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:project_101483741610537627',
+        hasCKDIStatusFrom: ckdiStatusK,
+        hasCKDIStatusArc: ckdiStatusK,
+        hasCKDIStatusTo: ckdiStatusK,
+        enabled: false
+    },     
+    
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: { options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    newKw('busid', BUSID_KFORM), 
+    newKw('channel', CHANNEL_FORM),  
+    OBJ_form = {
+        type: 'kform',
+        in: IN,
+        proc: PROC,
+        busId: BUSID_KFORM,
+        hasChannel: CHANNEL_FORM,
+        hasKw: rproc__4gl_kform__001,
+        hasDsca: kform_test_001_uiML,
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true,       
+        evtSubscribe: [{topic: 'exec', channel: CHANNEL_FORM}] ,
+        events:[{
+                type: 'navigate',
+                method: 'log',
+                targetBusId: BUSID_KFORM,
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        
+                        { type: 'method', name: 'publish', module: 'PubSub',
+                          in: {
+                            publish: [{
+                                topic: 'exec',
+                                channel: CHANNEL_FORM,
+                                payload: {
+                                    otroatributo: 'ok'
+                                }
+                            }]
+                          }
+                        },
+                        
+                        %%{ type: 'method', name: 'exec', busId: BUSID_KFORM},
+                        {type:'method', name: 'navigation', busId:BUSID_KFORM }
+                    ]
+                }
+        }]
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kform::usecase__1_autotemplate'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'dataset__ssa_test',
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:project_101483741610537627',
+        hasCKDIStatusFrom: ckdiStatusK,
+        hasCKDIStatusArc: ckdiStatusK,
+        hasCKDIStatusTo: ckdiStatusK,
+        enabled: false,
+        hasAggrupationLegacy: true,
+        hasCustomization: 'cust__micust'
+    },     
+    
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: { options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    newKw('busid', BUSID_KFORM), 
+    newKw('channel', CHANNEL_FORM),  
+    OBJ_form = {
+        type: 'kform',
+        in: IN,
+        proc: PROC,
+        busId: BUSID_KFORM,
+        hasChannel: CHANNEL_FORM,
+        hasKw: rproc__4gl_kform__001_autotemplate,
+        hasDsca: kform_test_001_autoTemplate_uiML,
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true,       
+        evtSubscribe: [{topic: 'exec', channel: CHANNEL_FORM}] ,
+        events:[{
+                type: 'navigate',
+                method: 'log',
+                targetBusId: BUSID_KFORM,
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        
+                        { type: 'method', name: 'publish', module: 'PubSub',
+                          in: {
+                            publish: [{
+                                topic: 'exec',
+                                channel: CHANNEL_FORM,
+                                payload: {
+                                    otroatributo: 'ok'
+                                }
+                            }]
+                          }
+                        },
+                        
+                        %%{ type: 'method', name: 'exec', busId: BUSID_KFORM},
+                        {type:'method', name: 'navigation', busId:BUSID_KFORM }
+                    ]
+                }
+        }]
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kform::usecase__2_autotemplate'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'dataset__ssa_test',
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:project_101483741610537627',
+        hasCKDIStatusFrom: ckdiStatusK,
+        hasCKDIStatusArc: ckdiStatusK,
+        hasCKDIStatusTo: ckdiStatusK,
+        enabled: false,
+        hasAggrupationLegacy: true
+    },     
+    
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: { options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    newKw('busid', BUSID_KFORM), 
+    newKw('channel', CHANNEL_FORM),  
+    OBJ_form = {
+        type: 'kform',
+        in: IN,
+        proc: PROC,
+        busId: BUSID_KFORM,
+        hasChannel: CHANNEL_FORM,
+        hasKw: rproc__4gl_kform__002_autotemplate,
+        hasDsca: kform_test_002_autoTemplate_uiML,
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true,       
+        evtSubscribe: [{topic: 'exec', channel: CHANNEL_FORM}] ,
+        events:[{
+                type: 'navigate',
+                method: 'log',
+                targetBusId: BUSID_KFORM,
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        
+                        { type: 'method', name: 'publish', module: 'PubSub',
+                          in: {
+                            publish: [{
+                                topic: 'exec',
+                                channel: CHANNEL_FORM,
+                                payload: {
+                                    otroatributo: 'ok'
+                                }
+                            }]
+                          }
+                        },
+                        
+                        %%{ type: 'method', name: 'exec', busId: BUSID_KFORM},
+                        {type:'method', name: 'navigation', busId:BUSID_KFORM }
+                    ]
+                }
+        }]
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+
+%%% Ejemplos de personalizaciones en plantilla
+
+'ss:project::cust__micust::complete_propertyInTemplate'( 'ss:closedProject', _Obj_in, Obj_control, Obj_out):-
+    !,
+    Obj_ControlMod = {
+        appearance: 'toggle'
+    },
+    obj_merge( Obj_control, Obj_ControlMod, Obj_out).
+
+'ss:project::cust__micust::complete_propertyInTemplate'( ARC, Obj_in, Obj_control, Obj_out):-
+    'builder::complete_propertyInTemplate'( ARC, Obj_in, Obj_control, Obj_out).
+
+'ss:project::complete_propertyInTemplate'('hasKw', _Estado, Obj_in, Obj_out):-
+    obj_fetch( hasKw, Obj_in, Kw),
+
+    Obj_perso = {
+        
+        type: table,
+        schema: [
+            {
+                label: {
+                    d: 'type'
+                }
+            },
+            {
+                label: {
+                    d: 'hasKw'
+                }
+            }
+        ],
+        children: [
+            {
+                type: tablerow,
+                children: [
+                    {
+                        type: text,
+                        value: 'ss:project',
+                        enabled: false
+                    },
+                    {
+                        type: text,
+                        value: Kw,
+                        enabled: false
+                    }
+                ]
+            }
+        ],
+        %label: { d: 'hasKw', i18n: 'd'},
+        enabled:false
+    },
+
+    obj_merge(Obj_in, Obj_perso, Obj_out).
+
+'ss:project::complete_propertyInTemplate'( 'ss:closedProject', _Obj_in, Obj_control, Obj_out):-
+    !,
+    Obj_ControlMod = {
+        appearance: 'toggle2'
+    },
+    obj_merge( Obj_control, Obj_ControlMod, Obj_out).
+
+
+'ss:project::complete_propertyInTemplate'( 'hasGeneralExpenses', _Obj_in, Obj_control, Obj_out):-
+    !,
+    Obj_table = {
+        'type':'table',
+        'pagination':{   
+            'perPage':5,
+            'total':200,
+            'events':[
+                {
+                    'type':'click'}
+            ]
+        },
+        'schema':[
+            {'label':{'d':'Columna1'}},
+            {'label':{'d':'Columna2'}},
+            {'label':{'d':'Columna3'}},
+            {'label':{'d':'Columna4'}}
+        ],
+        'children':[
+            {   'type':'tablerow',
+                'children':[
+                    {   'type':'text',
+                        'value':'Input1'
+                    },
+                    {   'type':'text','value':'Input1'},
+                    {   'type':'text','value':'Input3'},
+                    {   'type':'text','value':'Input4'}
+                ]
+            },
+            {   'type':'tablerow',
+                'children':[
+                    {   'type':'text','value':'Input2'},
+                    {   'type':'text','value':'Input1'},
+                    {   'type':'text','value':'Input1'},
+                    {   'type':'text','placeholder':'Input4'}
+                ]
+            }
+        ]
+    },
+    json_write( Obj_table, C_table),
+
+    Obj_ControlMod = {
+        'type': 'textarea',
+        'editor': 'json',
+        'value': C_table
+    },
+    obj_merge( Obj_control, Obj_ControlMod, Obj_out).
+
+'ss:project::complete_propertyInTemplate'( 'hasYearGeneralExpenses', _Obj_in, Obj_control, Obj_out):-
+    !,
+    ejemploInventadoMD( C_EjemploMD),
+    
+
+    Obj_ControlMod = {
+        'type': 'textarea',
+        'editor': 'markdown',
+        'value': C_EjemploMD
+    },
+    obj_merge( Obj_control, Obj_ControlMod, Obj_out).
+
+
+
+'ss:project::complete_propertyInTemplate'( ARC, Obj_in, Obj_control, Obj_out):-
+    'builder::complete_propertyInTemplate'( ARC, Obj_in, Obj_control, Obj_out).
+
+
+ejemploInventadoMD( Cont ):-
+    Cont = "# ARQUITECTURA DE UNA APLICACIÓN REPCON\nEn este documento se recoge el análisis hecho hasta el momento de como sería la arquitectura de una aplicación Repcon basada en modelos.\nLas aplicaciones Repcon constarán de dos aplicaciones conectadas entre si:\n- APP: Aplicación de usuario final ( APP)\n- App Builder: Aplicación que genera los modelos que utiliza la aplicación APP, genera los diferentes mantenimientos que aparecen en la aplicación APP",
+    true.
+
+
+'staber_kform::usecase__1_icons'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'dataset__ssa_test',
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:project_101483741610537627',
+        hasCKDIStatusFrom: ckdiStatusK,
+        hasCKDIStatusArc: ckdiStatusK,
+        hasCKDIStatusTo: ckdiStatusK,
+        enabled: false
+    },     
+    
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: { options: {getSchema: true, showIcons: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    newKw('busid', BUSID_KFORM), 
+    newKw('channel', CHANNEL_FORM),  
+    OBJ_form = {
+        type: 'kform',
+        in: IN,
+        proc: PROC,
+        busId: BUSID_KFORM,
+        hasChannel: CHANNEL_FORM,
+        hasKw: rproc__4gl_kform__001_icons,
+        hasDsca: kform_test_001_icons_uiML,
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true,       
+        evtSubscribe: [{topic: 'exec', channel: CHANNEL_FORM}] ,
+        events:[{
+                type: 'navigate',
+                method: 'log',
+                targetBusId: BUSID_KFORM,
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        
+                        { type: 'method', name: 'publish', module: 'PubSub',
+                          in: {
+                            publish: [{
+                                topic: 'exec',
+                                channel: CHANNEL_FORM,
+                                payload: {
+                                    otroatributo: 'ok'
+                                }
+                            }]
+                          }
+                        },
+                        {type:'method', name: 'navigation', busId:BUSID_KFORM }
+                    ]
+                }
+        }]
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+% Para añadir datos de ejemplo al dataset.
+% 'addContactsToCommercialAction':-
+%     DS = 'dataset__ss_master_test',
+%     r_setStmt( DS, hasNumberLines, hasContact, integer, 2, 0),
+%     r_setStmt( DS, hasContact, commercialAction_38192331654676439, contact_38192121654676438, 2),
+%     r_setStmt( DS, hasContact, commercialAction_38192331654676439, contact_38192141654676438, 3),
+%     r_setStmt( DS, hasContact, commercialAction_38192331654676439, contact_38192161654676438, 4),
+%     r_setStmt( DS, hasContact, commercialAction_38192331654676439, contact_38192221654676438, 5),
+%     r_setStmt( DS, hasContact, commercialAction_38192331654676439, contact_38192271654676438, 6).
+
+'staber_kform::usecase__3'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent   = 'builderweb',
+    I_dataset = 'dataset__ss_master_test',
+    Title = 'kform_test_003_uiML',
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'contact_38192101654676437',
+        hasKwc: 'contact',
+        hasCKDIStatusFrom: ckdiStatusD,
+        hasSchemaDataset: 'Default',
+        enabled: true,
+        template:{
+            type: assembly,
+            children:[
+                { arc: hasAddress}
+            ]
+        }
+    },
+    OBJ_FORM = {
+        type: 'kform',
+        in: IN,
+        hasDsca: Title,
+        hasIcon: 'group',
+        isRoot: false,
+        hasKw: rproc__4gl_kform__003,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__users, permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_FORM,_,OBJ_out).
+
+'staber_kform::usecase__4'(_, _OBJ_in, _, OBJ_out) :-
+    
+    I_agent   = 'builderweb',
+    I_dataset = 'Default',
+    newKw('busId__', BUSID_KFORM),
+    Obj_out_info = {
+        type: 'help',
+        classList: ['info-font-icon'],
+        busId: 'infoBusId'
+    },
+    Obj_out_help = {
+        type: 'help',
+        busId: 'helpBusId'
+    },
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'repcon',
+        hasCKDIStatusFrom: ckdiStatusKD,
+        enabled: true,
+        template: {
+            type: 'assembly',
+            children: [
+                {
+                    arc: hasPassword,
+                    hasHelp: true,
+                    inputtype: 'password'
+                },
+                {
+                    arc: hasLoginId,
+                    hasInfo: true
+                }
+            ]
+        }
+    },
+    addHelp( user, hasPassword,
+        es,
+        [ title( 'Recomendaciones de contraseña'),
+        '<p>De un mínimo de 8 caractéres, y que contenga algún número o mayúscula. Evitar fechas y demás datos personales conocidos.</p>'
+    ]),
+    addInfo( user, hasLoginId,
+        es,
+        [ '<p>Cadena de caracteres única con la que se identifica al usuario en el sistema.</p>']),
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',
+        in: IN,
+        proc: PROC,
+        busId: BUSID_KFORM
+    },
+    OBJ_Main={
+        type: 'assembly',
+        children: [
+            {
+                type:'assembly',
+                children: [
+                    {
+                        type: 'assembly',
+                        width: 70,
+                        children:[OBJ_form]
+                    },
+                    {
+                        type: 'assembly',
+                        width: 30,
+                        children:[Obj_out_help,Obj_out_info]
+                    }
+                ]
+            }
+        ]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ_Main,
+        hasKw: rproc__4gl_kform__004,
+        hasIcon: 'group',
+        hasDsca: 'kform_test_004_uiML',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_kform::usecase__5'(_, _OBJ_in, _, OBJ_out) :-
+    
+    I_agent   = 'builderweb',
+    I_dataset = 'dataset__semantic_test',
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:project_120006511568015358',
+        enabled: true
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',                                                           
+        in: IN,        
+        proc: PROC,
+        hasKw: rproc__4gl_kform__005,
+        hasDsca: kform_test_005_uiML,
+        hasIcon: 'group',
+        hasDlg: true,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+/*Ejemplo de Kmgt con Formulario de contactos basado en template con collapsibles*/
+'staber_kform::usecase__6'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    getContactAgrupation(collapsible, Obj_Agrupations),
+    IN = {
+        hasAgent: I_agent,                   
+        hasDataset: I_dataset, 
+        hasKw: 'testapp_contacto_007',
+        hasCKDIStatusFrom: ckdiStatusD,
+        enabled: true,
+        hasAggrupation: Obj_Agrupations
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',                                                           
+        in: IN,        
+        proc: PROC,
+        hasKw: rproc__4gl_kform__006,
+        hasDsca: kform_test_006_uiML,
+        hasIcon: 'instancia',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+/*Ejemplo de Kmgt con Formulario de contactos basado en template con tabs*/
+'staber_kform::usecase__7'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__ss_master_test',
+    I_agent = 'builderweb',
+    getContactAgrupation(tab, Obj_Agrupations),
+    IN = {
+        hasAgent: I_agent,                   
+        hasDataset: I_dataset, 
+        hasKw: 'contact_38192101654676437',
+        hasCKDIStatusFrom: ckdiStatusD,
+        enabled: true,
+        hasAggrupation: Obj_Agrupations
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',                                                           
+        in: IN,        
+        proc: PROC,
+        hasKw: rproc__4gl_kform__007,
+        hasDsca: kform_test_007_uiML,
+        hasIcon: 'instancia',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+/*Ejemplo de Kmgt con Formulario de contactos basado en template con initabs*/
+'staber_kform::usecase__8'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__ss_master_test',
+    I_agent = 'builderweb',
+    getContactAgrupationInitab(Obj_Agrupations),
+    IN = {
+        hasAgent: I_agent,                   
+        hasDataset: I_dataset, 
+        hasKw: 'contact_38192101654676437',
+        hasCKDIStatusFrom: ckdiStatusD,
+        enabled: true,
+        hasAggrupation: Obj_Agrupations
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',                                                           
+        in: IN,        
+        proc: PROC,
+        hasKw: rproc__4gl_kform__008,
+        hasDsca: kform_test_008_uiML,
+        hasIcon: 'instancia',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+/*Ejemplo de Kmgt con Formulario de contactos basado en template sin especificar*/
+'staber_kform::usecase__9'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__ss_master_test',
+    I_agent = 'builderweb',
+    getContactAgrupationDiv(Obj_Agrupations),
+    IN = {
+        hasAgent: I_agent,                   
+        hasDataset: I_dataset, 
+        hasKw: 'contact_38192101654676437',
+        hasCKDIStatusFrom: ckdiStatusD,
+        enabled: true,
+        hasAggrupation: Obj_Agrupations
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',                                                           
+        in: IN,        
+        proc: PROC,
+        hasKw: rproc__4gl_kform__009,
+        hasDsca: kform_test_009_uiML,
+        hasIcon: 'instancia',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kform::usecase__10'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__ss_master_test',
+    I_agent = 'builderweb',
+    getContactAgrupationComplexLayout(Obj_Agrupations),
+    IN = {
+        hasAgent: I_agent,                   
+        hasDataset: I_dataset, 
+        hasKw: 'contact_38192101654676437',
+        hasCKDIStatusFrom: ckdiStatusD,
+        enabled: true,
+        hasAggrupation: Obj_Agrupations
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',                                                           
+        in: IN,        
+        proc: PROC,
+        hasKw: rproc__4gl_kform__010,
+        hasDsca: kform_test_010_uiML,
+        hasIcon: 'instancia',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kform::usecase__11'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__ss_master_test',
+    I_agent = 'builderweb',
+    getContactAgrupationComplexTemplate(Obj_Template),
+    IN = {
+        hasAgent: I_agent,                   
+        hasDataset: I_dataset, 
+        hasKw: 'contact_38192101654676437',
+        hasCKDIStatusFrom: ckdiStatusD,
+        enabled: true,
+        template: Obj_Template
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',                                                           
+        in: IN,        
+        proc: PROC,
+        hasKw: rproc__4gl_kform__011,
+        hasDsca: kform_test_011_uiML,
+        hasIcon: 'instancia',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kform::usecase__12'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__ss_master_test',
+    I_agent = 'builderweb',
+    getAgrupationforConfigurator(Obj_Agrupation),
+    obj_get(data, Obj_Agrupation, JSON_data),
+    obj_get(propertyGUIGroup_config1, JSON_data, RSON_agrupation),
+    newKw('busId_kform', BusId),
+
+    IN = {
+        hasAgent: I_agent,                   
+        hasDataset: I_dataset, 
+        hasKw: 'contact_38192101654676437',
+        hasCKDIStatusFrom: ckdiStatusD,
+        enabled: true,
+        hasAggrupation: Obj_Agrupation
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',
+        busId: BusId,
+        in: IN,
+        proc: PROC
+    },
+    json_write( RSON_agrupation, Codes_Agrupation),
+    atom_codes( JSON_agrupation, Codes_Agrupation),
+    OBJ_Main={
+        type:'assembly',
+        children:[
+            {
+                type: 'assembly',
+                width: 70,
+                children:[OBJ_form]
+            },
+            {
+                type: 'assembly',
+                width: 30,
+                children:[{
+                    type: 'textarea',
+                    editor: 'json',
+                    value: JSON_agrupation
+                }]
+            }
+        ]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ_Main,
+        hasKw: rproc__4gl_kform__012,
+        hasDsca: kform_test_012_uiML,
+        hasIcon: 'instancia',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_kform::usecase__13'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    % Creamos el agente
+    agent *$ agent__collection_fileserver__usecase13
+    p [ useProtocol ¬> string $ 'fileserver',
+        useUrl ¬> string $ 'http://localhost:18080'
+    ], 
+    % Definimos la url
+    urlSpec *$ urlSpec__collections_fileserver__usecase13
+    p [
+        resourcePath ¬> string $ '/collections/',
+        delegatedTo ¬> agent $ agent__collection_fileserver__usecase13
+    ],
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        %hasKw: 'ss:document_47643821619430883',
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        hasCKDIStatusFrom: 'ckdiStatusD',
+        enabled: true,
+        navigationFilter: 'all',
+        template: {
+            type: 'assembly',
+            children:[{
+                type: 'fileupload',                
+                arc: 'contact:hasFileAttachment',
+                hasKw: 'testapp_contacto_007'
+            }
+            ]
+        }
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: { getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',  
+        busId: 'ejemplo_kform_fileInput',
+        in: IN,      
+        do_exec: true,  
+        proc: PROC,
+        hasKw: rproc__4gl_kform__013,
+        hasDsca: kform_test_013_uiML,
+        hasIcon: 'instancia',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kform::usecase__15'(_, _OBJ_in, _, OBJ_out):-
+    I_agent     = 'builderweb',
+    I_dataset   = 'Default',
+    I_chat      = 'testapp:chat__15',
+    newKw('busid', BUSID_KFORM),    
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: 'Default',
+        hasKw: I_chat,
+        hasKwc:  'testapp:chat',
+        hasCKDIStatusFrom: ckdiStatusD,
+        enabled: true,   
+        navigationFilter: 'all',
+        template:{
+            type: assembly,
+            children:[
+                {
+                    type: 'label',
+                    id: 'label-1',
+                    size: 'h3',
+                    d: 'Bienvenido al Chat !!'
+                },
+                { 
+                    arc: 'testapp:hasField1',
+                    label: {
+                        d: 'Campo chat1'
+                    },
+                    class: 'custom_class_to_stmtedition'
+                },
+                { 
+                    arc: 'testapp:hasField2',
+                    label: {
+                        d: 'Campo chat2'
+                    },
+                    class: 'custom_class_to_stmtedition'
+                }
+            ]
+        }
+    },    
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: I_agent}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },     
+    Title = 'kform_test_015_uiML',
+    OBJ_FORM = {
+        type: 'kform',            
+        in: IN, 
+        proc: PROC,
+        busId: BUSID_KFORM,      
+        events:[{
+                type: 'zoomAdd',
+                method: 'zoomAdd',
+                targetBusId: BUSID_KFORM,
+                payload: { hasDataset: I_dataset, hasKw: I_chat},
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        { type: 'function', name: 'testapp:zoomAddInstance', context: { delegatedTo: I_agent } }
+                    ]
+                }
+            },
+            {          
+                type: 'updateStmt',
+                payload: { hasDataset: I_dataset, hasKw: I_chat},
+                method: 'log',
+                targetBusId: BUSID_KFORM,
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        { type: 'function', name: 'testapp:updateStmt', context: { delegatedTo: I_agent } },
+                        { type: 'method', name: 'change_config', busId: BUSID_KFORM }
+                    ]
+                }
+            }
+        ]
+    },   
+    
+    OBJ_ASEMBLY = {
+        type: 'assembly',
+        children: [
+            OBJ_FORM
+        ]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ_ASEMBLY,
+        hasKw: rproc__4gl_kform__015,
+        hasDsca: Title,        
+        hasIcon: 'grid',      
+        security_view: [permissionProfile__users, permissionProfile__repositorioTests_KRP], 
+        security_edit: [permissionProfile__users, permissionProfile__repositorioTests_KRP],
+        isRoot: false
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_kform::usecase__16'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('bus__kform_aggrupations_', BUSID),
+    newKw('channel__kform_aggrupations_', CHANNEL),
+    IN = {
+        hasAgent: I_agent,                   
+        hasDataset: I_dataset, 
+        hasKw: 'testapp_contacto_007',
+        hasKwc: 'testapp:contact',
+        hasCKDIStatusFrom: ckdiStatusD,
+        hasAggrupationLegacy: true,
+        hasState: 'state_noedit',
+        enabled: true,
+        navigationFilter: 'all'
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {navigationFilter: all, getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',                                                           
+        in: IN,
+        busId: BUSID,
+        hasChannel: CHANNEL,
+        do_exec: true,        
+        proc: PROC,
+        hasKw: formulario_contactos_agrupaciones_api,
+        hasDsca: kform_test_016_uiML,
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kform::AgrupationsSim'(_, _, _, _) :-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kformAgrupationsSim,
+        hasDsca: kform_test_simulated_aggrupations_uiML,
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__4gl_kform__006,
+            rproc__4gl_kform__007,
+            rproc__4gl_kform__008,
+            rproc__4gl_kform__009,
+            rproc__4gl_kform__010,
+            rproc__4gl_kform__011,
+            rproc__4gl_kform__012,
+            rproc__4gl_kform__013
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).
+
+'staber_kform::AgrupationsSimTable'(_, _, _, _) :-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kformAgrupationsSimTable,
+        hasDsca: kform_test_simulated_aggrupations_table_uiML,
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__4gl_kform__006_table,
+            rproc__4gl_kform__009_table,
+            kform_display_table_with_help
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).
+
+
+
+/*Ejemplo de Kmgt con Formulario de contactos basado en template con collapsibles*/
+'staber_kform::usecase__6_table'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__ss_master_test',
+    I_agent = 'builderweb',
+    getContactAgrupationTable(collapsible, Obj_Agrupations),
+    newKw('busId__', BusId),
+    addHelp( user, hasEmail,
+        es,
+        [ title( 'Ayuda de Email'),
+        '<p>Un email se compone de dos cadenas de texto sin caracteres especiales separadas por una "@". La segunda cadena tiene un sufijo precedido por un punto.</p>'
+    ]),
+    addInfo( user, hasEmail,
+        es,
+        [ '<p>Cadena de caracteres única con la que se identifica la dirección de correo electrónico del usuario.</p>']),
+    IN = {
+        hasAgent: I_agent,                   
+        hasDataset: I_dataset, 
+        hasKw: 'contact_38192101654676437',
+        hasCKDIStatusFrom: ckdiStatusD,
+        enabled: true,
+        navigationFilter: all,
+        hasAggrupation: Obj_Agrupations
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {navigationFilter: all, getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    Obj_out_info = {
+        type: 'help',
+        classList: ['info-font-icon'],
+        busId: 'infoBusId'
+    },
+    Obj_out_help = {
+        type: 'help',
+        busId: 'helpBusId'
+    },
+    OBJ_form = {
+        type: 'kform',
+        busd: BusId,
+        in: IN,
+        proc: PROC
+    },
+    OBJ_Main={
+        type: 'assembly',
+        children: [
+            {
+                type:'assembly',
+                children: [
+                    {
+                        type: 'assembly',
+                        width: 70,
+                        children:[OBJ_form]
+                    },
+                    {
+                        type: 'assembly',
+                        width: 30,
+                        children:[Obj_out_help,Obj_out_info]
+                    }
+                ]
+            }
+        ]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ_Main,
+        hasKw: rproc__4gl_kform__006_table,
+        hasDsca: kform_test_006_table_uiML,
+        hasIcon: 'instancia',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+/*Ejemplo de Kmgt con Formulario de contactos basado en template sin especificar*/
+'staber_kform::usecase__9_table'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'dataset__ss_master_test',
+    I_agent = 'builderweb',
+    getContactAgrupationDivTable(Obj_Agrupations),
+    IN = {
+        hasAgent: I_agent,                   
+        hasDataset: I_dataset, 
+        hasKw: 'contact_38192101654676437',
+        hasCKDIStatusFrom: ckdiStatusD,
+        enabled: true,
+        hasAggrupation: Obj_Agrupations
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    OBJ_form = {
+        type: 'kform',                                                           
+        in: IN,        
+        proc: PROC,
+        hasKw: rproc__4gl_kform__009_table,
+        hasDsca: kform_test_009_table_uiML,
+        hasIcon: 'instancia',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,OBJ_form,_,OBJ_out).
+
+'staber_kform::usecase__form_table_testappContact'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    getArupationTableWithHelp(collapsible, Obj_Agrupations),
+    newKw('busId__', BusId),
+    IN = {
+        hasAgent: I_agent,                   
+        hasDataset: I_dataset, 
+        hasKw: 'testapp_contacto_005',
+        hasCKDIStatusFrom: ckdiStatusD,
+        enabled: true,
+        navigationFilter: all,
+        hasAggrupation: Obj_Agrupations
+    },
+    PROC = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: {options: {navigationFilter: all, getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    Obj_out_info = {
+        type: 'help',
+        classList: ['info-font-icon'],
+        busId: 'infoBusId'
+    },
+    Obj_out_help = {
+        type: 'help',
+        busId: 'helpBusId'
+    },
+    OBJ_form = {
+        type: 'kform',
+        busId: BusId,
+        in: IN,
+        proc: PROC
+    },
+    OBJ_Main={
+        type: 'assembly',
+        children: [
+            {
+                type:'assembly',
+                children: [
+                    {
+                        type: 'assembly',
+                        width: 70,
+                        children:[OBJ_form]
+                    },
+                    {
+                        type: 'assembly',
+                        width: 30,
+                        children:[Obj_out_help,Obj_out_info]
+                    }
+                ]
+            }
+        ]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ_Main,
+        hasKw: kform_display_table_with_help,
+        hasDsca: kform_test_formulario_contactos_table_with_help_uiML,
+        hasIcon: 'instancia',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_kform::AgrupationsApi'(_, _, _, _) :-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kformAgrupationsApi,
+        hasDsca: kform_test_aggrupations_using_API_uiML,
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            formulario_contactos_agrupaciones_api
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).
+
+'staber_kform::AgrupationFolders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kformAgrupations,
+        hasDsca: kform_test_aggrupations_uiML,
+        hasIcon: 'folder',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            folder__repositorioTests_kformAgrupationsSim,
+            folder__repositorioTests_kformAgrupationsApi,
+            folder__repositorioTests_kformAgrupationsSimTable
+
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).
+
+
+'staber_kform::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_kform,
+        hasDsca: kform_test_kform_uiML,
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            usecase_kform_example,
+            formulario_contactos_simple, 
+            rproc__4gl_kform__001,
+            rproc__4gl_kform__001_autotemplate,
+            rproc__4gl_kform__002_autotemplate,
+            rproc__4gl_kform__001_icons,
+            rproc__4gl_kform__003,
+            rproc__4gl_kform__004,
+            rproc__4gl_kform__005,
+            folder__repositorioTests_kformAgrupations,
+            rproc__4gl_kform__015
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).
+
+'testapp:zoomAddInstance'(Ctx, Obj_in, Ctx, Obj_out):-    
+    obj_ppd(Obj_in),
+    obj_get(hasKw, Obj_in, KWI),
+    obj_get(property:hasKw, Obj_in, KWA),
+    %% Añadimos mensaje    
+    'testapp:message' +$ Msg,        
+    Msg ¬ 'testapp:hasTxt' := 'hola...',
+    KWI += KWA ¬> Msg,
+    Obj_out = Obj_in.
+
+'testapp:updateStmt'(Ctx, Obj_in, Ctx, Obj_out):-    
+    obj_ppd(Obj_in),
+    obj_get(from, Obj_in, Msg),
+    obj_get(orda, Obj_in, Orda),
+    obj_get(arc, Obj_in, KWA),
+    obj_get(to, Obj_in, Value),
+    %% Añadimos algo al value para verificar que se refresca bien    
+    concatAtoms([Value, '. Ok'], Value_out),    
+
+    setStmt(KWA, Msg, string, Value_out, Orda),
+    Obj_out = Obj_in.
+
+
+
+    
+
+
+
+
+    

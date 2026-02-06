@@ -1,0 +1,252 @@
+﻿/**
+@descr	staber_ksearch <br>
+		staber_ksearch
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_ksearch') :-
+	class +$ 'staber_ksearch' d ( es,'Patrón rproc para ksearch') sc function,
+    'staber_ksearch_basic::kmgt_searchResult'(_, _, _, _),
+    'staber_ksearch_basic::bydefault'(_, _, _, _),
+    'staber_ksearch_basic::withoutmodifier'(_, _, _, _),
+    'staber_ksearch_basic::fieldsdefined'(_, _, _, _),
+    'staber_ksearch_basic::withoverride'(_, _, _, _),
+    'staber_ksearch::folders'(_, _, _, _).
+    
+%  Ejemplo de búsqueda con resultado para ejemplo framework
+'staber_ksearch_basic::kmgt_searchResult'(_, _, _, OBJ_out):-
+    newKw('bus__search__', BUS_ID),
+    IN = {
+        hasKwc: 'testapp:contact',
+        hasDataset: 'dataset__test_5gl_server',
+        selectable: false,
+        hasLayout: searchResult,
+        hasArea:{
+            result: {
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            class: 'user',
+                            arc: 'contact:hasName',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                },
+                includedProperties: [
+                    'hasIcon',
+                    'contact:hasName',
+                    'contact:hasEmail'
+                ]
+            },
+            search: {
+                fieldsToSearchFromSchema: true
+            }
+        }
+    },
+	Obj_class = {
+        type : 'kmgt',
+        busId: BUS_ID,
+        in: IN,
+        hasKw: search_000_kmgt_searchResult,
+        hasDsca: 'Busqueda y resultado',
+        hasIcon: 'sort',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isSession: true,
+        hasNavbar: false
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+/* Ejemplo de Búsqueda sencilla */   
+'staber_ksearch_basic::bydefault'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__search__', CHANNEL_SEARCH), 
+    newKw('bus__search__', BUS_ID),
+	Obj_class = {
+        type : 'ksearch',
+        busId: BUS_ID,
+        hasChannel: CHANNEL_SEARCH,
+        hasKw: ksearch_bydefault,
+        hasDsca: [('es', 'Búsqueda simple por defecto')],
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_ksearch_basic::withoutmodifier'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__search__', CHANNEL_SEARCH), 
+    newKw('bus__search__', BUS_ID),
+
+	IN = {
+        hiddenButtons: ['case']
+    },
+	Obj_class = {
+        in : IN,
+        type : 'ksearch',
+        busId: BUS_ID,
+        hasChannel: CHANNEL_SEARCH,
+        hasKw: ksearch_withoutmodifier,
+        hasDsca: [('es', 'Búsqueda simple sin modificador (caseSensitive)')],
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).         
+
+'staber_ksearch_basic::fieldsdefined'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__search__', CHANNEL_SEARCH), 
+    newKw('bus__search__', BUS_ID),
+	IN = {
+        hiddenButtons :['case', 'fullWord'],
+        fieldsToSearch: [
+            {
+                arc:'hasKw',                        
+                label: {
+                    d: 'Keyword'
+                }            
+            },
+            {
+                arc:'hasDsca',                        
+                label: {
+                    d: 'Descripción'
+                }                               
+            }
+        ]     
+    },
+	Obj_class = {
+        in : IN,
+        type : 'ksearch',
+        busId: BUS_ID,
+        hasChannel: CHANNEL_SEARCH,
+        hasKw: ksearch_fieldsdefined,
+        hasDsca: [('es', 'Búsqueda simple con definición de campos')],
+        hasIcon: 'search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).  
+
+'staber_ksearch_basic::withoverride'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel__search__', CHANNEL_SEARCH), 
+    newKw('bus__search__', BUS_ID),
+    OVERRIDES = [            
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function', 
+                        name: 'staber_ksearch_basic::rc_gui_out', 
+                        context: { delegatedTo: 'builderweb' } 
+                    }
+                ]
+            }
+         }        
+    ],
+	Obj_class = {
+        type : 'ksearch',
+        busId: BUS_ID,
+        hasChannel: CHANNEL_SEARCH,
+        hasKw: ksearch_withoverride,
+        hasDsca: [('es', 'Búsqueda simple por sobrecarga (override GUI_OUT)')],
+        hasIcon: 'search',
+        overrides: OVERRIDES,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).    
+
+% Auxiliary predicates
+'staber_ksearch_basic::rc_gui_out'(CTX, OBJ_in, CTX, OBJ_out) :-
+    %% BusId del componente "ksearch"
+    obj_get(in:parentBusId, OBJ_in,  PARENTBUS),
+    !,
+    OBJ_out = {
+        type: 'assembly',
+        children:
+        [              
+            {
+                type: 'text',
+                placeholder: 'Descripción...',
+                events: [
+                    {
+                        type: 'change',
+                        method: 'set_propertyValue',
+                        targetBusId: PARENTBUS,
+                        payload: {property: 'hasDscaFilter'}
+                    }
+                ]
+            },             
+            {
+                type: 'button',
+                label: { 
+                    icon: 'search'
+                },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'setSearchQuery',
+                        targetBusId: PARENTBUS,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { 
+                                    type: 'function', 
+                                    name: 'staber_kmgt::ontology::search::setSearchQuery', 
+                                    context: { 
+                                        delegatedTo: 'builderweb' 
+                                    } 
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }.
+
+'staber_kmgt::ontology::search::setSearchQuery'(_Obj_ctx, Obj_in, _Obj_ctx, Obj_out):-
+    obj_get(hasDscaFilter, Obj_in, Dsca, ''),
+    Obj_out = {
+        queryFilter : {
+            hasDscaFilter: Dsca
+        }
+    }.
+
+'staber_ksearch::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_ksearch,
+        hasDsca: 'ksearch: Componente Búsquedas',
+        hasIcon: 'search',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            ksearch_bydefault,
+            ksearch_withoutmodifier,
+            ksearch_fieldsdefined,
+            ksearch_withoverride
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).
+
+

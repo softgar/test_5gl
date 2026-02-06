@@ -1,0 +1,1395 @@
+﻿/**
+@descr	staber_ktalogue <br>
+		staber_ktalogue
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_ktalogue') :-
+	class +$ 'staber_ktalogue' d ( es,'Patrón rproc para ktalogue') sc function,
+     'staber_ktalogue::usecase__000'(_, _, _, _),
+     'staber_ktalogue::usecase__001'(_, _, _, _),
+     'staber_ktalogue::usecase__select_Nav'(_, _, _, _),
+     'staber_ktalogue::usecase__noSelect_noNav'(_, _, _, _),
+     'staber_ktalogue::usecase__noSelect_Nav'(_, _, _, _),
+     'staber_ktalogue::usecase__select_noNav'(_, _, _, _),
+     'staber_ktalogue::usecase__002'(_, _, _, _),
+     'staber_ktalogue::usecase__003'(_, _, _, _),
+     'staber_ktalogue::usecase__004'(_, _, _, _),
+     'staber_ktalogue::usecase__005'(_, _, _, _),
+     'staber_ktalogue::usecase__006'(_, _, _, _),
+     'staber_ktalogue::usecase__007'(_, _, _, _),
+    'staber_ktalogue_selections_navs::folders'(_, _, _, _),
+    'staber_ktalogue_hasLayout::folders'(_, _, _, _),
+    'staber_ktalogue::folders'(_, _, _, _).
+
+'staber_ktalogue::usecase__000'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'dataset__test_5gl_server',
+    CATALOGUE_SCHEMA = {
+        data: [
+            {
+                label: {
+                    d: 'Palabra Clave'
+                },
+                arc: 'hasKw',
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Nombre'
+                },
+                arc: 'contact:hasName',
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Icon'
+                },
+                arc: 'hasIcon',
+                sorted: true
+            }
+        ]
+    },
+    IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasLayout: 'resultCatalogue',
+        hasArea:{
+            catalogue: {
+                backButton: false,
+                layoutType:'kgallery',
+                schema: CATALOGUE_SCHEMA,
+                hasIncludedProperties: ['hasKw', 'hasDsca', 'contact:hasName', 'hasIcon'],
+                hasTemplate :{
+                    default:{
+                        hasKw : '_.hasKw',
+                        hasDsca:  '_.contact:hasName',
+                        hasImage: '_.hasIcon'
+                    }
+                }
+            }
+        },
+        collapsible: {
+            collapsed: false,
+            floating: true,
+            fixed: true
+        }
+    },
+    RESULT_OVERRIDES = [
+        {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function',  name: 'rc_gui_out:tree:testapp:contact', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ], 
+    Title =  'Explorador de contactos',
+    OBJ_in = {
+        type: 'ktalogue',
+        in: IN,
+        hasKw: ktalogue_test_000,
+        hasDsca: Title,
+        hasAppOverride: {
+            result: RESULT_OVERRIDES
+        },
+        hasIcon: 'user-ok',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        isRoot: false
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+'staber_ktalogue::dlg'(Obj_out, Obj_ButtonStatus):-
+    obj_get(accept, Obj_ButtonStatus, Ok_Enabled, true),
+    obj_get(cancel, Obj_ButtonStatus, Cancel_Enabled, true),
+    obj_get(enableButtonsOnSelect, Obj_ButtonStatus, EnableButtonsOnSelect, false),
+    Obj_out = {
+        type: 'rdlg',
+        busId: '_.dlg.busId',
+        in: {
+            enableButtonsOnSelect: EnableButtonsOnSelect,
+            close: false,
+            options: {
+                label: {
+                    d: 'Seleccione los elementos'
+                },
+                actions: [{
+                    type: 'button',
+                    appearance: 'line',
+                    label:{
+                        d:'Aceptar'
+                    },
+                    enabled: Ok_Enabled,
+                    events: [{
+                        type: 'click',
+                        method: 'accept',
+                        targetBusId: '_.dlg.busId'
+                    }]
+                },
+                {
+                    type: 'button',
+                    appearance: 'line',
+                    label:{
+                        d:'Cancelar'
+                    },
+                    enabled: Cancel_Enabled,
+                    events: [{
+                        type: 'click',
+                        method: 'cancel',
+                        targetBusId: '_.dlg.busId'
+                    }]
+                }]
+            }
+        }
+    }.
+ 'staber_ktalogue::usecase__001'(_, _, _, OBJ_out):-
+    I_dataset = 'dataset__semantic_test',
+    I_agent = 'builderweb',
+    newKw('channel__main__', CHANNEL_MAIN),
+     SEARCH_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::ontology::search::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ], 
+    RESULT_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function',  name: 'staber_kmgt::ontology::result::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:resource',
+        hasKw: 'ss:resource',
+        hasChannel: CHANNEL_MAIN,
+        searchLayout: 'basic',
+        collapsible: {
+            floating: true
+        },
+        hasArea:{
+            catalogue: {
+                includedProperties: [hasDsca, hasKw],
+                multiselection: true,
+                reset: true,
+                backButton: false,
+                layoutType:'kgallery', 
+                hasTemplate :{
+                    default:{
+                        hasDsca:  '_.hasDsca',
+                        hasIconClass: 'document',
+                        hasKw : '_.hasKw'
+                    }
+                }
+            }
+        }        
+    },   
+    Title =  'Catálogo usando plantilla con búsqueda, árbol y galería',
+    OBJ_in = {
+        type: 'ktalogue',
+        in: IN,
+        hasKw: ktalogue_test_001,
+        hasDsca: Title,
+        hasIcon: 'layout04',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+         hasAppOverride: {
+            search :SEARCH_OVERRIDES,
+            result : RESULT_OVERRIDES
+        }
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+ 'staber_ktalogue::usecase__noSelect_noNav'(_, _, _, OBJ_out):-
+    I_dataset = 'dataset__erc_ofita_product_v0_builderWeb_test',
+    I_agent = 'builderweb',
+    newKw('channel__main__', CHANNEL_MAIN),
+     SEARCH_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::ontology::search::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ], 
+    RESULT_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function',  name: 'staber_kmgt::ontology::result::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ditemOfita',
+        hasChannel: CHANNEL_MAIN,
+        searchLayout: 'basic',
+        collapsible: {
+            floating: true
+        },
+        hasArea:{
+            catalogue: {
+                layoutType:'kgallery', 
+                hasAgent: I_agent,
+                hasDataset: I_dataset,
+                do_exec: true,
+                query: 'stmt(subclassOf, HASKW, {$.hasKw})', 
+                persistence: 'remote',
+                selectable: false,
+                stmtFilter: '[HASKW]',
+                searchType: 'rem',
+                hasTemplate: {
+                    class:{
+                        hasDsca:  '_.hasDsca',
+                        hasKw : '_.hasKw',
+                        subclassOf: '_.subclassOf'
+                    },
+                    default:{
+                        hasKw : '_.hasKw',
+                        hasDsca:  '_.hasDsca',
+                        subclassOf: '_.subclassOf',
+                        hasIconClass: 'folder',
+                        type: 'myBox'
+                    }                      
+                }
+            }
+        }        
+    },   
+    Title =  'Sin selección y sin exploración',
+    OBJ_in = {
+        type: 'ktalogue',
+        in: IN,
+        hasKw: ktalogue_test_noSelect_noNav,
+        hasDsca: Title,
+        hasIcon: 'layout04',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+         hasAppOverride: {
+            search :SEARCH_OVERRIDES,
+            result : RESULT_OVERRIDES
+        }
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+ 'staber_ktalogue::usecase__select_Nav'(_, _, _, OBJ_out):-
+    I_dataset = 'dataset__erc_ofita_product_v0_builderWeb_test',
+    I_agent = 'builderweb',
+    newKw('channel__main__', CHANNEL_MAIN),
+     SEARCH_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::ontology::search::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ], 
+    RESULT_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function',  name: 'staber_kmgt::ontology::result::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+    Catalogue_Schema = {
+        data: [
+            {
+                label: {
+                    d: 'Palabra Clave'
+                },
+                arc: 'hasKw',
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Descripción'
+                },
+                arc: 'hasDsca',
+                sorted: false
+            },
+            {
+                label: {
+                    d: 'Subclase de '
+                },
+                arc: 'subclassOf',
+                sorted: false
+            }
+        ]
+    },
+    IncludedProperties = ['hasKw', 'hasDsca', 'subclassOf'],
+    NavigableProperties =['subclassOf'],
+    IN_NAV_CATALOGUE= {
+        query: 'stmt(subclassOf, HASKW, ?hasInstance)',
+        hasAgent: I_agent,
+        persistence: 'remote',
+        hasDataset: I_dataset,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Catalogue_Schema,
+        searchType: 'rem',
+        hasProperty: ['subclassOf'],
+        hasTemplate: {
+            class:{
+                hasDsca:  '_.hasDsca',
+                hasKw : '_.hasKw',
+                subclassOf: '_.subclassOf'
+            },
+            default:{
+                hasKw : '_.hasKw',
+                subclassOf: '_.subclassOf',
+                hasIconClass: 'folder',
+                type: 'myBox'
+            }                      
+        }
+    },
+    NAVCATALOGUE = [{ hasProperty: 'subclassOf',  in: IN_NAV_CATALOGUE}],
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ditemOfita',
+        hasChannel: CHANNEL_MAIN,
+        searchLayout: 'basic',
+        collapsible: {
+            floating: true
+        },
+        hasArea:{
+            catalogue: {
+                layoutType:'kgallery', 
+                hasAgent: I_agent,
+                hasDataset: I_dataset,
+                do_exec: true,
+                query: 'stmt(subclassOf, HASKW, {$.hasKw})', 
+                persistence: 'remote',
+                selectable: true,
+                multiselection: true,
+                reset: true,
+                hasIncludedProperties : IncludedProperties,
+                hasNavigableProperties: NavigableProperties,
+                nav: NAVCATALOGUE,
+                stmtFilter: '[HASKW]',
+                searchType: 'rem',
+                schema: Catalogue_Schema,
+                hasTemplate: {
+                    class:{
+                        hasDsca:  '_.hasDsca',
+                        hasKw : '_.hasKw',
+                        subclassOf: '_.subclassOf'
+                    },
+                    default:{
+                        hasKw : '_.hasKw',
+                        hasDsca:  '_.hasDsca',
+                        subclassOf: '_.subclassOf',
+                        hasIconClass: 'folder',
+                        type: 'myBox'
+                    }                      
+                }
+            }
+        }        
+    },   
+    Title =  'Con selección y con exploración',
+    OBJ_in = {
+        type: 'ktalogue',
+        in: IN,
+        hasKw: ktalogue_test_select_Nav,
+        hasDsca: Title,
+        hasIcon: 'layout04',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+         hasAppOverride: {
+            search :SEARCH_OVERRIDES,
+            result : RESULT_OVERRIDES
+        }
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+ 'staber_ktalogue::usecase__noSelect_Nav'(_, _, _, OBJ_out):-
+    I_dataset = 'dataset__erc_ofita_product_v0_builderWeb_test',
+    I_agent = 'builderweb',
+    newKw('channel__main__', CHANNEL_MAIN),
+     SEARCH_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::ontology::search::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ], 
+    RESULT_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function',  name: 'staber_kmgt::ontology::result::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+    Catalogue_Schema = {
+        data: [
+            {
+                label: {
+                    d: 'Palabra Clave'
+                },
+                arc: 'hasKw',
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Descripción'
+                },
+                arc: 'hasDsca',
+                sorted: false
+            },
+            {
+                label: {
+                    d: 'Subclase de '
+                },
+                arc: 'subclassOf',
+                sorted: false
+            }
+        ]
+    },
+    IncludedProperties = ['hasKw', 'hasDsca', 'subclassOf'],
+    NavigableProperties =['subclassOf'],
+    IN_NAV_CATALOGUE= {
+        query: 'stmt(subclassOf, HASKW, ?hasInstance)',
+        hasAgent: I_agent,
+        persistence: 'remote',
+        hasDataset: I_dataset,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Catalogue_Schema,
+        searchType: 'rem',
+        hasProperty: ['subclassOf'],
+        hasTemplate: {
+            class:{
+                hasDsca:  '_.hasDsca',
+                hasKw : '_.hasKw',
+                subclassOf: '_.subclassOf'
+            },
+            default:{
+                hasKw : '_.hasKw',
+                subclassOf: '_.subclassOf',
+                hasIconClass: 'folder',
+                type: 'myBox'
+            }                      
+        }
+    },
+    NAVCATALOGUE = [{ hasProperty: 'subclassOf',  in: IN_NAV_CATALOGUE}],
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ditemOfita',
+        hasChannel: CHANNEL_MAIN,
+        searchLayout: 'basic',
+        collapsible: {
+            floating: true
+        },
+        hasArea:{
+            catalogue: {
+                layoutType:'kgallery', 
+                hasAgent: I_agent,
+                hasDataset: I_dataset,
+                do_exec: true,
+                query: 'stmt(subclassOf, HASKW, {$.hasKw})', 
+                persistence: 'remote',
+                selectable: false,
+                hasIncludedProperties : IncludedProperties,
+                hasNavigableProperties: NavigableProperties,
+                nav: NAVCATALOGUE,
+                stmtFilter: '[HASKW]',
+                searchType: 'rem',
+                schema: Catalogue_Schema,
+                hasTemplate: {
+                    class:{
+                        hasDsca:  '_.hasDsca',
+                        hasKw : '_.hasKw',
+                        subclassOf: '_.subclassOf'
+                    },
+                    default:{
+                        hasKw : '_.hasKw',
+                        hasDsca:  '_.hasDsca',
+                        subclassOf: '_.subclassOf',
+                        hasIconClass: 'folder',
+                        type: 'myBox'
+                    }                      
+                }
+            }
+        }        
+    },   
+    Title =  'Sin selección y con exploración en caja',
+    OBJ_in = {
+        type: 'ktalogue',
+        in: IN,
+        hasKw: ktalogue_test_noSelect_Nav,
+        hasDsca: Title,
+        hasIcon: 'layout04',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+         hasAppOverride: {
+            search :SEARCH_OVERRIDES,
+            result : RESULT_OVERRIDES
+        }
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+ 'staber_ktalogue::usecase__select_noNav'(_, _, _, OBJ_out):-
+    I_dataset = 'dataset__erc_ofita_product_v0_builderWeb_test',
+    I_agent = 'builderweb',
+    newKw('channel__main__', CHANNEL_MAIN),
+     SEARCH_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::ontology::search::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ], 
+    RESULT_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function',  name: 'staber_kmgt::ontology::result::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ditemOfita',
+        hasChannel: CHANNEL_MAIN,
+        searchLayout: 'basic',
+        collapsible: {
+            floating: true
+        },
+        hasArea:{
+            catalogue: {
+                layoutType:'kgallery', 
+                hasAgent: I_agent,
+                hasDataset: I_dataset,
+                do_exec: true,
+                query: 'stmt(subclassOf, HASKW, {$.hasKw})', 
+                persistence: 'remote',
+                selectable: true,
+                multiselection: true,
+                reset: true,
+                stmtFilter: '[HASKW]',
+                searchType: 'rem',
+                hasTemplate: {
+                    class:{
+                        hasDsca:  '_.hasDsca',
+                        hasKw : '_.hasKw',
+                        subclassOf: '_.subclassOf'
+                    },
+                    default:{
+                        hasKw : '_.hasKw',
+                        hasDsca:  '_.hasDsca',
+                        subclassOf: '_.subclassOf',
+                        hasIconClass: 'folder',
+                        type: 'myBox'
+                    }                      
+                }
+            }
+        }        
+    },   
+    Title =  'Con selección y sin exploración',
+    OBJ_in = {
+        type: 'ktalogue',
+        in: IN,
+        hasKw: ktalogue_test_select_noNav,
+        hasDsca: Title,
+        hasIcon: 'layout04',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+         hasAppOverride: {
+            search :SEARCH_OVERRIDES,
+            result : RESULT_OVERRIDES
+        }
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+
+
+/* Cajas de diálogo para conectar con motor de procesos- ktalogue multiselection */
+'staber_ktalogue::usecase__002'(_, _, _, OBJ_out):-
+
+    newKw('bus', BUS),
+    OVERRIDES = [          
+         {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_ktalogue::rc_gui_out::usecase__002', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],        
+    IN = {                
+        campo1: ''
+    },    
+	Obj_class = {  
+        in : IN,
+        type : 'rprocess',
+        busId: BUS,
+        hasDlg : true,
+        hasKw: ktalogue_test_002,            
+        hasDsca: 'Catálogo en diálogo, con galería con multiselección',
+        hasIcon: 'layout04',            
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+        overrides: OVERRIDES
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+    
+
+'staber_ktalogue::rc_gui_out::usecase__002'(CTX, OBJ_in, CTX, OBJ_out):-   
+    obj_get(busId, OBJ_in,  BUS_PARENT), 
+    obj_get(in:campo1, OBJ_in,  CAMPO1),
+    !,
+    'staber_ktalogue::dlg'(DLG1, {accept: false, cancel: true, enableButtonsOnSelect: true} ),     
+    I_dataset = 'dataset__semantic_test',
+    I_agent = 'builderweb',    
+     SEARCH_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::ontology::search::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ], 
+    RESULT_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::ontology::result::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+    
+    SCHEMA_DLG = {
+        data: [           
+            {
+                label: {
+                    d: 'Kw'
+                },
+                arc: 'hasKw'
+            },
+            {
+                label: {
+                    d: 'Descripción'
+                },
+                arc: 'hasDsca'
+            }
+        ]
+    },
+    IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:resource',
+        hasKw: 'ss:resource',        
+        searchLayout: 'basic',
+        hasArea:{
+            catalogue: {
+                includedProperties: [hasDsca, hasKw],                
+                multiselection: true,
+                selectable: true,
+                reset: true,             
+                schema: SCHEMA_DLG,                
+                layoutType:'kgallery',
+                backButton: false,
+                hasTemplate :{
+                    default:{
+                        hasDsca:  '_.hasDsca',
+                        hasIconClass: 'document',
+                        hasKw : '_.hasKw'
+                    }
+                }
+                
+            }
+        }        
+    },   
+    BUS = 'bus',
+    DATA1 = {
+        type: 'ktalogue',
+        busId: BUS,
+        in: IN,      
+        hasChannel: '_.dlg.hasChannel',  
+        hasAppOverride: {
+            search :SEARCH_OVERRIDES,
+            result : RESULT_OVERRIDES
+        },
+        evtPublish:[
+            { topic: 'setNode', channel: '_.dlg.hasChannel'},
+            { topic: 'setPayload', channel: '_.dlg.hasChannel'}
+        ]
+    },
+    
+    OBJ_out = {
+        type: 'assembly',
+        children:
+            [
+                {
+                    type: 'text',
+                    label: {
+                        d: 'rDlg con introducción de Datos a través de ktalogue'
+                    },
+                    value: CAMPO1,
+                    actions: [{
+                        label: {
+                            icon: 'zoom'
+                        },
+                        collapse: false,
+                        events: [
+                            {
+                                type: 'click',
+                                method: 'log',
+                                targetBusId: BUS_PARENT,
+                                payload:{
+                                    '?CAMPO1':'Dato aceptado'
+                                },
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { type: 'method', in: { dlg_connection: setNodeFromCatalogue, dlg_data: DATA1, dlg: DLG1}, name: 'dialog_exec', busId: BUS_PARENT},
+                                        { type: 'method', in: {campo1: '?CAMPO1', pattern: {'hasKw': '_.hasKw', selectedKw: '_.selectedKw'}}, name: 'map',  module: 'Mapper' },
+                                        { type: 'function', name: 'parseMultiSelectionToStringValue', context:{ delegatedTo: 'builderweb'}},
+                                        { type: 'method', name: 'change_config', busId: BUS_PARENT }
+                                    ]
+                                }
+                            }]
+                    }]
+                }                
+            ]
+    }.
+
+ 'staber_ktalogue::usecase__003'(_, _, _, OBJ_out):-
+    I_dataset = 'dataset__semantic_test',
+    I_agent = 'builderweb',
+    newKw('channel__main__', CHANNEL_MAIN),
+     SEARCH_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::ontology::search::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ], 
+    RESULT_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function',  name: 'staber_kmgt::ontology::result::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:resource',
+        hasKw: 'ss:resource',
+        hasChannel: CHANNEL_MAIN,
+        searchLayout: 'basic',
+        hasLayout: 'resultCatalogue',
+        hasArea:{
+            catalogue: {
+                includedProperties: [hasDsca, hasKw],
+                multiselection: true,
+                reset: true,
+                backButton: false,
+                layoutType:'kgallery',
+                hasTemplate :{
+                    default:{
+                        hasDsca:  '_.hasDsca',
+                        hasIconClass: 'document',
+                        hasKw : '_.hasKw'
+                    }
+                }
+            }
+        }        
+    },   
+    Title =  'Catálogo usando plantilla con árbol y galería',
+    OBJ_in = {
+        type: 'ktalogue',
+        in: IN,
+        hasKw: ktalogue_test_003,
+        hasDsca: Title,
+        hasIcon: 'layout03',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+         hasAppOverride: {
+            search :SEARCH_OVERRIDES,
+            result : RESULT_OVERRIDES
+        }
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+ 'staber_ktalogue::usecase__004'(_, _, _, OBJ_out):-
+    I_dataset = 'dataset__semantic_test',
+    I_agent = 'builderweb',
+    newKw('channel__main__', CHANNEL_MAIN),
+     SEARCH_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::ontology::search::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ], 
+    RESULT_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function',  name: 'staber_kmgt::ontology::result::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:resource',
+        hasKw: 'ss:resource',
+        hasChannel: CHANNEL_MAIN,
+        searchLayout: 'basic',
+        hasLayout: 'searchResult',
+        hasLayoutNavigation: 'detail',
+        hasArea:{
+            catalogue: {
+                includedProperties: [hasDsca, hasKw],
+                multiselection: true,
+                reset: true,
+                backButton: false,
+                layoutType:'kgallery',
+                hasTemplate :{
+                    default:{
+                        hasDsca:  '_.hasDsca',
+                        hasIconClass: 'document',
+                        hasKw : '_.hasKw'
+                    }
+                }
+            }
+        }        
+    },   
+    Title =  'Catálogo usando plantilla con búsqueda y árbol con navegación a galería',
+    OBJ_in = {
+        type: 'ktalogue',
+        in: IN,
+        hasKw: ktalogue_test_004,
+        hasDsca: Title,
+        hasIcon: 'layout03',
+        isRoot: false,
+        do_exec: true,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+         hasAppOverride: {
+            search :SEARCH_OVERRIDES,
+            result : RESULT_OVERRIDES
+        }
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+    
+ 'staber_ktalogue::usecase__005'(_, _, _, OBJ_out):-
+    I_dataset = 'dataset__semantic_test',
+    I_agent = 'builderweb',
+    newKw('channel__main__', CHANNEL_MAIN),
+     SEARCH_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::ontology::search::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ], 
+    RESULT_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function',  name: 'staber_kmgt::ontology::result::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:resource',
+        hasKw: 'ss:resource',
+        hasChannel: CHANNEL_MAIN,
+        searchLayout: 'basic',
+        hasLayout: 'result',
+        hasLayoutNavigation: 'detail',
+        hasArea:{
+            catalogue: {
+                includedProperties: [hasDsca, hasKw],
+                multiselection: true,
+                reset: true,
+                backButton: false,
+                layoutType:'kgallery',
+                hasTemplate :{
+                    default:{
+                        hasDsca:  '_.hasDsca',
+                        hasIconClass: 'document',
+                        hasKw : '_.hasKw'
+                    }
+                }
+            }
+        }        
+    },   
+    Title =  'Catálogo usando plantilla con árbol con navegación a galería',
+    OBJ_in = {
+        type: 'ktalogue',
+        in: IN,
+        hasKw: ktalogue_test_005,
+        hasDsca: Title,
+        hasIcon: 'layout03',
+        isRoot: false,
+        do_exec: true,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+         hasAppOverride: {
+            search :SEARCH_OVERRIDES,
+            result : RESULT_OVERRIDES
+        }
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+ 'staber_ktalogue::usecase__006'(_, _, _, OBJ_out):-
+    I_dataset = 'dataset__semantic_test',
+    I_agent = 'builderweb',
+    newKw('channel__main__', CHANNEL_MAIN),
+     SEARCH_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_kmgt::ontology::search::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ], 
+    RESULT_OVERRIDES = [    
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function',  name: 'staber_kmgt::ontology::result::rc_gui_out', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+        }
+    ],
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss:resource',
+        hasKw: 'ss:resource',
+        hasChannel: CHANNEL_MAIN,
+        searchLayout: 'basic',
+        hasLayout: 'catalogue',
+        hasArea:{
+            catalogue: {
+                includedProperties: [hasDsca, hasKw],
+                multiselection: true,
+                reset: true,
+                backButton: false,
+                layoutType:'kgallery',
+                hasTemplate :{
+                    default:{
+                        hasDsca:  '_.hasDsca',
+                        hasIconClass: 'document',
+                        hasKw : '_.hasKw'
+                    }
+                }
+            }
+        }        
+    },   
+    Title =  'Catálogo usando plantilla con galería',
+    OBJ_in = {
+        type: 'ktalogue',
+        in: IN,
+        hasKw: ktalogue_test_006,
+        hasDsca: Title,
+        hasIcon: 'layout02',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [],
+         hasAppOverride: {
+            search :SEARCH_OVERRIDES,
+            result : RESULT_OVERRIDES
+        }
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+ 'staber_ktalogue::usecase__007'(_, _, _, OBJ_out):-
+    I_dataset = 'dataset__erc_ofita_product_v0_builderWeb_test',
+    I_agent = 'builderweb',
+    newKw('channel__main__', CHANNEL_MAIN),
+
+    Nav_Schema = [
+        {
+            label: {
+                d: 'Palabra Clave'
+            },
+            arc: 'hasKw',
+            sorted: true
+        },
+        {
+            label: {
+                d: 'Descripción'
+            },
+            arc: 'hasDsca',
+            sorted: false,
+            enabled: false
+        },
+        {
+            label: {
+                d: 'Subclase de '
+            },
+            arc: 'subclassOf',
+            sorted: false,
+            enabled: false
+        }
+    ],
+    Result_Schema = {
+        data: [
+            {
+                label: {
+                    d: 'Palabra Clave'
+                },
+                arc: 'hasKw',
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Descripción'
+                },
+                arc: 'hasDsca',
+                sorted: false,
+                enabled: false
+            },
+            {
+                label: {
+                    d: 'Subclase de '
+                },
+                arc: 'subclassOf',
+                sorted: false,
+                enabled: false
+            }
+        ]
+    },
+    Catalogue_Schema = {
+        data: [
+            {
+                label: {
+                    d: 'Palabra Clave'
+                },
+                arc: 'hasKw',
+                sorted: true
+            },
+            {
+                label: {
+                    d: 'Descripción'
+                },
+                arc: 'hasDsca',
+                sorted: false
+            },
+            {
+                label: {
+                    d: 'Imagen'
+                },
+                arc: 'hasImage',
+                sorted: false
+            },
+            {
+                label: {
+                    d: 'Subclase de '
+                },
+                arc: 'subclassOf',
+                sorted: false
+            }
+        ]
+    },
+    
+    IncludedProperties = ['hasKw', 'hasDsca', 'hasImage', 'subclassOf'],
+    NavigableProperties =['subclassOf'],
+
+    IN_NAV_RESULT= {
+        query: 'stmt(subclassOf, HASKW, ?hasInstance)',
+        hasAgent: I_agent,
+        persistence: 'remote',
+        hasDataset: I_dataset,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Nav_Schema,
+        searchType: 'rem',
+        hasProperty: ['subclassOf'],
+        hasTemplate: {
+            class:{
+                hasDsca:  '_.hasDsca',
+                hasKw : '_.hasKw',
+                hasImage: '/repcon/f_get/{_.hasImage}',
+                subclassOf: '_.subclassOf'
+            },
+            default:{
+                hasKw : '_.hasKw',
+                subclassOf: '_.subclassOf',
+                hasIconClass: 'folder',
+                type: 'myBox'
+            }                      
+        }
+    },
+    IN_NAV_CATALOGUE= {
+        query: 'stmt(subclassOf, HASKW, ?hasInstance)',
+        hasAgent: I_agent,
+        persistence: 'remote',
+        hasDataset: I_dataset,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        schema: Catalogue_Schema,
+        searchType: 'rem',
+        hasProperty: ['subclassOf'],
+        hasTemplate: {
+            class:{
+                hasDsca:  '_.hasDsca',
+                hasKw : '_.hasKw',
+                hasImage: '/repcon/f_get/{_.hasImage}',
+                subclassOf: '_.subclassOf'
+            },
+            default:{
+                hasKw : '_.hasKw',
+                subclassOf: '_.subclassOf',
+                hasIconClass: 'folder',
+                type: 'myBox'
+            }                      
+        }
+    },
+
+    NAVRESULT = [{ hasProperty: 'subclassOf',  in: IN_NAV_RESULT}],
+    NAVCATALOGUE = [{ hasProperty: 'subclassOf',  in: IN_NAV_CATALOGUE}],
+
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,        
+        hasKw: 'ditemOfita',
+        hasChannel: CHANNEL_MAIN,
+        persistence: 'remote',
+        searchLayout: 'basic',
+        hasLayout: 'genericSelection',
+        selectable: true,
+        hasArea:{
+            search: {
+                isCollapsible: true
+            },
+            result: {
+                hasAgent: I_agent,
+                hasDataset: I_dataset,
+                do_exec: true,
+                query: 'stmt(subclassOf, HASKW, {$.hasKw})', 
+                persistence: 'remote',
+                layoutType:'kpivotgrid',
+                schemaHeader: false,
+                singleselection: true,
+                hasIncludedProperties : IncludedProperties,
+                hasNavigableProperties: NavigableProperties,
+                nav: NAVRESULT,
+                stmtFilter: '[HASKW]',
+                searchType: 'rem',
+                schema: Result_Schema,
+                hasTemplate: {
+                    class:{
+                        hasDsca:  '_.hasDsca',
+                        hasKw : '_.hasKw',
+                        hasImage: '/repcon/f_get/{_.hasImage}',
+                        subclassOf: '_.subclassOf'
+                    },
+                    default:{
+                        hasKw : '_.hasKw',
+                        hasDsca:  '_.hasDsca',
+                        subclassOf: '_.subclassOf',
+                        hasIconClass: 'folder',
+                        type: 'myBox'
+                    }                      
+                }
+            },
+            catalogue: {      
+                hasAgent: I_agent,
+                hasDataset: I_dataset,
+                do_exec: true,
+                query: 'stmt(subclassOf, HASKW, {$.hasKw})', 
+                persistence: 'remote',
+                layoutType:'kgallery',
+                multiselection: true,
+                reset: true,
+                hasIncludedProperties : IncludedProperties,
+                hasNavigableProperties: NavigableProperties,
+                nav: NAVCATALOGUE,
+                stmtFilter: '[HASKW]',
+                searchType: 'rem',
+                schema: Catalogue_Schema,
+                hasTemplate: {
+                    class:{
+                        hasDsca:  '_.hasDsca',
+                        hasKw : '_.hasKw',
+                        hasImage: '/repcon/f_get/{_.hasImage}',
+                        subclassOf: '_.subclassOf'
+                    },
+                    default:{
+                        hasKw : '_.hasKw',
+                        hasDsca:  '_.hasDsca',
+                        subclassOf: '_.subclassOf',
+                        hasIconClass: 'folder',
+                        type: 'myBox'
+                    }                      
+                }
+            }
+        }        
+    },   
+    Title =  'Catálogo usando plantilla con búsqueda, árbol y galería con navegación interna',
+    OBJ_in = {
+        type: 'ktalogue',
+        in: IN,
+        hasKw: ktalogue_test_007,
+        hasDsca: Title,
+        hasIcon: 'layout02',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: []
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+trimMultiselectionToString(_ctx, Obj_in, _ctx, Obj_out):-
+    obj_fetch(campo1, Obj_in, VALUE, ''),
+    ( is_list(VALUE) ->
+        concatConstants(VALUE, ',', CAMPO1),
+        obj_merge( Obj_in, {campo1: CAMPO1}, Obj_out)
+    ;
+        CAMPO1 = VALUE,
+        Obj_out = Obj_in
+    ).
+
+'staber_ktalogue_hasLayout::folders'(_, _, _, _):-    
+     Title =  'Comportamientos según plantilla',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_ktalogue_hasLayout,            
+            hasDsca: Title,            
+            hasIcon: 'folder-line',
+            isRoot: false,            
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [],
+            hasERCPart: [
+                ktalogue_test_001,
+                ktalogue_test_003,
+                ktalogue_test_004,
+                ktalogue_test_005,
+                ktalogue_test_006,
+                ktalogue_test_007
+            ]
+    },_,_).
+
+'staber_ktalogue_selections_navs::folders'(_, _, _, _):-    
+     Title =  'Comportamientos según selección y exploración *En desarrollo*',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_ktalogue_selections_navs,            
+            hasDsca: Title,            
+            hasIcon: 'folder-line',
+            isRoot: false,            
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [],
+            hasERCPart: [
+                ktalogue_test_select_Nav,
+                ktalogue_test_noSelect_noNav,
+                ktalogue_test_select_noNav,
+                ktalogue_test_noSelect_Nav
+            ]
+    },_,_).
+
+'staber_ktalogue::folders'(_, _, _, _):-    
+     Title =  'ktalogue (5GL clases/instancias)',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_ktalogue,            
+            hasDsca: Title,            
+            hasIcon: 'folder-line',
+            isRoot: false,            
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [],
+            hasERCPart: [
+                ktalogue_test_000,
+                folder__repositorioTests_ktalogue_hasLayout,
+                folder__repositorioTests_ktalogue_selections_navs,
+                ktalogue_test_002
+            ]
+    },_,_).
+

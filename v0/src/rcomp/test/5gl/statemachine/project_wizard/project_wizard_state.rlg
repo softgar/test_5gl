@@ -1,0 +1,212 @@
+
+/* Estados de la máquina */
+
+
+'project_wizard_state::state_init'(State_init):-
+    'project_wizard_state_toolbar::state_init'(O_toolbar),
+    State_init ={    
+        type: 'state',
+        gui_out: {
+            type: 'assembly',
+            children: [
+                O_toolbar,
+                {
+                    type: 'assembly',
+                    children: [{
+                        type: 'html',
+                        value: '<h3>Bienvenido al <b>Wizard de Ascensores </b>, pulse Comenzar.. </h3>'
+                        
+                    }]
+
+                }
+            ]
+        }
+    }.
+
+'project_wizard_state::state_step1'(State_step1):-
+    'project_wizard_state_toolbar::state_step1'(O_toolbar),
+    Obj ={
+            enabled: true,
+            hasAgent: '$.in.hasAgent',
+            applyRules: '$.in.applyRules',
+            hasDataset: '$.in.hasDataset',                            
+            hasKw: '$.in.hasKw'                            
+    },
+    project_wizard_form(Obj, Form),
+    State_step1 = {
+        type: 'state',
+        gui_out: {
+            type: 'assembly',
+            children: [                
+                O_toolbar,
+                {
+                    type: 'assembly',
+                    label: {d: 'DATOS INICIALES DEL PROYECTO'},
+                    classList :['card'],
+                    scroll: 'main',
+                    children: [ 
+                        Form
+                    ]
+                }
+            ]
+        }
+    }.
+'project_wizard_state::state_step2'(State_step2):-
+    'project_wizard_state_toolbar::state_step2'(O_toolbar),
+    Obj ={
+            enabled: true,
+            hasAgent: '$.in.hasAgent',
+            applyRules: '$.in.applyRules',
+            hasDataset: '$.in.hasDataset',                            
+            hasKw: '$.in.hasKw'                            
+    },
+    project_wizard_form(Obj, Form),
+    
+
+    State_step2 = {
+        type: 'state',
+        gui_out: {
+            type: 'assembly',
+            children: [                
+                O_toolbar,
+                {
+                    type: 'assembly',                    
+                    label: {d: 'AGREGUE CARPETAS Y DOCUMENTOS'},
+                    classList :['card'],
+                    scroll: 'main',
+                    children: [
+                        Form
+                    ]
+               }
+            ]
+        }
+    }.
+
+
+'project_wizard_state::state_finish'(State_finish):-
+    'project_wizard_state_toolbar::state_finish'(O_toolbar),
+    Obj ={
+            enabled: false,
+            hasAgent: '$.in.hasAgent',
+            applyRules: '$.in.applyRules',
+            hasDataset: '$.in.hasDataset',                            
+            hasKw: '$.in.hasKw'                            
+    },
+    project_wizard_form(Obj, Form),
+    State_finish = {
+        type: 'state',
+        gui_out: {
+            type: 'assembly',
+            children: [                
+                O_toolbar,
+                {
+                    type: 'assembly',                    
+                    label: {d: 'GUARDE LOS CAMBIOS'},
+                    classList :['card'],
+                    scroll: 'main',
+                    children: [
+                        Form
+                    ]
+                        
+                }
+            ]
+        }
+    }.
+
+
+
+project_wizard_form(Obj, Form):-
+    Form = {
+        type: 'kform',     
+        hasDlg: true,   
+        busId: '{$.busId}__form',
+        in: Obj,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                { type: 'function', in: { options: { getSchema: true } }, name: 'get_formInfo', context: { delegatedTo: '$.hasAgent' } },
+                { type: 'method', name: 'import', module: 'Dataset' }
+            ]
+        },
+        events: [
+            {
+                type: 'zoom',
+                method: 'zoom',
+                targetBusId: '{$.busId}__form',
+                payload: {                    
+                    hasDataset: '$.in.hasDataset.{_.hasKwc}',
+                    hasKwc: '_.hasKwc',
+                    applyRules: '$.in.applyRules',                    
+                    '?STMT': '_.stmt',
+                    '?HASKW': '_.hasKw'
+                },
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [{
+                        type: 'function',
+                        in: {
+                            stmt: '?STMT'
+                        },
+                        name: 'get5gl_instances',
+                        context: {
+                            delegatedTo: '$.in.hasAgent'
+                        }
+                    },
+                    {
+                        type: 'method',
+                        name: 'dialog_exec',
+                        busId: '{$.busId}__form'
+                    },
+                    {
+                        type: 'method',
+                        in: {
+                            stmt: '?STMT',
+                            hasKw: '?HASKW',
+                            pattern: {
+                                'root': '_.stmt.from',
+                                'from': '_.stmt.from',
+                                'arc': '_.stmt.arc',
+                                'cto': '_.stmt.cto',
+                                'orda': -1,
+                                'to': '_.hasKw',                                
+                                'hasDataset': '$.in.hasDataset',
+                                'applyRules': '$.in.applyRules'
+                            }
+                        },
+                        name: 'map',
+                        module: 'Mapper'
+                    },
+                    {
+                        type: 'function',
+                        name: 'builder50_updStmt',
+                        context: {
+                            delegatedTo: '$.in.hasAgent'
+                        }
+                    }
+                    ]
+                }
+            },
+            
+            {
+            type: 'updateStmt',
+            method: 'updateStmt',
+            targetBusId: '{$.busId}__form',
+            payload: {
+                hasDataset: '$.in.hasDataset',
+                hasConfiguration: '$.in.hasAgent',
+                hasEvent: '$.in.hasEvent',
+                hasState: '$.in.hasState',
+                applyRules: '$.in.applyRules'
+            },
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [{
+                    type: 'function',
+                    name: 'updStmt_wizard',
+                    context: {
+                        delegatedTo: '$.in.hasAgent'
+                    }
+                }]
+            }
+        }]                    
+    }.

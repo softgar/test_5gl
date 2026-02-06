@@ -1,0 +1,569 @@
+﻿/**
+@descr	staber_rcanvas <br>
+		staber_rcanvas
+@author gbl
+@date	2024_06_03
+**/
+rc_class('staber_rcanvas') :-
+
+	class +$ 'staber_rcanvas' d ( es,'Ejemplos RCanvas') sc function,
+    'staber_rcanvas::usecase_001'(_, _, _, _),
+    'staber_rcanvas::usecase_002'(_, _, _, _),
+    'staber_rcanvas::folders'(_, _, _, _).
+
+getCanvasDefinition(Canvas_definition):-
+    Canvas_definition = {
+        background: {
+            source: '/repcon/f_get/repository/data/test_5gl_server/JobCardFrame.png',
+            color:  white,
+            size: auto
+        },
+        border: {
+            color: "black",
+            width: 2
+        }
+    }.
+
+getTemplateProperty(Template_property):-
+    Template_property = [
+        {
+            'hasKw': 'contact:hasIdPhoto',
+            'property_schema': {
+                'type': 'propertyRepcon',
+                'hasKw': 'contact:hasIdPhoto',
+                'range': 'mmResource',
+                'hasDsca': 'Foto de Carnet',
+                'cardMin': 1,
+                'cardMax': 1,
+                'hasZoom': true,
+                'allowOptions': false,
+                'allowCreation': false,
+                'allowClassInOptions': false
+            }
+        },
+        {
+            'hasKw': 'contact:hasName',
+            'property_schema': {
+                'type': 'propertyRepcon',
+                'hasKw': 'contact:hasName',
+                'range': 'string',
+                'hasDsca': 'Nombre',
+                'cardMin': 1,
+                'cardMax': 1,
+                'hasZoom': false,
+                'allowOptions': false,
+                'allowCreation': false,
+                'allowClassInOptions': false
+            }
+        },
+        {
+            'hasKw': 'contact:hasEmail',
+            'property_schema': {
+                'type': 'propertyRepcon',
+                'hasKw': 'contact:hasEmail',
+                'range': 'string',
+                'hasDsca': 'Email',
+                'cardMin': 1,
+                'cardMax': 1,
+                'hasZoom': false,
+                'allowOptions': false,
+                'allowCreation': false,
+                'allowClassInOptions': false
+            }
+        },
+        {
+            'hasKw': 'contact:hasPhoneNumber',
+            'property_schema': {
+                'type': 'propertyRepcon',
+                'hasKw': 'contact:hasPhoneNumber',
+                'range': 'string',
+                'hasDsca': 'Teléfono',
+                'cardMin': 1,
+                'cardMax': 1,
+                'hasZoom': false,
+                'allowOptions': false,
+                'allowCreation': false,
+                'allowClassInOptions': false
+            }
+        }
+    ].
+
+'staber_rcanvas::usecase_001'(_, _OBJ_in, _, OBJ_out) :-
+    getCanvasDefinition(Canvas_definition),
+    getTemplateProperty(Template_property),
+    newKw('busId__rcanvas__', BusId),
+	Obj_form = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'rcanvas',
+                busId: BusId,
+                scope:{
+                    origin: 'dst',
+                    query:{
+                        from: 'testapp_contacto_001'
+                    }
+                },
+                hasDataset: 'Default',
+                hasAgent: builderweb,
+                enabled: false,
+                canvasDefinition: Canvas_definition,
+                template:{
+                    templateProperty: Template_property,
+                    canvasProperties:[
+                        {
+                            type: 'image',
+                            % arc: 'contact:hasIdPhoto',
+                            % resourcepath: 'repository/data/test_5gl_server/',
+                            mimetype: 'app/img',
+                            width: 120,
+                            height: 150,
+                            position: {
+                                x: 100,
+                                y: 100
+                            },
+                            source: '/repcon/f_get/repository/data/test_5gl_server/avatar4.png'
+                        },
+                        {
+                            type: image,
+                            % resourcepath: 'repository/data/test_5gl_server/',
+                            source: '/repcon/f_get/repository/data/test_5gl_server/repcon_grid.png',
+                            height: 20,
+                            width: 95,
+                            position:{
+                                x: 400,
+                                y: 465
+                            }
+                        },
+                        {
+                            
+                            type: image,
+                            % resourcepath: 'repository/data/test_5gl_server/',
+                            source: '/repcon/f_get/repository/data/test_5gl_server/semantic-systems.png',
+                            height: 100,
+                            position:{
+                                x: 680,
+                                y: 15
+                                % x: 25,
+                                % y: 15
+                            }
+                        },
+                        {
+                            type: label,
+                            color: white,
+                            font: {
+                                size: '1rem'
+                            },
+                            position: {
+                                x: 710,
+                                y: 115
+                            },
+                            d:'Semantic-Systems'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+                            width: 5,
+                            height: 5,
+                            position:{
+                                x: 90,
+                                y: 297
+                            }
+                        },
+                        {
+                            type: label,
+                            % arc: 'contact:hasName',
+                            % icon: user,
+                            font: {
+                                size: '1.2rem'
+                            },
+                            position: {
+                                x: 100,
+                                y: 280
+                            },
+                            d:'Ana García'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+                            width: 5,
+                            height: 5,
+                            position:{
+                                x: 90,
+                                y: 327
+                            }
+                        },
+                        {
+                            type: label,
+                            % icon: phone,
+                            font: {
+                                size: '1.2rem'
+                            },
+                            % arc: 'contact:hasPhoneNumber',
+                            position: {
+                                x: 100,
+                                y: 310
+                            },
+                            d: '+34 94 587 68 52'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+                            width: 5,
+                            height: 5,
+                            position:{
+                                x: 90,
+                                y: 357
+                            }
+                        },
+                        {
+                            type: label,
+                            font: {
+                                size: '1.2rem'
+                            },
+                            % icon: pencil,
+                            % arc: 'contact:hasEmail',
+                            position: {
+                                x: 100,
+                                y: 340
+                            },
+                            d: 'ana.garcia@example.com'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+                            width: 5,
+                            height: 5,
+                            position:{
+                                x: 650,
+                                y: 200
+                            }
+                        },
+                        {
+                            type: label,
+                            font: {
+                                size: '1.5rem'
+                            },
+                            color: white,
+                            position: {
+                                x: 670,
+                                y: 180
+                            },
+                            d: 'Soluciones a medida'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+                            width: 5,
+                            height: 5,
+                            position:{
+                                x: 650,
+                                y: 240
+                            }
+                        },
+                        {
+                            type: label,
+                            font: {
+                                size: '1.5rem'
+                            },
+                            color: white,
+                            position: {
+                                x: 670,
+                                y: 220
+                            },
+                            d: 'Configurador'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+                            width: 5,
+                            height: 5,
+                            position:{
+                                x: 650,
+                                y: 280
+                            }
+                        },
+                        {
+                            type: label,
+                            font: {
+                                size: '1.5rem'
+                            },
+                            color: white,
+                            position: {
+                                x: 670,
+                                y: 260
+                            },
+                            d: 'Factory'
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    Obj_class = {
+        type: 'rprocess',
+        hasKw: rproc__rcanvas__001,
+        hasDsca: [(es, 'rcanvas modo consulta')],
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_form
+	},
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rcanvas::usecase_002'(_, _OBJ_in, _, OBJ_out) :-
+    getCanvasDefinition(Canvas_definition),
+    getTemplateProperty(Template_property),
+    newKw('busId__rcanvas__', BusId),
+	Obj_form = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'rcanvas',
+                busId: BusId,
+                scope:{
+                    origin: 'dst',
+                    query:{
+                        from: 'testapp_contacto_001'
+                    }
+                },
+                hasDataset: 'Default',
+                hasAgent: builderweb,
+                enabled: false,
+                canvasDefinition: Canvas_definition,
+                template:{
+                    templateProperty: Template_property,
+                    canvasProperties:[
+                        {
+                            type: 'image',
+                            arc: 'contact:hasIdPhoto',
+                            resourcepath: 'repository/data/test_5gl_server/',
+                            mimetype: 'app/img',
+                            width: 120,
+                            height: 150,
+                            position: {
+                                x: 100,
+                                y: 100
+                            }
+                            % source: '/repcon/f_get/repository/data/test_5gl_server/avatar4.png'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/repcon_grid.png',
+                            height: 20,
+                            width: 95,
+                            position:{
+                                x: 400,
+                                y: 465
+                            }
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/semantic-systems.png',
+                            height: 100,
+                            position:{
+                                x: 680,
+                                y: 15
+                            }
+                        },
+                        {
+                            type: label,
+                            color: white,
+                            font: {
+                                size: '1rem'
+                            },
+                            position: {
+                                x: 710,
+                                y: 115
+                            },
+                            d:'Semantic-Systems'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+                            width: 5,
+                            height: 5,
+                            position:{
+                                x: 90,
+                                y: 297
+                            }
+                        },
+                        {
+                            type: label,
+                            arc: 'contact:hasName',
+                            % icon: user,
+                            font: {
+                                size: '1.2rem'
+                            },
+                            position: {
+                                x: 100,
+                                y: 280
+                            }
+                            % d:'Ana García'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+                            width: 5,
+                            height: 5,
+                            position:{
+                                x: 90,
+                                y: 327
+                            }
+                        },
+                        {
+                            type: label,
+                            font: {
+                                size: '1.2rem'
+                            },
+                            arc: 'contact:hasPhoneNumber',
+                            position: {
+                                x: 100,
+                                y: 310
+                            }
+                            % d: '+34 94 587 68 52'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/punto-rojo.png',
+                            width: 5,
+                            height: 5,
+                            position:{
+                                x: 90,
+                                y: 357
+                            }
+                        },
+                        {
+                            type: label,
+                            font: {
+                                size: '1.2rem'
+                            },
+                            % icon: pencil,
+                            arc: 'contact:hasEmail',
+                            position: {
+                                x: 100,
+                                y: 340
+                            }
+                            % d: 'ana.garcia@example.com'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+                            width: 5,
+                            height: 5,
+                            position:{
+                                x: 650,
+                                y: 200
+                            }
+                        },
+                        {
+                            type: label,
+                            font: {
+                                size: '1.5rem'
+                            },
+                            color: white,
+                            position: {
+                                x: 670,
+                                y: 180
+                            },
+                            d: 'Soluciones a medida'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+                            width: 5,
+                            height: 5,
+                            position:{
+                                x: 650,
+                                y: 240
+                            }
+                        },
+                        {
+                            type: label,
+                            font: {
+                                size: '1.5rem'
+                            },
+                            color: white,
+                            position: {
+                                x: 670,
+                                y: 220
+                            },
+                            d: 'Configurador'
+                        },
+                        {
+                            type: image,
+                            source: '/repcon/f_get/repository/data/test_5gl_server/punto.png',
+                            width: 5,
+                            height: 5,
+                            position:{
+                                x: 650,
+                                y: 280
+                            }
+                        },
+                        {
+                            type: label,
+                            font: {
+                                size: '1.5rem'
+                            },
+                            color: white,
+                            position: {
+                                x: 670,
+                                y: 260
+                            },
+                            d: 'Factory'
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    Obj_class = {
+        type: 'rprocess',
+        hasKw: rproc__rcanvas__002,
+        hasDsca: [(es, 'rcanvas modo consulta contra dataset')],
+        hasIcon: 'dinamic',
+        in:{
+            hasKw: 'testapp_contacto_001',
+            navigationFilter: 'all',
+            hasDataset: 'dataset__test_5gl_server'
+        },
+        isRoot: false,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                {
+                    type: 'function',
+                    name: 'get_formInfo',
+                    context: {
+                        delegatedTo: 'builderweb'
+                    }
+                },
+                {
+                    type: 'method',
+                    name: 'import',
+                    module: 'Dataset'
+                }
+            ]
+        },
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_form
+	},
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_rcanvas::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_rcanvas,
+        hasDsca: 'Tests rcanvas (* En Desarrollo)',
+        hasIcon: 'photo',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__rcanvas__001,
+            rproc__rcanvas__002
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

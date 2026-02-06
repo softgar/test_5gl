@@ -1,0 +1,108 @@
+﻿/**
+@descr	staber_rform_rproc_pattern <br>
+		staber_rform_rproc_pattern
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_rform_rproc_pattern') :-
+
+	class +$ 'staber_rform_rproc_pattern' d ( es,'Ejemplos Rform') sc function,
+    'staber_rform_rproc_pattern::exampleFileupload'(_, _, _, _),
+    'staber_rform_rproc_pattern::folders'(_, _, _, _).
+
+'staber_rform_rproc_pattern::exampleFileupload'(_, _OBJ_in, _, OBJ_out) :-
+	OBJ_form = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'rform',
+                busId: 'busId__rproc__4gl_rform__001',
+                hasDataset: 'Default',
+                scope:{
+                    origin: 'dst',
+                    query:{
+                        from: 'rform_fileInputTest_001'
+                    }
+                },
+                enabled: true,
+                keyNavigation: tab,
+                events:[
+                {
+                    type: 'init',
+                    payload: {navigationFilter: 'all', options:{getSchema: true}, hasDataset: 'Default'},
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            {  type: 'function', name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+                            {  type: 'method',   name: 'import',  module: 'Dataset' }
+                        ]
+                }
+                },
+                {
+                    type: 'get',
+                    %% Si da problemas vemos con que metodo lo llamamos
+                    method: 'getPost',
+                    targetBusId: 'busId__rproc__4gl_rform__001',
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess:[
+                            { type: 'function', name: 'get_krp_resource', context: { delegatedTo: 'builderweb'} },
+                            { type: 'method', name: 'openFile', module: 'FileManager' }
+                        ]
+                    }
+                },
+                {
+                    type: 'post',
+                    method: 'getPost',
+                    targetBusId: 'busId__rproc__4gl_rform__001',
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { type: 'method', name: 'postFile', module: 'FileManager'},
+                            %% Control de CardN
+                            { type: 'function',in: {hasUrl:'ejemplo_rform_001/'}, name: 'check_post_krp_resource', context: { delegatedTo: 'builderweb' }},
+                            { type: 'function',name: 'post_krp_resource', context: { delegatedTo: 'builderweb' }}
+                        ]
+                    }
+                },
+                {
+                    type: 'del',
+                    method: 'getPost',
+                    targetBusId: 'busId__rproc__4gl_rform__001',
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [
+                            { type: 'function', name: 'del_krp_resource', context: { delegatedTo: 'builderweb' }}
+                        ]
+                    }
+                }
+                ]
+            }
+        ]
+	},
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ_form,
+        hasKw: rproc__4gl_rform__001,
+        hasDsca: [(es, 'Test_001 Fileupload Rform')],
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_rform_rproc_pattern::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_rform,
+        hasDsca: 'Tests Rform',
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__4gl_rform__001
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

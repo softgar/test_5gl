@@ -1,0 +1,15 @@
+{
+    "data": {
+        "dataSource": [{
+                "id": 2,
+                "name": "Javier",
+                "color": "#343323"
+            },
+            {
+                "id": 1,
+                "name": "Arantxa",
+                "color": "#dd24aa"
+            }
+        ]
+    }
+}

@@ -1,0 +1,383 @@
+﻿/**staber_k
+@descr	staber_container_overrides <br>
+		staber_container_overrides
+@author opr
+@date	2024_04_22
+**/
+rc_class('staber_container_overrides') :-
+	class +$ 'staber_container_overrides' d ( es,'Testeos para la configuración de sobrecargas (updateAreasData / setAppOverrides)') sc function,
+    'staber_container_overrides::kmgt_updateAreasData'(_, _, _, _),
+    'staber_container_overrides::kmgt_setAppOverrides'(_, _, _, _),
+    'staber_container_overrides::folders'(_, _, _, _).
+
+'staber_container_overrides::kmgt_updateAreasData'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('channel__kmgt', CHANNEL_KMGT),
+    newKw('bus__kmgt', BUSID_KMGT),
+    Title =  'Overrides para actualizar la conf. de las areas (en desarrollo)',
+    UPDATE_AREAS_OVERRIDE = [           
+         {
+            type: 'updateAreasData',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { type: 'function', name: 'staber_container::override_updateKmgtAreas', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+         }         
+    ],   
+    Row_Actions = {
+        fixed: true,
+        icon: 'menu2',
+        align: 'right',
+        actions: [
+            {
+                label: {
+                    icon: 'pencil',
+                    d: 'Editar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log'                       
+                    }
+                ]
+            }
+        ]
+    },
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,        
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp_contacto_001',
+        searchType: 'rql',
+        hasArea: {            
+            detail: {
+                 compulsoryNewKwDlg: false
+            },
+            result: {
+                rowactions: Row_Actions
+            }
+        }
+    },  
+    OBJ_kmgt = {
+        type: 'kmgt',
+        in: IN,
+        hasChannel: CHANNEL_KMGT,
+        busId :BUSID_KMGT, 
+        overrides: UPDATE_AREAS_OVERRIDE,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    Obj_explain_and_kmgt = {  
+        type: 'assembly',
+        id: 'assembly_kmgt_areaoverrides', 
+        label: {
+            d: 'Verificación de los overrides para las areas'
+        },       
+        children: [   
+            {
+                type: 'list',
+                id: 'list-1',         
+                elements: [
+                    {
+                        label: {
+                            d: 'Result: la acción de fila se sobrescribe desde la sobrecarga del área con la opción "Copiar"'
+                        }
+                    },
+                    {
+                        label: {
+                            d: 'Result: la propiedad de tipo de búsqueda se sobrescribe desde la sobrecarga del área con la opción "rem" (remota)'
+                        }
+                    },
+                    {
+                        label: {
+                            d: 'Detail: la propiedad "compulsoryNewKwDlg" de petición de nueva clave se sobrescribe desde la sobrecarga del área con el valor a verdadero'
+                        }
+                    }
+                ]
+            },    
+            OBJ_kmgt            
+        ]
+    },
+    OBJ_in = {
+        type: 'rprocess',
+        hasKw: kmgt_test_updateAreasData,
+        hasDsca: Title,
+        hasIcon: 'folder-open-line',
+        isSession: true,
+        hasNavbar: true,        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_explain_and_kmgt
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+'staber_container::override_updateKmgtAreas'(Ctx, _Obj_in, Ctx, Obj_out):-
+    Row_Actions = {
+        fixed: true,
+        icon: 'menu2',
+        align: 'left',
+        actions: [
+            {
+                label: {
+                    icon: 'copy',
+                    d: 'Copiar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log'                        
+                    }
+                ]
+            }
+        ]
+    },
+    Obj_out = {
+        hasArea: {
+            search:{
+                hiddenButtons: ['case']
+            },
+            result:{
+                searchType: 'rem',
+                selectable: 'true',
+                schema : {
+                    data: [   
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            arc: 'contact:hasName',
+                            sorted: true
+                        },                
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'                                       
+                        }                    
+                    ]
+                },
+                rowactions: Row_Actions                             
+            },
+            detail:{
+                compulsoryNewKwDlg: true,
+                showAllProperties: true
+            }
+        }        
+    }.
+
+'staber_container_overrides::kmgt_setAppOverrides'(_, _OBJ_in, _, OBJ_out):-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb',
+    Title =  'Overrides para actualizar la conf. de los override de APP (en desarrollo)',        
+    TOOLBAR_OVERRIDES = [          
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function',
+                        name: 'staber_container_overrides::rc_gui_out::toolbar',
+                        context: { delegatedTo: 'builderweb' } 
+                    }
+                ]
+            }
+        }         
+    ], 
+    SET_APP_OVERRIDES = [
+         {
+            type: 'setAppOverrides',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function', 
+                        name: 'staber_container_overrides::rc_gui_out::kmgt_setAppOverrides', 
+                        context: { delegatedTo: 'builderweb' } 
+                    }
+                ]
+            }
+         }         
+    ],  
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,        
+        hasKwc: 'testapp:contact',
+        hasKw: 'testapp_contacto_001'
+    },  
+    OBJ_kmgt = {
+        type: 'kmgt',
+        in: IN,
+        hasAppOverride:{
+            toolbar : TOOLBAR_OVERRIDES
+        },
+        overrides: SET_APP_OVERRIDES,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    Obj_explain_and_kmgt = {  
+        type: 'assembly',
+        id: 'assembly_kmgt_setappoverrides', 
+        label: {
+            d: 'Verificación de los overrides para la propiedad "setAppOverrides"'
+        },       
+        children: [   
+            {
+                type: 'list',
+                id: 'list-1',         
+                elements: [
+                    {
+                        label: {
+                            d: 'Toolbar: teniendo definido una sobrecarga para la barra de acciones en "hasAppOverride" se realiza una sobrecarga para esta a traves de "overrides"'
+                        }
+                    },
+                    {
+                        label: {
+                            d: 'Result: se define una sobrecarga para el esquema de la tabla de resultados para mostrar las columnas "nombre" y "edad")'
+                        }
+                    }
+                ]
+            },    
+            OBJ_kmgt            
+        ]
+    },
+    OBJ_in = {
+        type: 'rprocess',
+        hasKw: kmgt_test_setAppOverrides,
+        hasDsca: Title,
+        hasIcon: 'folder-open',
+        isSession: true,
+        hasNavbar: true,        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_explain_and_kmgt
+    },
+    create_rprocess(_,OBJ_in,_,OBJ_out).
+
+'staber_container_overrides::rc_gui_out::kmgt_setAppOverrides'(Ctx, _Obj_in, Ctx, Obj_out):-
+    Obj_out = {
+        toolbar : [          
+            {
+                type: 'getUIControls',            
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        { 
+                            type: 'function',
+                            name: 'staber_container_overrides::rc_gui_out::toolbar_fake', 
+                            context: { delegatedTo: 'builderweb' } 
+                        }
+                    ]
+                }
+            }         
+        ],
+        result: [
+            {
+                type: 'getSchemaControls',
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [
+                        {
+                            type: 'function',
+                            name: 'staber_container_overrides::rc_gui_out::getSchemaControls',
+                            context: {
+                                delegatedTo: 'builderweb'
+                            }
+                        }
+                    ]
+                }
+            }
+        ]        
+    }.
+
+'staber_container_overrides::rc_gui_out::getSchemaControls'(_OBJ_ctx, _OBJ_in, _OBJ_ctx, OBJ_out) :-
+    OBJ_out = {
+        data:[
+            {
+                label: {
+                    d: 'Nombre de usuario'
+                },
+                arc: 'hasDsca'                
+            },
+            {
+                label: {
+                    d: 'Edad'
+                },
+                arc: 'contact:hasAge',
+                inputtype: 'integer'
+            }         
+        ]
+    }.
+
+'staber_container_overrides::rc_gui_out::toolbar'(Ctx_in, Obj_in, Ctx_in, Obj_out):-
+    obj_get(hasChannel, Obj_in, MyChannel),
+    obj_get(busId, Obj_in, MyBus),
+    Obj_out = {
+        type: 'assembly',
+        id: 'buttons_assembly',
+        children: [
+            {
+                type: 'button',                
+                appearance: 'line',
+                label: {
+                    icon: 'add',
+                    d: 'Nuevo contacto'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'log',
+                    targetBusId: MyBus,                                         
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [            
+                            { type: 'method', name: 'publish', module: 'PubSub', 
+                                in: { 
+                                    publish:[
+                                        { topic: 'newNode', channel: MyChannel} 
+                                    ]
+                                }
+                            }                        
+                        ]
+                    }
+                }]
+            }                             
+        ]
+    }.
+
+'staber_container_overrides::rc_gui_out::toolbar_fake'(Ctx_in, _Obj_in, Ctx_in, Obj_out):-
+    Obj_out = {
+        type: 'assembly',
+        id: 'buttons_assembly',
+        children: [
+            {
+                type: 'button',                
+                appearance: 'line',                
+                label: {
+                    icon: 'print',
+                    d: 'Imprimir '
+                }                              
+            }                          
+        ]
+    }.
+
+'staber_container_overrides::folders'(_, _, _, _):-
+    Title = 'Testeos para la configuración de sobrecargas (updateAreasData / setAppOverrides)',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_container_overrides,
+        hasDsca: Title,
+        hasIcon: 'folder-open-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            kmgt_test_updateAreasData,
+            kmgt_test_setAppOverrides
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

@@ -1,0 +1,9 @@
+
+kdetail_navbar(O_navbar):-
+    O_navbar ={
+        type: 'kbreadcrumb',
+        busId: '$.hasArea.navbar.busId',
+        in: {data: '$.hasArea.navbar.data'},
+        evtPublish : [{topic: 'setNode', channel: '$.hasChannel.navbar'}],
+        evtSubscribe : [{topic: 'setNode', channel: '$.hasChannel.detail'}, {topic: 'resetNode', channel: '$.hasChannel.detail'}]
+}.

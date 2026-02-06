@@ -1,0 +1,407 @@
+﻿/**
+@descr	staber_kmqtlite <br>
+		staber_kmqtlite
+@author XXX
+@date	20XX_XX_XX
+**/
+defmultifile( discardAgrupationProperties/1).
+rc_class('staber_kmqtlite') :-
+	class +$ 'staber_kmqtlite' d ( es,'Patrón rproc para kmqtlite') sc function,
+     % configuración contra modelo propio testapp:contacto en Default
+    'staber_kmqtlite::usecase__000'(_, _, _, _),   
+    'staber_kmqtlite::usecase__001'(_, _, _, _),   
+    'staber_kmqtlite::folders'(_, _, _, _).
+
+'staber_kmqtlite::usecase__000'(_, _OBJ_in, _, OBJ_proc) :-
+    % I_config = 'configuration__staber_testapp_server',   
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb', 
+    newKw('kmqtlite_test_001_', BusId),
+    SEARCH_OVERRIDES = [
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function',
+                        name: 'staber_kmqtlite::rc_gui_out::kadvancedsearch', 
+                        context: { delegatedTo: 'builderweb' } 
+                    }
+                ]
+            }
+        }         
+    ],
+    INCLUDED_PROPERTIES = ['hasIcon','contact:hasName', 'contact:hasAge', 'contact:hasBirthCountry', 'contact:hasFathersCountry', 'contact:hasMothersCountry','contact:hasBirthDate','contact:hasEmail'],
+    
+	IN = {
+        hasTitle: 'Contactos modelo de Tests',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',        
+        selectable: true,
+        hasArea: {           
+            result: {
+                includedProperties: INCLUDED_PROPERTIES,
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            class: 'user',
+                            arc: 'contact:hasName',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Edad'
+                            },
+                            arc: 'contact:hasAge',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Fecha Nacimiento'
+                            },
+                            arc: 'contact:hasBirthDate',
+                            range: date,
+                            sorted: true
+                        },
+                         {
+                            label: {
+                                d: 'Lugar'
+                            },
+                            arc: 'contact:hasBirthCountry',                            
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'País Nac. Padre'
+                            },
+                            arc: 'contact:hasFathersCountry',                            
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'País Nac. Madre'
+                            },
+                            arc: 'contact:hasMothersCountry',                            
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+            }
+        },
+        resizable: true
+    },
+    Title =  'Búsqueda de contactos (kadvancedsearch)',
+    OBJ_proc = {
+        type: 'kmqtlite',
+        busId: BusId,
+        in: IN,
+        hasKw: kmqtlite_test_000,
+        hasDsca: Title,
+        hasIcon: 'search',        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        hasAccessPrivilege: 'all',
+        hasAppOverride:{
+            search: SEARCH_OVERRIDES
+        }
+    },
+    create_rprocess(_,OBJ_proc,_,_).
+
+/*
+{type: 'function', name:'new_childSearch_Instance', context:{delegatedTo: 'builderweb'}},
+{ type: 'function', name: 'get_instance', context: { delegatedTo: 'builderweb' } },
+{ type: 'method', name: 'subgraphImport', module: 'DataProcess' },
+{ type: 'function', name: 'get_search_template', context: { delegatedTo: 'builderweb' } },
+{ type: 'method', name: 'deserialize', module: 'DataProcess' }
+*/
+'staber_kmqtlite::usecase__001'(_, _OBJ_in, _, OBJ_proc) :-
+    % I_config = 'configuration__staber_testapp_server',   
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb', 
+    newKw('kmqtlite_test_001_', BusId),
+    SEARCH_OVERRIDES = [
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function',
+                        name: 'staber_kmqtlite::rc_gui_out::kform', 
+                        context: { delegatedTo: 'builderweb' } 
+                    }
+                ]
+            }
+        }         
+    ],
+    INCLUDED_PROPERTIES = ['hasIcon','contact:hasName', 'contact:hasAge', 'contact:hasBirthDate','contact:hasBirthCountry', 'contact:hasFathersCountry','contact:hasMothersCountry','contact:hasEmail'],
+    
+	IN = {
+        hasTitle: 'Contactos modelo de Tests',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',        
+        selectable: true,
+        hasArea: {           
+            result: {
+                includedProperties: INCLUDED_PROPERTIES,
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            class: 'user',
+                            arc: 'contact:hasName',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Edad'
+                            },
+                            arc: 'contact:hasAge',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Fecha Nacimiento'
+                            },
+                            arc: 'contact:hasBirthDate',
+                            range: date,
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Lugar'
+                            },
+                            arc: 'contact:hasBirthCountry',                            
+                            sorted: true
+                        },
+                        
+                        {
+                            label: {
+                                d: 'País Nac. Padre'
+                            },
+                            arc: 'contact:hasFathersCountry',                            
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'País Nac. Madre'
+                            },
+                            arc: 'contact:hasMothersCountry',                            
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+            }
+        },
+        resizable: true
+    },
+    Title =  'Búsqueda de contactos (kform)',
+    OBJ_proc = {
+        type: 'kmqtlite',
+        busId: BusId,
+        in: IN,
+        hasKw: kmqtlite_test_001,
+        hasDsca: Title,
+        hasIcon: 'search',        
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        hasAccessPrivilege: 'all',
+        hasAppOverride:{
+            search: SEARCH_OVERRIDES
+        }
+    },
+    create_rprocess(_,OBJ_proc,_,_).
+
+'staber_kmqtlite::rc_gui_out::kadvancedsearch'( Ctx, Obj_in, Ctx, Obj_out):-
+
+    newKw('BusId_kadvancedsearch__',BUS_FORM),
+    obj_get(hasChannel, Obj_in, MyChannel),    
+    IN_SEARCH =  {
+        hasKwc: 'testapp:contact',
+        enabled: true,
+        hasDataset: 'Default',        
+        hasPropertySearchMode: 'classProperties'        
+    },
+    Obj_form = {
+        type: 'kadvancedsearch',
+        busId: BUS_FORM,
+        in: IN_SEARCH
+    },
+
+    Obj_out = {
+        type: 'assembly',
+        label: {
+            d: 'Búsqueda de Contactos'
+        },
+        children: [
+            Obj_form,
+            {
+                type: button,
+                label: {
+                    d: 'Buscar',
+                    icon: search
+                },
+                appearance: flat,
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_FORM,                        
+                        p_exec:{
+                            type: sequence,
+                            hasProcess: [
+                                {  type: 'method', in: { format: 'json' },name: 'getSelectedProperties', busId : BUS_FORM},                                                                                                
+                                { type: 'method', in: {searchType: 'rem'}, name: 'selectedPropertiesToFilter', module: 'QueryFilterService' },
+                                { type: 'method', name: 'publish', module: 'PubSub', 
+                                in: { 
+                                    publish:[
+                                        { topic: 'setSearch', channel: MyChannel} 
+                                    ]
+                                }
+                            }      
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }.
+
+
+'staber_kmqtlite::rc_gui_out::kform'( Ctx, Obj_in, Ctx, Obj_out):-
+    newKw('BusId_kform__',BUS_FORM),
+    obj_get(hasChannel, Obj_in, MyChannel),    
+    /*
+    Obj_search ={
+        elementToSearch: 'testapp:contact',
+        mqtMode: 'mqtlite',
+        options: {
+            getSchema:true
+        }
+    },   
+    new_childSearch_Instance(Ctx, Obj_search, Ctx, Obj_out_search ),
+    obj_get(hasKw,Obj_out_search, KwSearch ),    
+    */        
+    ApplyRules = true,
+    Dataset = 'Default',
+    setProperty(searchClassWithAdvancedControls, false),    
+    new_search_instance( 'testapp:contact', ApplyRules, SearchItem),
+    IN =  {                
+        hasKw: SearchItem,
+        hasKwc: 'testapp:contact',
+        hasDataset: 'Default',
+        enabled: true,
+        applyRules: ApplyRules
+    },   
+    EVENTS =  [
+        {
+            type: 'updateStmt',
+            method: 'updateStmt',
+            targetBusId: BUS_FORM,
+            payload: {
+                hasDataset: Dataset,
+                applyRules: ApplyRules
+            },
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [{
+                    type: 'function',
+                    name: 'builder50_updStmt',
+                    context: {
+                        delegatedTo: 'builderweb'
+                    }
+                }]
+            }
+        }
+    ],
+    Obj_form = {
+        type: 'kform',
+        busId: BUS_FORM,      
+        in: IN,
+        events : EVENTS
+    },
+
+    Obj_out = {
+        type: 'assembly',
+        label: {
+            d: 'Búsqueda de Contactos'
+        },
+        children: [
+            Obj_form,
+            {
+                type: button,
+                label: {
+                    d: 'Buscar',
+                    icon: search
+                },
+                appearance: flat,
+                events: [
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_FORM,                        
+                        p_exec:{
+                            type: sequence,
+                            hasProcess: [
+                                {type: 'function', in: { hasSearchKw:SearchItem, searchType: 'rem' },name: 'generate_searchFormInfo', context: { delegatedTo: 'builderweb' } },  
+                                { type: 'method', name: 'publish', module: 'PubSub', 
+                                in: { 
+                                    publish:[
+                                        { topic: 'setSearch', channel: MyChannel} 
+                                    ]
+                                }
+                            }      
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }.
+
+'staber_kmqtlite::folders'(_, _, _, _):-
+     Title =  'kmqtlite  [Búsquedas avanzadas]',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_kmqtlite,
+            hasDsca: Title,
+            hasIcon: 'search',
+            isRoot: false,
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [
+                kmqtlite_test_000,
+                kmqtlite_test_001
+            ]
+    },_,_).
+
+
+
+
+
+    

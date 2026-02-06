@@ -1,0 +1,392 @@
+﻿/**staber_k
+@descr	staber_general_features <br>
+		staber_general_features
+@author opr
+@date	2024_04_04
+**/
+rc_class('staber_general_features') :-
+	class +$ 'staber_general_features' d ( es,'Funcionalidades genéricas') sc function,
+    'staber_general_features::textarea_behaviour_when_enabled_false'(_, _, _, _),
+    'staber_general_features::rlg_editor_with_extra_actions'(_, _, _, _),
+    'staber_general_features::dynamic_tags_register'(_, _, _, _),
+    'staber_general_features::folders'(_, _, _, _).
+
+'staber_general_features::textarea_behaviour_when_enabled_false'(_, _ObjIn, _, ObjOut) :-
+    newKw('actions_payload_behaviour_test_BusId', BusId),
+    newKw('actions_payload_behaviour_test_channel', Channel),
+    Obj_controls = {
+        type: 'assembly',
+        children:[
+            {
+                type: 'assembly',
+                children: [
+                    {
+                        type: 'text',
+                        value: '',
+                        placeholder: 'ui_ux_textarea_behaviour_when_enabled_false_placeholder',
+                        i18n: 'placeholder'
+                    }
+                ]
+            },
+            {
+                type: 'assembly',
+                stylesVars: {
+                    cols: 3
+                },
+                children: [
+                    {
+                        type: 'assembly',
+                        stylesVars: {
+                            cols: 1
+                        },
+                        children:[
+                            {
+                                type: 'label',
+                                size: 'h3',
+                                d: 'ui_ux_textarea_behaviour_when_enabled_false_no_form',
+                                i18n: 'd'
+                            },
+                            {
+                                type: 'textarea',
+                                enabled: false,
+                                value: 'Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas \'Letraset\', las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.'
+                            },
+                            {
+                                type: 'label',
+                                size: 'h3',
+                                d: 'ui_ux_textarea_behaviour_when_enabled_false_no_form_rlg_editor',
+                                i18n: 'd'
+                            },
+                            {
+                                type: 'textarea',
+                                editor: 'rlg',
+                                enabled: false,
+                                value: 'Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas \'Letraset\', las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.'
+                            },
+                            {
+                                type: 'label',
+                                size: 'h3',
+                                d: 'ui_ux_textarea_behaviour_when_enabled_false_no_form_json_editor',
+                                i18n: 'd'
+                            },
+                            {
+                                type: 'textarea',
+                                editor: 'json',
+                                enabled: false,
+                                value: '{"obj": "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas \'Letraset\', las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum."}'
+                            },
+                            {
+                                type: 'label',
+                                size: 'h3',
+                                d: 'ui_ux_textarea_behaviour_when_enabled_false_no_form_md_editor',
+                                i18n: 'd'
+                            },
+                            {
+                                type: 'textarea',
+                                editor: 'markdown',
+                                enabled: false,
+                                value: 'Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas \'Letraset\', las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.'
+                            }
+                        ]
+                    },
+                    {
+                        type: 'assembly',
+                        stylesVars: {
+                            cols: 1
+                        },
+                        children:[
+                            {
+                                type: 'label',
+                                size: 'h3',
+                                d: 'ui_ux_textarea_behaviour_when_enabled_false_form',
+                                i18n: 'd'
+                            },
+                            {
+                                type: 'kform',
+                                busId: 'textarea_behaviour_when_enabled_false_form_busId',
+                                in: {
+                                    hasKw: 'testapp_contacto_007',
+                                    enabled: false,
+                                    template: {
+                                        type: 'assembly',
+                                        children: [{
+                                            editor: 'rlg',
+                                            arc: 'contact:hasProfessionalProfile'
+                                        }]
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        type: 'assembly',
+                        stylesVars: {
+                            cols: 1
+                        },
+                        children:[
+                            {
+                                type: 'label',
+                                size: 'h3',
+                                d: 'ui_ux_textarea_behaviour_when_enabled_false_table',
+                                i18n: 'd'
+                            },
+                            {
+                                type: 'kresult',
+                                busId: 'textarea_behaviour_when_enabled_false_table',
+                                in:{
+                                    hasKw: 'testapp:contact',
+                                    enabled: false,
+                                    schema: {
+                                        data: [
+                                            {
+                                                label: { d: 'Nombre' },
+                                                arc: 'contact:hasName'
+                                            },
+                                            {
+                                                label: { d: 'por defecto' },
+                                                arc: 'contact:hasProfessionalProfile'
+                                            },
+                                            {
+                                                label: {d: "con control"},
+                                                control: {
+                                                    type: textarea,
+                                                    editor: 'rlg',
+                                                    enabled: false,
+                                                    value: '_.contact:hasProfessionalProfile'
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    Title = 'ui_ux_general_features_textarea_behaviour_when_enabled_false',
+    ObjMain = {
+        type: 'rprocess',
+        busId: BusId,
+        hasChannel: Channel,
+        hasKw: 'staber_general_features_textarea_behaviour_when_enabled_false',           
+        hasDsca: Title,
+        hasIcon: 'table',
+        isRoot: false, 
+        isSession: true,
+        hasNavbar: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_controls
+    },
+    create_rprocess(_,ObjMain,_,ObjOut).
+
+'staber_general_features::rlg_editor_with_extra_actions'(_, _ObjIn, _, ObjOut) :-
+    I_agent = 'builderweb',
+    I_dataset = 'Default',
+    newKw('actions_payload_behaviour_test_BusId', BusId),
+    newKw('actions_payload_behaviour_test_channel', Channel),
+    newKw('actions_payload_behaviour_test_form_busId', FormBusId),
+    newKw('actions_payload_behaviour_test_form_channel', FormChannel),
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_007',
+        enabled: true,
+        template: {
+            type: 'assembly',
+            children: [
+                {
+                    type: text,
+                    arc: 'contact:hasName',
+                    editor: 'rlg',
+                    actions:[
+                        {
+                            customAction: {
+                                label: {
+                                    icon: 'cog'
+                                },
+                                collapse: false,
+                                events:[
+                                    {
+                                        type: 'click',
+                                        method: 'log',
+                                        targetBusId: BusId,
+                                        p_exec: {
+                                            type: "sequence",
+                                            hasProcess: [
+                                                { 
+                                                    type: "function",
+                                                    in:{delay: 5000},
+                                                    name: "delay_function",
+                                                    context: { delegatedTo: "builderweb" }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: textarea,
+                    arc: 'contact:hasProfessionalProfile',
+                    editor: 'rlg'
+                },
+                {
+                    arc: 'contact:hasAddress'
+                }
+            ]
+        }
+    },
+
+    Title = 'ui_ux_staber_general_features_payload_in_rlg_editor_actions',
+    ObjForm = {
+        type: 'kform',
+        busId: FormBusId,
+        hasChannel: FormChannel,
+        in: IN
+    },
+    ObjMain = {
+        type: 'rprocess',
+        busId: BusId,
+        hasChannel: Channel,
+        in:{},
+        hasKw: form_behaviors_rlg_editor_with_extra_actions,
+        hasDsca: Title,
+        hasIcon: 'list-add',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: {
+            type: 'assembly',
+            children: [ObjForm]
+        }
+    },
+    create_rprocess(_,ObjMain,_,ObjOut).
+
+
+
+'testapp::get_new_workspace_tag'(L_tags) :-
+    Obj_new = {
+        isMDI: true,
+        hasTag: 'my_new_tag',
+        hasControl: {
+            type: 'assembly',
+            children: [
+                {
+                    type: 'rprocess',
+                    busId: 'bus_new_registered_tag',
+                    hasKw: 'new_registered_tag',
+                    hasDsca: 'Nuevo tag registrado',
+                    hasIcon: 'tag',
+                    hasNavbar: false,
+                    isSession: true,
+                    gui_out: { type: 'label', d: 'Lorem ipsum', size: 'h2' }
+                }
+            ]
+        }
+    },
+
+    L_tags = [Obj_new].
+
+
+'testapp::notify:successful_register'( Obj_ctx, Obj_in, Obj_ctx, Obj_out) :-
+    wAddInfoConsoleMsgML('kworkspace', 'Se ha registrado un nuevo tag', { showTime: 5 }),
+    Obj_out = Obj_in.
+
+
+
+'staber_general_features::dynamic_tags_register'(_, _Obj_in, _, Obj_out) :-
+    % I_agent = 'builderweb',
+    % I_dataset = 'Default',
+
+    newKw('bus_dynamic_tags_register', BusId),
+    newKw('channel_dynamic_tags_register', Channel),
+    Title = 'ui_ux_staber_general_features_tag_register',
+
+    Gui_out = {
+        type: 'assembly',
+        classList: ['cols-1'],
+        children: [
+            {
+                type: 'label',
+                d: 'Nuevo registro',
+                size: 'h2'
+            },
+            {
+                type: 'label',
+                d: 'Se ha registrado un nuevo tag mediante una publicación a kworkspace al topic \'registerTags\' en el proc de este componente, haz click en el botón para navegar.'
+            },
+            {
+                type: 'button',
+                label: { d: 'Navegar', icon: 'send' },
+                events: [
+                    {
+                        type: 'click',
+                        method: 'nav',
+                        targetBusId: BusId,
+                        payload: { hasTag: 'my_new_tag' }
+                    }
+                ]
+            }
+        ]
+    },
+
+    'testapp::get_new_workspace_tag'(L_tags),
+
+    Obj_proc = {
+        type: 'rprocess',
+        busId: BusId,
+        hasChannel: Channel,
+        in: {},
+        hasKw: rproc_features_tag_register,
+        hasDsca: Title,
+        hasIcon: 'tag',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Gui_out,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                {
+                    type: 'method',
+                    name: 'publish',
+                    module: 'PubSub',
+                    in: {
+                        publish: [
+                            { topic: 'registerTags', channel: 'channel__broadcast', resultset: L_tags }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+
+    create_rprocess(_, Obj_proc , _, Obj_out).
+
+
+
+'staber_general_features::folders'(_, _, _, _):-
+    Title = 'ui_ux_test_general_features',
+	ConfFolder = {
+        type: 'krp:folder',
+        hasKw: 'folder__staber_general_features',
+        hasDsca: Title,
+        hasIcon: 'worker-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            'staber_general_features_textarea_behaviour_when_enabled_false',
+            'form_behaviors_rlg_editor_with_extra_actions',
+            rproc_features_tag_register
+        ]
+	},
+    create_rprocess(_,ConfFolder,_,_).
+
+delay_function(_ctx, ObjIn, _ctx, ObjIn) :-
+    Default_MS = 2000,
+    obj_get(delay, ObjIn, MS, Default_MS),
+    sleep_ms(MS).

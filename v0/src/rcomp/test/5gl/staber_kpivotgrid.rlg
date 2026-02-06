@@ -1,0 +1,2978 @@
+﻿/**
+@descr	staber_pivotgrid_rproc_pattern <br>
+		staber_pivotgrid_rproc_pattern
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kpivotgrid') :-
+	class +$ 'staber_kpivotgrid' d ( es,'Patrón rproc para PivotGrid') sc function,
+    'staber_pivotgrid_rproc_pattern::usecase__rem_testappmodel_pivotgrid'(_, _, _, _),
+    'staber_pivotgrid_rproc_pattern::usecase__rem_proyects_pivotgrid'(_, _, _, _),
+    'staber_pivotgrid_usecase_raw_isVisible_test'(_, _, _, _),
+    'staber_pivotgrid_rproc_pattern::usecase__rql_local_pivotgrid'(_, _, _, _),  
+    'staber_pivotgrid_rproc_pattern::usecase__rql_remote_pivotgrid'(_, _, _, _),     
+    % 'staber_pivotgrid_rproc_pattern::usecase__sdp_sql_pivotgrid'(_, _, _, _),    
+    'staber_pivotgrid_rproc_pattern::selectAndExpand_from_external_component'(_, _, _, _),
+    'staber_pivotgrid_rproc_pattern::deferredSelectAndExpand_persistencelocal'(_, _, _, _),
+    'staber_pivotgrid_rproc_pattern::deferredSelectAndExpand_persistencelocal_rql'(_, _, _, _),
+    'staber_pivotgrid_rproc_pattern::selectedTreePathInConfig_path'(_, _, _, _),
+    'staber_pivotgrid_rproc_pattern::selectedTreePathInConfig_expanded'(_, _, _, _),
+    'staber_pivotgrid_rproc_pattern::externalEvent_refresh'(_, _, _, _),
+    'staber_pivotgrid_rproc_pattern::externalEvents__folders'(_, _, _, _),
+    'staber_pivotgrid_rproc_pattern::customization_columns_simple'(_, _, _, _),
+    'staber_pivotgrid_rproc_pattern::rql__folders'(_, _, _, _),
+    'staber_pivotgrid_rproc_pattern::visibility__folders'(_, _, _, _),
+    'staber_pivotgrid_rproc_pattern::folders'(_, _, _, _).
+
+'staber_pivotgrid_rproc_pattern::usecase__rem_testappmodel_pivotgrid'(_, _, _, OBJ_out) :-
+    newKw('channel_mainrprocess_', CHANNEL_MAIN),
+    newKw('busid_mainrprocess_', BUSID_MAIN),
+    
+    newKw('channel_kpivotgrid_contact_', CHANNEL_PIVOT),
+    newKw('bus_kpivotgrid_contact_',BUS_PIVOT),
+
+    Obj_pivot = {
+        type: 'kpivotgrid',
+        busId: BUS_PIVOT,
+        hasChannel: CHANNEL_PIVOT,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                {
+                    type: 'method',
+                    name: 'schemaToQuery',
+                    module: 'QueryFilterService'
+                },
+                {
+                    type: 'function',
+                    name: 'remql',
+                    context: {
+                        delegatedTo: 'builderweb'
+                    }
+                }
+            ]
+        },
+        do_exec: true,
+        autoRows: true,
+        selectable: false,
+        evtPublish: [
+            {
+                topic: 'setNode',
+                channel: CHANNEL_PIVOT
+            },
+            {
+                topic: 'setNodes',
+                channel: CHANNEL_PIVOT
+            }
+        ],
+        evtSubscribe: [
+            {
+                topic: 'clearSelected',
+                channel: CHANNEL_PIVOT
+            },
+            {
+                topic: 'clearSelection',
+                channel: CHANNEL_PIVOT
+            }
+        ],
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'Default',
+            hasKw: 'testapp:contact',
+            persistence: 'remote',
+            
+            schema: [
+                {
+                    label: {
+                        d: 'Nombre'
+                    },
+                    arc: 'contact:hasName',
+                    filter: true
+                },     
+                {
+                    label: {
+                        d: 'Tags'
+                    },
+                    arc: 'contact:hasTag',                                        
+                    control:{
+                         type: 'taglist'
+                    }
+                },   
+                {
+                    label: {
+                        d: 'Edad'
+                    },
+                    arc: 'contact:hasAge',
+                    filter: true,
+                    inputtype: 'integer'
+                },                     
+                {
+                    label: {
+                        d: 'Fecha nacimiento'
+                    },
+                    arc: 'contact:hasBirthDate',                    
+                    range: 'date',
+                    mask: 'DD/MM/YY'
+                },
+                {
+                    label: {
+                        d: 'Vida laboral'
+                    },
+                    arc: 'contact:hasProfessionalProfile',
+                    control: {
+                        type: "textarea",
+                        lines: 1
+                    }
+                },
+                {
+                    label: {
+                        d: 'Tiene Pais'
+                    },
+                    arc: 'contact:hasResidenceCountry',
+                    range: 'country',
+                    path: '_.contact:hasResidenceCountry.hasDsca'
+                },
+                {
+                    label: {
+                        d: 'Tiene Master'
+                    },
+                    arc: 'contact:hasMaster',
+                    control: {
+                        type: 'checkbox'
+                    }
+                }
+            ],
+            rootElement: true,
+            expanded: false,
+            schemaHeader: true,
+            resizable: true,
+            
+            searchType: 'rem',
+            
+            selectable: false,
+            enabled: false,
+            
+            pagination: true,
+            limit: 20,
+                        
+            hasIncludedProperties: [
+                'contact:hasTag',
+                'contact:hasName',
+                'contact:hasResidenceCountry',
+                'contact:hasVisitedCountry',
+                'contact:hasAge',
+                'contact:hasBirthDate',
+                'contact:hasProfessionalProfile',
+                'contact:hasMaster',
+                'contact:hasIdPhoto',
+                'hasUrl'
+            ],
+            hasNavigableProperties: ['contact:hasIdPhoto']
+        }
+    },
+
+    OBJ_Main = {
+        type:'rprocess',
+        hasChannel: CHANNEL_MAIN,
+        busId: BUSID_MAIN,    
+        hasKw: rproc__4gl_testappmodel_pivotgrid,
+        hasDsca: 'PIVOTGRID sobre testApp:Contact',
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false,
+        gui_out: {
+            type: 'assembly',
+            children: [Obj_pivot]
+        }
+    },
+    create_rprocess(_,OBJ_Main,_,OBJ_out).
+
+'staber_pivotgrid_rproc_pattern::usecase__rem_proyects_pivotgrid'(_, _, _, OBJ_out) :-    
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__ssa_test',
+
+    newKw('channel_mainrprocess_', CHANNEL_MAIN),
+    newKw('busid_mainrprocess_', BUSID_MAIN),
+    
+    newKw('channel_kpivotgrid_contact_', CHANNEL_PIVOT),
+    newKw('bus_kpivotgrid_contact_',BUS_PIVOT),
+
+    'staber_pivotgrid_rproc_pattern::dlg'(DLG1),
+    'staber_pivotgrid_rproc_pattern::data'(I_agent, I_dataset, DATA1),
+    'staber_pivotgrid_rproc_pattern::usecase__rql_tableschema'(DATA1, DLG1, BUS_PIVOT, I_agent, I_dataset, Table_Schema),
+
+    Obj_pivot = {
+        type: 'kpivotgrid',
+        busId: BUS_PIVOT,
+        hasChannel: CHANNEL_PIVOT,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                {
+                    type: 'method',
+                    name: 'schemaToQuery',
+                    module: 'QueryFilterService'
+                },
+                {
+                    type: 'function',
+                    name: 'remql',
+                    context: {
+                        delegatedTo: 'builderweb'
+                    }
+                }
+            ]
+        },
+        do_exec: true,
+        autoRows: true,
+        selectable: false,
+        evtPublish: [
+            {
+                topic: 'setNode',
+                channel: CHANNEL_PIVOT
+            },
+            {
+                topic: 'setNodes',
+                channel: CHANNEL_PIVOT
+            }
+        ],
+        evtSubscribe: [
+            {
+                topic: 'clearSelected',
+                channel: CHANNEL_PIVOT
+            },
+            {
+                topic: 'clearSelection',
+                channel: CHANNEL_PIVOT
+            }
+        ],
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'dataset__ssa_test',
+            hasKw: 'ss:project',
+            persistence: 'remote',
+            
+            schema: Table_Schema,
+            rootElement: true,
+            expanded: false,
+            schemaHeader: true,
+            resizable: true,
+            
+            searchType: 'rem',
+            
+            selectable: false,
+            enabled: false,
+            
+            pagination: true,
+            limit: 20,
+                 
+            hasIncludedProperties: [
+                'krp:hasERCTask', 
+                'krp:hasActivity',
+                'hasDsca', 
+                'hasIDI', 
+                'hasCustomer',
+                'isResponsible', 
+                'hasStartDate', 
+                'hasEndDate',
+                'plannedHours', 
+                'realHours'
+            ],
+            hasNavigableProperties: [
+                'isResponsible',
+                'hasCustomer', 
+                'krp:hasERCTask', 
+                'krp:hasActivity'
+            ]
+        }
+    },
+
+    OBJ_Main = {
+        type:'rprocess',
+        hasChannel: CHANNEL_MAIN,
+        busId: BUSID_MAIN,    
+        hasKw: rproc__4gl_proyects_pivotgrid,
+        hasDsca: 'PIVOTGRID sobre Proyectos',
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false,
+        gui_out: {
+            type: 'assembly',
+            children: [Obj_pivot]
+        }
+    },
+    create_rprocess(_,OBJ_Main,_,OBJ_out).
+
+'staber_pivotgrid_usecase_raw_isVisible_test'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel_mainrprocess_', CHANNEL_MAIN),
+    newKw('busid_mainrprocess_', BUSID_MAIN),
+
+    newKw('channel_kpivotgrid_visibility_test_', CHANNEL_PIVOT),
+    newKw('bus__',BUS_PIVOT),
+
+    Obj_pivot = {
+        type: 'kpivotgrid',
+        hasChannel: CHANNEL_PIVOT,
+        busId: BUS_PIVOT,     
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'Default',
+            hasKw: 'testapp:contact',
+            
+            schema: [
+                {
+                    label: {
+                        d: 'Nombre'
+                    },
+                    arc: 'contact:hasName',
+                    enabled: false
+                },     
+                {
+                    label: {
+                        d: 'Edad'
+                    },
+                    arc: 'contact:hasAge',
+                    inputtype: 'integer',
+                    enabled: false
+                },                     
+                {
+                    label: {
+                        d: 'Fecha de nacimiento'
+                    },
+                    arc: 'contact:hasBirthDate',
+                    mask: 'DD/MM/YY',
+                    enabled: false,
+                    inputtype: 'date',
+                    range: date
+                }
+            ],
+            schemaHeader: true,
+            resizable: true,
+
+            persistence: 'local',
+            pagination: true,
+            limit: 20,
+           
+            rootElement: true, 
+            hasIncludedProperties: [
+                'contact:hasName',
+                'contact:hasAge',
+                'contact:hasBirthDate'
+            ]
+        },
+        out: {
+            'count': 10,
+            'limit': 20,
+            'page': 0,
+            'result': [
+                {
+                    'format': 'rson',
+                    'data': {
+                        'testapp_contacto_001': {
+                            'type': 'testapp:contact',
+                            'hasDsca': {
+                                'cto': 'stringML',
+                                'to': {
+                                    'en': 'Contact 001',
+                                    'es': 'Contacto 001'
+                                },
+                                'ord': 10,
+                                'definedBy': {
+                                    'cto': 'agent',
+                                    'to': 'userAgent'
+                                }
+                            },
+                            'contact:hasName': {
+                                'cto': 'string',
+                                'to': 'Ana García',
+                                'ord': 10,
+                                'definedBy': {
+                                    'cto': 'agent',
+                                    'to': 'userAgent'
+                                }
+                            },
+                            'contact:hasBirthDate': {
+                                'cto': 'date',
+                                'to': 1119650400000,
+                                'ord': 50,
+                                'definedBy': {
+                                    'cto': 'agent',
+                                    'to': 'userAgent'
+                                }
+                            }
+                        }
+                    },
+                    'hasRoot': 'testapp_contacto_001'
+                },
+                {
+                    'format': 'rson',
+                    'data': {
+                        'testapp_contacto_002': {
+                            'type': 'testapp:contact',
+                            'hasDsca': {
+                                'cto': 'stringML',
+                                'to': {
+                                    'en': 'Contact 002',
+                                    'es': 'Contacto 002'
+                                },
+                                'ord': 10,
+                                'definedBy': {
+                                    'cto': 'agent',
+                                    'to': 'userAgent'
+                                }
+                            },
+                            'contact:hasName': {
+                                'cto': 'string',
+                                'to': 'Juan Martínez',
+                                'ord': 10,
+                                'definedBy': {
+                                    'cto': 'agent',
+                                    'to': 'userAgent'
+                                }
+                            },
+                            'contact:hasAge': {
+                                'cto': 'integer',
+                                'to': 29,
+                                'ord': 40,
+                                'definedBy': {
+                                    'cto': 'agent',
+                                    'to': 'userAgent'
+                                }
+                            },
+                            'contact:hasBirthDate': {
+                                'cto': 'date',
+                                'to': 698713200000,
+                                'ord': 50,
+                                'isVisible': false,
+                                'definedBy': {
+                                    'cto': 'agent',
+                                    'to': 'userAgent'
+                                }
+                            }
+                        }
+                    },
+                    'hasRoot': 'testapp_contacto_002'
+                },
+                {
+                    'format': 'rson',
+                    'data': {
+                        'testapp_contacto_003': {
+                            'type': 'testapp:contact',
+                            'hasDsca': {
+                                'cto': 'stringML',
+                                'to': {
+                                    'en': 'Contact 003',
+                                    'es': 'Contacto 003'
+                                },
+                                'ord': 10,
+                                'definedBy': {
+                                    'cto': 'agent',
+                                    'to': 'userAgent'
+                                }
+                            },
+                            'contact:hasName': {
+                                'cto': 'string',
+                                'to': 'María Rodríguez',
+                                'ord': 10,
+                                'definedBy': {
+                                    'cto': 'agent',
+                                    'to': 'userAgent'
+                                }
+                            },
+                            'contact:hasAge': {
+                                'cto': 'integer',
+                                'to': 39,
+                                'ord': 40,
+                                'definedBy': {
+                                    'cto': 'agent',
+                                    'to': 'userAgent'
+                                }
+                            },
+                            'contact:hasBirthDate': {
+                                'cto': 'date',
+                                'to': 474332400000,
+                                'ord': 50,
+                                'definedBy': {
+                                    'cto': 'agent',
+                                    'to': 'userAgent'
+                                }
+                            }
+                        }
+                    },
+                    'hasRoot': 'testapp_contacto_003'
+                }
+            ],
+            'execId': 'execId23012-bc23b24f-818d-43b0-8c75-a2d8d98174e0'
+        }
+    },
+
+    OBJ_Main = {
+        type:'rprocess',
+        hasChannel: CHANNEL_MAIN,
+        busId: BUSID_MAIN,    
+        hasKw: rproc__4gl_testappmodel_pivotgrid_raw_test,
+        hasDsca: 'Probando NO visualización de datos en celda',
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false,
+        gui_out: {
+            type: 'assembly',
+            children: [
+                {
+                    type: 'list',
+                    id: 'list-visibility',
+                    enabled: false,
+                    label: {
+                        d: 'Lista de comprobación'
+                    },
+                    elements: [
+                        {
+                            label: {
+                                d: 'Primera fila no se muestra el año al no aparecer en la instancia',
+                                icon: 'ok'
+                            }
+                        },
+                        {
+                            label: {
+                                d: 'Segunda fila no se muestra la fecha de cumpleaños al tener la propiedad isVisible=false',
+                                icon: 'cancel'
+                            }
+                        }
+                    ]
+                },
+                Obj_pivot                
+            ]
+        }
+    },
+    create_rprocess(_,OBJ_Main,_,OBJ_out).
+
+% PIVOT Scenarios for Projects/Activities/Tasks (RQL / BIG-DATASET)
+'staber_pivotgrid_rproc_pattern::usecase__rql_local_pivotgrid'(_, OBJ_in, _, OBJ_out) :-
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__ssa_test',    
+    
+    newKw(canal__,CHANNEL_KPIVOTGRID_DEFAULT),
+    obj_get(channel, OBJ_in, CHANNEL_KPIVOTGRID, CHANNEL_KPIVOTGRID_DEFAULT),
+    BUS_PIVOT = "bus__usecase__rql_local_pivotgrid",
+
+    newKw('channel_toolbar_', CHANNEL_KTOOLBAR),
+    newKw('busid_toolbar_', BUSID_KTOOLBAR),
+
+    newKw('channel_mainrprocess_', CHANNEL_MAIN),
+    newKw('busid_mainrprocess_', BUSID_MAIN),
+
+    'staber_pivotgrid_rproc_pattern::dlg'(DLG1),
+    'staber_pivotgrid_rproc_pattern::data'(I_agent, I_dataset, DATA1),
+    'staber_pivotgrid_rproc_pattern::usecase__rql_tableschema'(DATA1, DLG1, BUS_PIVOT, I_agent, I_dataset, Table_Schema),
+    'staber_pivotgrid_rproc_pattern::usecase__rql_toolbar'(I_dataset, BUS_PIVOT, CHANNEL_KTOOLBAR, BUSID_KTOOLBAR, KTOOLBAR),
+
+    IncludedProperties = [
+        'krp:hasERCTask', 
+        'krp:hasActivity',
+        'hasDsca', 
+        'hasIDI', 
+        'hasCustomer',
+        'isResponsible', 
+        'hasStartDate', 
+        'hasEndDate',
+        'plannedHours', 
+        'realHours'
+    ],
+
+    NavigableProperties =[
+        'isResponsible',
+        'hasCustomer', 
+        'krp:hasERCTask', 
+        'krp:hasActivity'
+    ],
+
+    concatConstants([
+        '?hasDataset @ ( \n',
+        '?I type ?hasClass.\n',
+        'like_ci(?hasKw, ?I). \n',
+        'get_dsca(?I, ?D). \n',
+        'like_ci(?hasDsca, ?D). \n',
+        '?pointer = {navigableProperties: ?hasNavigableProperties, includedProperties:?hasIncludedProperties,hasDataset:?hasDataset,hasKw:?I}. \n',
+        'rg_obj_get(_,?pointer,_,?OUT). \n'
+
+    ],DOC_S_CODE),
+    
+    IN_NAV_ACTIVITY = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,   
+        persistence: 'local',
+        pagination: false,
+        enabled: true,              
+        schema: Table_Schema,             
+        resizable: true,
+        expanded: false, 
+        % ToDo en LOCAL va a TRUE
+        % cacheExpanded: true,
+        multiselection: true
+    },
+
+    IN_NAV_PART = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset, 
+        persistence: 'local',
+        pagination: false,
+        enabled: false,
+        schema: Table_Schema,  
+        resizable: true,
+        expanded: false,   
+        % cacheExpanded: false,
+        multiselection: true           
+    },
+
+    NAV = [
+        { hasProperty: 'krp:hasActivity',  in: IN_NAV_ACTIVITY },
+        { hasProperty: 'krp:hasERCTask',   in: IN_NAV_PART }
+    ], 
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasClass: 'ss:project',
+        persistence: 'local',
+        hasKw: '*',
+        hasIDI: '*',
+        hasDsca: '*',
+        enabled: true,  
+        pagination: false,        
+        code: DOC_S_CODE,
+        schema: Table_Schema,         
+        schemaHeader: true,
+        rootElement: true,     
+        resizable: true,
+        expanded: false,
+        cacheExpanded: true,        
+        expandOnScroll: true,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties,
+        multiselection: true
+    },
+
+    Obj_pivot_persistence_local = {            
+        type : 'kpivotgrid',
+        hasChannel: CHANNEL_KPIVOTGRID,
+        busId: BUS_PIVOT,            
+        in : IN,
+        nav: NAV,
+        ktoolbar: KTOOLBAR,             
+        hasDlg: true,
+        hasCustomizationId: 'usecase__rql_local_pivotgrid_customization',
+        hasCustomization: {
+            columns: true
+        },
+        proc: { 
+            type: 'function', 
+            name: 'rql', 
+            context: { delegatedTo: I_agent } 
+        },
+        evtPublish: [{topic:'setNode',channel:CHANNEL_KPIVOTGRID}]
+    },     
+    
+    OBJ_Main = {
+        type:'rprocess',
+        hasChannel: CHANNEL_MAIN,
+        busId: BUSID_MAIN,    
+        hasKw: rproc__4gl_pivotgrid_local,
+        hasDsca: 'Escenario con persistencia LOCAL',
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false,
+        gui_out: {
+            type: 'assembly',
+            children: [Obj_pivot_persistence_local]
+        }
+    },
+    create_rprocess(_,OBJ_Main,_,OBJ_out).
+
+'staber_pivotgrid_rproc_pattern::usecase__rql_remote_pivotgrid'(_, OBJ_in, _, OBJ_out) :-
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__ssa_test',    
+
+    newKw(canal__,CHANNEL_KPIVOTGRID_DEFAULT),
+    obj_get(channel, OBJ_in, CHANNEL_KPIVOTGRID, CHANNEL_KPIVOTGRID_DEFAULT),
+    BUS_PIVOT = "bus__usecase__rql_remote_pivotgrid",
+
+    newKw('channel_toolbar_', CHANNEL_KTOOLBAR),
+    newKw('busid_toolbar_', BUSID_KTOOLBAR),
+
+    newKw('channel_mainrprocess_', CHANNEL_MAIN),
+    newKw('busid_mainrprocess_', BUSID_MAIN),
+
+    'staber_pivotgrid_rproc_pattern::dlg'(DLG1),
+    'staber_pivotgrid_rproc_pattern::data'(I_agent, I_dataset, DATA1),
+    'staber_pivotgrid_rproc_pattern::usecase__rql_tableschema'(DATA1, DLG1, BUS_PIVOT, I_agent, I_dataset, Table_Schema),
+    'staber_pivotgrid_rproc_pattern::usecase__rql_toolbar'(I_dataset, BUS_PIVOT, CHANNEL_KTOOLBAR, BUSID_KTOOLBAR, KTOOLBAR),
+
+    IncludedProperties = [
+        'krp:hasERCTask', 
+        'krp:hasActivity',
+        'hasDsca', 
+        'hasIDI', 
+        'hasCustomer',
+        'isResponsible', 
+        'hasStartDate', 
+        'hasEndDate',
+        'plannedHours', 
+        'realHours'
+    ],
+
+    NavigableProperties = [
+        'isResponsible',
+        'hasCustomer'
+    ],
+
+    concatConstants([
+        '?hasDataset @ ( \n',
+        '?I type ?hasClass.\n',
+        'like_ci(?hasKw, ?I). \n',
+        'get_dsca(?I, ?D). \n',
+        'like_ci(?hasDsca, ?D). \n',
+        '?pointer = {navigableProperties: ?hasNavigableProperties, includedProperties:?hasIncludedProperties,hasDataset:?hasDataset,hasKw:?I}. \n',
+        'rg_obj_get(_,?pointer,_,?OUT). \n'
+
+    ],DOC_S_CODE),
+
+	concatConstants([
+        '?hasDataset @ ( \n',
+        '?hasInstance ?hasProperty ?I.\n',
+        'like_ci(?hasKw, ?I). \n',
+        'get_dsca(?I, ?D). \n',
+        'like_ci(?hasDsca, ?D). \n',
+        '?pointer = {hasInstance: ?hasInstance, navigableProperties: ?hasNavigableProperties, includedProperties:?hasIncludedProperties,hasDataset:?hasDataset,hasKw:?I}. \n',
+        'rg_obj_get(_,?pointer,_,?OUT). \n'
+    ],DOC_S_NAV),
+
+    IN_NAV_ACTIVITY= {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        persistence: 'remote',
+        pagination: true, 
+        limit: 5,
+        multiselection: true,
+        enabled: true,
+        schema: Table_Schema,    
+        schemaHeader: true,     
+        resizable: true,
+
+        hasKw: '*',
+        hasIDI: '*',
+        hasDsca: '*',
+        code :  DOC_S_NAV, 
+    
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties
+        % rowactions: Row_Actions
+    },
+
+    IN_NAV_PART = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        persistence: 'remote',
+        pagination: 'true',
+        limit: 5,
+        enabled: true,
+        schema: Table_Schema,
+        schemaHeader: false, 
+        resizable: true,
+
+        hasKw: '*',
+        hasIDI: '*',
+        hasDsca: '*',
+        code :  DOC_S_NAV, 
+
+        hasInstance: 'ss:project',
+        hasProperty: 'krp:hasERCTask',
+
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties
+        % rowactions: Row_Actions
+    },
+
+    NAV = [
+        { hasProperty: 'krp:hasActivity',  in: IN_NAV_ACTIVITY },
+        { hasProperty: 'krp:hasERCTask',   in: IN_NAV_PART }
+    ], 
+
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasClass: 'ss:project',
+        persistence : 'remote',
+        hasKw: '*',
+        hasIDI: '*',
+        hasDsca: '*',
+        enabled: true, 
+        pagination: true,
+        limit: 10,
+        multiselection: true,
+        code: DOC_S_CODE,
+        rootElement: true,        
+        schema: Table_Schema,          
+        schemaHeader: true,
+        resizable: true,   
+        % rowactions: Row_Actions,        
+        expanded: false,
+        hasIncludedProperties : IncludedProperties,
+        hasNavigableProperties: NavigableProperties
+    },
+
+    Obj_pivot_persistence_remote = {
+        type : 'kpivotgrid',
+        hasChannel: CHANNEL_KPIVOTGRID,
+        busId: BUS_PIVOT,
+        in : IN,
+        nav: NAV, 
+        ktoolbar: KTOOLBAR,      
+        hasDlg: true,             
+        proc: { 
+            type: 'function', 
+            name: 'rql', 
+            context: { delegatedTo: I_agent } 
+        },
+        evtPublish: [{topic:'setNode',channel:CHANNEL_KPIVOTGRID}]
+    },
+    
+    OBJ_Main = {
+        type:'rprocess',
+        hasChannel: CHANNEL_MAIN,
+        busId: BUSID_MAIN,    
+        hasKw: rproc__4gl_pivotgrid_remote,
+        hasDsca: 'Escenario con persistencia REMOTA',
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false,
+        gui_out: {
+            type: 'assembly',
+            children: [Obj_pivot_persistence_remote]
+        }
+    },
+    create_rprocess(_,OBJ_Main,_,OBJ_out).
+
+'staber_pivotgrid_rproc_pattern::usecase__rql_tableschema'(DATA1, DLG1, BUS_PIVOT, I_agent, I_dataset, Table_Schema):-
+    Table_Schema = [
+        {
+            label: {
+                d: 'Descripción'
+            },
+            arc: 'hasDsca',                        
+            % enabled: false,            
+            orderBy: '_.hasDsca'
+        },                     
+        {
+            label: {
+                d: 'Cliente'
+            }, 
+            arc: 'hasCustomer',                    
+            control: {
+                type: 'text',                        
+                value: '_.hasCustomer.hasDsca.to',                        
+                actions: [
+                    {
+                        label: {
+                            icon: 'search'
+                        },
+                        collapse: false,
+                        events: [
+                            {
+                                type: 'click',
+                                payload: {
+                                    hasKw: '_.hasKw',
+                                    '?HASKW': '_.hasKw',
+                                    '?HASKWFROM': '_.hasKw',
+                                    '?HASKWCUSTOMER': '_.hasCustomer.hasKw'
+                                },
+                                method: 'refreshGUIOut',
+                                targetBusId: '_.busId',
+                                p_exec: {
+                                    type: 'sequence',
+                                    hasProcess: [
+                                        { 
+                                            type: 'method', 
+                                            in: { dlg_data: DATA1, dlg: DLG1}, 
+                                            name: 'dialog_exec', 
+                                            busId: BUS_PIVOT
+                                        },
+                                        { 
+                                            type: 'method', 
+                                            in: {
+                                                to: '?HASKWCUSTOMER', 
+                                                pattern: {'to': '_.hasKw'}
+                                            }, 
+                                            name: 'map',  
+                                            module: 'Mapper' 
+                                        },   
+                                        { 
+                                            type: 'function', 
+                                            in:
+                                                { 
+                                                    hasDataset: I_dataset, 
+                                                    hasKw: '?HASKW',
+                                                    from: '?HASKWFROM',
+                                                    arc: 'hasCustomer',
+                                                    cto: 'customer', 
+                                                    orda:0 
+                                                }, 
+                                            name: 'update_instance', 
+                                            context: {delegatedTo: I_agent}
+                                        },
+                                        { 
+                                            type: 'function', 
+                                            in: { propagate: '?PROPAGATE'}, 
+                                            name: 'generateCollectionResult', 
+                                            context: {delegatedTo: I_agent}
+                                        }
+
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            label: {
+                d: 'Responsable'
+            },
+            arc: 'isResponsible',                    
+            % enabled: false,
+            control: {
+                type: 'label',
+                d: '_.isResponsible.hasDsca'             
+            }
+        },
+        {
+            label: {
+                d: 'Fecha Inicio'
+            },
+            arc: 'hasStartDate',
+            mask: 'DD/MM/YYYY',
+            range: date
+        },
+        {
+            label: {
+                d: 'Fecha Fin'
+            },
+            arc: 'hasEndDate',
+            mask: 'DD/MM/YYYY',
+            range: date
+        },
+        {
+            label: {
+                d: 'Horas Plan.'
+            },
+            arc: 'plannedHours',
+            mask: '###.###,###',
+            range: float,
+            events: [
+                {
+                    type: 'change',
+                    method: 'propagateRefreshGUIOut',
+                    refreshMode: 'all',
+                    p_exec: {
+                        type: 'sequence',
+                        hasProcess: [                           
+                            { 
+                                type: 'function', 
+                                in: { 
+                                    propagate: '?PROPAGATE'
+                                }, 
+                                name: 'generateCollectionResult', 
+                                context: {delegatedTo: I_agent}
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            label: {
+                d: 'Horas Reales'
+            },
+            arc: 'realHours',			
+            control: {
+                type: 'text',           
+                % with mask the predicate staber_pivotgrid_rproc_pattern::hours_update 
+                % fails on atomtonumber (100.000,00)
+                % mask: '###.###,###',
+                range: float,
+                events: [
+                    {
+                        type: 'change',
+                        method: 'propagateRefreshGUIOut', 
+                        payload: {
+                            range: 'text', 
+                            arc: 'realHours',
+                            refreshMode: 'downtop',
+                            '?HASKW': '_.hasKw',
+                            '?HASFROM': '_.hasKw'      
+                        },
+                        targetBusId: '_.busId',
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess: [
+                                { 
+                                    type: 'function', 
+                                    in: { 
+                                        propagate: '?PROPAGATE', 
+                                        hasDataset: I_dataset, 
+                                        hasKw: '?HASKW',
+                                        from: '?HASFROM',
+                                        arc: 'realHours',
+                                        cto: 'float', 
+                                        orda:0 
+                                    }, 
+                                    name: 'staber_pivotgrid_rproc_pattern::hours_update', 
+                                    context: { delegatedTo: I_agent }
+                                },
+                                { 
+                                    type: 'function', 
+                                    in: { 
+                                        propagate: '?PROPAGATE'
+                                    }, 
+                                    name: 'generateCollectionResult', 
+                                    context: {delegatedTo: I_agent}
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+	].
+
+'staber_pivotgrid_rproc_pattern::usecase__rql_toolbar'(I_dataset, BUS_PIVOT, CHANNEL_KTOOLBAR, BUSID_KTOOLBAR, Toolbar):-
+    Toolbar = {
+        type: 'ktoolbar',
+        in : {
+            actions: [
+                {
+                    type: 'button',                
+                    label: { icon: 'ray', d: 'Refrescar pivot (exec)' },
+                    events: [
+                        {
+                            type: 'click',
+                            method: 'log',
+                            targetBusId: BUS_PIVOT,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    {
+                                        type: "function", 
+                                        in: {  
+                                            hasKw: "ss:project_21266021702783036",
+                                            hasDataset: I_dataset                                           
+                                        }, 
+                                        name: "modifyRealHour", 
+                                        context: { delegatedTo: "builderweb" } 
+                                        
+                                    },
+                                    {
+                                        type: "function", 
+                                        in: {  
+                                            hasKw: "ss:project_2126601341702783092",
+                                            hasDataset: I_dataset                                           
+                                        }, 
+                                        name: "modifyRealHour", 
+                                        context: { delegatedTo: "builderweb" } 
+                                        
+                                    },
+                                    {
+                                        type: "function", 
+                                        in: {  
+                                            hasKw: "krp:activity__060A01_G00",
+                                            hasDataset: I_dataset                                           
+                                        }, 
+                                        name: "modifyRealHour", 
+                                        context: { delegatedTo: "builderweb" } 
+                                        
+                                    },                                    
+                                    {
+                                        type: "function", 
+                                        in: {  
+                                            hasKw: "krp:task__806002",
+                                            hasDataset: I_dataset                                           
+                                        }, 
+                                        name: "modifyRealHour", 
+                                        context: { delegatedTo: "builderweb" } 
+                                        
+                                    },
+                                    {
+                                        type: 'method',
+                                        name: 'exec',
+                                        busId: BUS_PIVOT
+                                    }                                
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'button',                
+                    label: { icon: 'ray', d: 'Refrescar pivot (refresh_gui)' },
+                    events: [
+                        {
+                            type: 'click',
+                            % method: 'refresh_gui',
+                            method: 'log',
+                            targetBusId: BUS_PIVOT,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    {
+                                        type: "function", 
+                                        in: {  
+                                            hasKw: "ss:project_21266021702783036",
+                                            hasDataset: I_dataset                                           
+                                        }, 
+                                        name: "modifyRealHour", 
+                                        context: { delegatedTo: "builderweb" } 
+                                        
+                                    },
+                                    {
+                                        type: "function", 
+                                        in: {  
+                                            hasKw: "ss:project_2126601341702783092",
+                                            hasDataset: I_dataset                                           
+                                        }, 
+                                        name: "modifyRealHour", 
+                                        context: { delegatedTo: "builderweb" } 
+                                        
+                                    },
+                                    {
+                                        type: "function", 
+                                        in: {  
+                                            hasKw: "krp:activity__060A01_G00",
+                                            hasDataset: I_dataset                                           
+                                        }, 
+                                        name: "modifyRealHour", 
+                                        context: { delegatedTo: "builderweb" } 
+                                        
+                                    },                                    
+                                    {
+                                        type: "function", 
+                                        in: {  
+                                            hasKw: "krp:task__806002",
+                                            hasDataset: I_dataset                                           
+                                        }, 
+                                        name: "modifyRealHour", 
+                                        context: { delegatedTo: "builderweb" } 
+                                        
+                                    },
+                                    {
+                                        type: 'method',
+                                        name: 'refresh_gui',
+                                        busId: BUS_PIVOT
+                                    }                                  
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'button',                
+                    label: { icon: 'ray', d: 'Refrescar pivot (refreshNode)' },
+                    events: [
+                        {
+                            type: 'click',
+                            % method: 'refresh_gui',
+                            method: 'log',
+                            targetBusId: BUS_PIVOT,
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [
+                                    {
+                                        type: "function", 
+                                        in: {  
+                                            hasKw: "ss:project_21266021702783036",
+                                            hasDataset: I_dataset                                           
+                                        }, 
+                                        name: "modifyRealHour", 
+                                        context: { delegatedTo: "builderweb" } 
+                                        
+                                    },
+                                    {
+                                        type: "function", 
+                                        in: {  
+                                            hasKw: "ss:project_2126601341702783092",
+                                            hasDataset: I_dataset                                           
+                                        }, 
+                                        name: "modifyRealHour", 
+                                        context: { delegatedTo: "builderweb" } 
+                                        
+                                    },
+                                    {
+                                        type: "function", 
+                                        in: {  
+                                            hasKw: "krp:activity__060A01_G00",
+                                            hasDataset: I_dataset                                           
+                                        }, 
+                                        name: "modifyRealHour", 
+                                        context: { delegatedTo: "builderweb" } 
+                                        
+                                    },                                    
+                                    {
+                                        type: "function", 
+                                        in: {  
+                                            hasKw: "krp:task__806002",
+                                            hasDataset: I_dataset                                           
+                                        }, 
+                                        name: "modifyRealHour", 
+                                        context: { delegatedTo: "builderweb" } 
+                                        
+                                    },
+                                    {
+                                        type: 'method',
+                                        name: 'refreshNode',
+                                        busId: BUS_PIVOT
+                                    }                                  
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    type: 'button',                
+                    label: { icon: 'flow-split', d: 'Expand all' },
+                    events: [{
+                        type: 'click',
+                        method: 'expandAll',
+                        targetBusId: BUS_PIVOT
+                    }]
+                },
+                {
+                    type: 'button',                
+                    label: { icon: 'up-dir', d: 'Collapse all' },
+                    events: [{
+                        type: 'click',
+                        method: 'collapseAll',
+                        targetBusId: BUS_PIVOT
+                    }]
+                },
+                {
+                    type: 'button',                
+                    label: { icon: 'down-dir', d: 'Expand 1 level' },
+                    events: [{
+                        type: 'click',
+                        payload: {expansdedLevels: 1},
+                        method: 'expandCollapse',
+                        targetBusId: BUS_PIVOT
+                    }]
+                },
+                {
+                    type: 'button',                
+                    label: { icon: 'eye', d: 'Ver seleccionados' },
+                    events: [{
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_PIVOT,
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess:[ 
+                                {  
+                                    type: 'method',                
+                                    name: 'getSelected', 
+                                    busId: BUS_PIVOT 
+                                },
+                                {
+                                    type: 'function',
+                                    name: 'showSelected',
+                                    context: {
+                                        delegatedTo: 'builderweb'
+                                    }
+                                } 
+                            ]
+                        }
+                    }]
+                },
+                {
+                    type: 'button',                
+                    label: { icon: 'eye', d: 'Borrar selección' },
+                    events: [{
+                        type: 'click',
+                        % method: 'log',
+                        method: 'exec',
+                        % method: 'propagateRefreshGUIOut',
+                        % method: 'refreshGUIOut',
+                        % payload: {
+                        %     refreshMode: 'all'
+                        % },        
+                        % targetBusId: BUS_PIVOT,
+                        % targetBusId: '_.busId',
+                        targetBusId: '$.busId',
+                        p_exec: {
+                            type: 'sequence',
+                            hasProcess:[ 
+                                % {  
+                                %     type: 'method',                
+                                %     name: 'clearSelected',
+                                %     busId: BUS_PIVOT 
+                                % }
+                                {  
+                                    type: 'method',                
+                                    name: 'clearSelectionMine',
+                                    busId: BUS_PIVOT
+                                }
+                                % { 
+                                %     type: 'function', 
+                                %     in: { 
+                                %         propagate: '?PROPAGATE'
+                                %     }, 
+                                %     name: 'generateCollectionResult', 
+                                %     context: {delegatedTo: I_agent}
+                                % }
+                                % {
+                                %     type: 'function',
+                                %     name: 'showSelected',
+                                %     context: {
+                                %         delegatedTo: 'builderweb'
+                                %     }
+                                % }
+                                % {  
+                                %     type: 'method',                
+                                %     name: 'refreshGUIOut', 
+                                %     busId: BUS_PIVOT 
+                                % }
+                            ]
+                        }
+                    }]
+                }
+            ]
+        },
+        hasChannel: CHANNEL_KTOOLBAR,
+        busId: BUSID_KTOOLBAR        
+    }.
+
+'staber_pivotgrid_rproc_pattern::rowactions'(BUS_PIVOT, Row_Actions):-
+	Row_Actions = {
+        fixed: true,
+        icon: 'menu2',
+        align: 'left',
+        actions: [
+            {
+                label: {
+                    icon: 'pencil',
+                    d: 'Editar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_PIVOT,
+                        payload: {accion: 'Editar'}
+                    }
+                ]
+            }
+        ]
+    }.
+
+'staber_pivotgrid_rproc_pattern::hours_update'(Ctx, Obj_in, Ctx, Obj_out):-
+    % obj_ppd(Obj_in),
+    obj_get(arc, Obj_in, realHours),
+    !,
+    obj_get(value, Obj_in, ValueA),
+    obj_get(cto, Obj_in, Cto),
+    obj_get(from, Obj_in, From),
+    obj_get(orda, Obj_in, Orda),
+    obj_get(hasDataset, Obj_in, DS),
+    atomToNumber(ValueA, Value),
+    r_setStmt(DS, realHours, From, Cto, Value, Orda),
+    %% Calcular horas reales
+    call_in_dataset(DS, 'staber_pivotgrid_rproc_pattern::calculate'(From)),
+    Obj_out = Obj_in.
+
+'staber_pivotgrid_rproc_pattern::calculate'(KW):-
+    stmt(type, KW, KWC),
+    KWC == 'krp:task',
+    !,
+    'staber_pivotgrid_rproc_pattern::calculateAll'(KW, 'krp:hasERCTask', 'krp:activity',Activity),
+    'staber_pivotgrid_rproc_pattern::calculate'(Activity).
+
+'staber_pivotgrid_rproc_pattern::calculate'(KW):-
+    stmt(type, KW, KWC),
+    KWC == 'krp:activity',
+    !,
+    'staber_pivotgrid_rproc_pattern::calculateAll'(KW, 'krp:hasActivity', 'ss:project', _).
+    
+'staber_pivotgrid_rproc_pattern::calculate'(_).
+'staber_pivotgrid_rproc_pattern::calculateAll'(KW, KWA, KWCF, KWF):-
+    once( (stmt(KWA, KWF, KW),  stmt(type,KWF,KWCF))),
+    sumFindall(RH,
+        (
+            stmt(KWA, KWF, KWT),
+            stmt(realHours, KWT, RH)
+        ),SUM_RH),
+    setStmt(realHours, KWF, float, SUM_RH, 0 ).
+
+'staber_pivotgrid_rproc_pattern::dlg'(Obj_out):-
+    Obj_out = {
+        type: 'rdlg',
+        busId: '$.dlg.busId',
+        hasChannel: '$.dlg.hasChannel',
+        in: {
+            close: false,
+            options: {
+                label: {
+                    d: 'Selección de'
+                },
+                actions: [
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label:{
+                            d:'Cancelar'
+                        },
+                        enabled: true,
+                        events: [{
+                            type: 'click',
+                            method: 'cancel',
+                            targetBusId: '$.dlg.busId'
+                        }]
+                    }
+                ]
+            }
+        }
+    }.
+
+'staber_pivotgrid_rproc_pattern::data'(I_agent, I_dataset, Obj_out):-
+    SCHEMA_DLG = {
+        data: [           
+            {
+                label: {
+                    d: 'Kw'
+                },
+                arc: 'hasKw'
+            },
+            {
+                label: {
+                    d: 'Descripción'
+                },
+                arc: 'hasDsca'
+            }
+        ]
+    },
+    Obj_out = {
+        type: 'kresult',
+        busId: '{$.busId}_zoom',
+        hasChannel: '$.dlg.hasChannel',
+        in: {
+            hasAgent: I_agent,
+            hasDataset: I_dataset,
+            hasKw: 'customer',
+            includedProperties:['hasKw', 'hasDsca'],            
+            hasLayout: 'result',
+            searchType: 'rem',
+            schema: SCHEMA_DLG,            
+            selectable: true            
+        }
+    }.    
+    
+% PIVOT Scenarios (SQL)
+'staber_pivotgrid_rproc_pattern::usecase__sdp_sql_pivotgrid'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('bus__',BUS_PIVOT),
+    % Schema primer nivel
+	Table_Schema0 = [
+                {
+                    label: {
+                        d: 'Artículo'
+                    },
+                    arc: 'ARTFINAL'
+                },
+                {
+                    label: {
+                        d: 'F.Op.'
+                    },
+                    arc: 'FECHOP',
+                    field: 'a.T$FOPE',
+                    range: date,
+                    filter:true,
+                    sorted:true
+                },
+                {
+                    label: {
+                        d: 'F.Entrega'
+                    },
+                    arc: 'FECHENTREGA',
+                    field: 'b.T$FEEN',
+                    range: date,
+                    filter:true,
+                    sorted:true
+                },
+				{
+                    label: {
+                        d: 'H.Entrega'
+                    },
+                    arc: 'HORAENTREGA'
+                },
+				{
+                    label: {
+                        d: 'Tarea'
+                    },
+                    arc: 'TAREA',
+                    range: 'string',
+                    field: 'a.T$TADE',
+                    filter:true,
+                    sorted:true
+                },
+
+                {
+                    label: {
+                        d: 'Desc.'
+                    },
+                    arc: 'ARTFINALDSCA'
+                },
+                {
+                    label: {
+                        d: 'Revisión'
+                    },
+                    arc: 'ARTFINALREV'
+                },
+                {
+                    label: {
+                        d: 'Rep.'
+                    },
+                    arc: 'STRUCTURECOMPONENTS'
+                },
+                {
+                    label: {
+                        d: 'Cliente'
+                    },
+                    arc: 'KW_OPDYNAMICFIELD_5'
+                }
+	],
+    CODE0 = "SELECT a.T$IDFC as ID, a.T$MASC as Mascara, c.T$NIVE as Nivel, a.T$OPNO as NumeroOperacion, a.T$OPER as Operacion, b.T$CORT as Corte, a.T$ESTA as Disponibilidad, a.T$FOPE as FechOp, b.T$FEEN as FechEntrega, b.T$HOEN as HoraEntrega, CONCAT(CONCAT(c.T$CPRJ, ' '), c.T$ITEM) as Art, c.T$DSCA as Dsca, a.T$TADE as Tarea, b.T$ORNE as Origen, e.T$DESC as OrigenDsca, c.T$CANT as CantidadInicial, a.T$CADI as CantidadDisponible, a.T$CATE as CantidadTerminada, a.T$CARE as CantidadRechazada, d.ITEM as ArtFinal, d.DSCA as ArtFinalDsca, d.REVI as ArtFinalRevi, e.TotalReparaciones, (SELECT COUNT (d.T$IDFA) as StructureComponentes FROM baan.ttisdp110650 d WHERE d.T$IDFA = a.T$IDFC AND T$ESFA = 1) as StructureEnabled, (SELECT COUNT(e.T$SEMA) as Markings FROM baan.ttisdp126650 e LEFT JOIN baan.ttisdp120650 f ON e.T$IDFC = f.T$IDFC AND e.T$MASC = f.T$MASC AND e.T$OPER = f.T$OPER WHERE e.T$IDFC = a.T$IDFC AND e.T$MASC = a.T$MASC AND e.T$OPER = a.T$OPER AND e.T$EMIN = 123 AND E.T$MACE <> 0 AND f.T$ESTA <>  4) as CurrentMarkings, (SELECT COUNT(e.T$SEMA) as Markings FROM baan.ttisdp126650 e LEFT JOIN baan.ttisdp120650 f ON e.T$IDFC = f.T$IDFC AND e.T$MASC = f.T$MASC AND e.T$OPER = f.T$OPER WHERE e.T$IDFC = a.T$IDFC AND e.T$MASC = a.T$MASC AND e.T$OPER = a.T$OPER AND e.T$EMIN <> 123 AND E.T$MACE <>  0 AND f.T$ESTA <>  4) as OthersMarkings, ( SELECT TRIM(T$VALO) FROM baan.ttisdp122650 select_5 WHERE select_5.T$IDFC = a.T$IDFC  AND select_5.T$MASC = a.T$MASC  AND select_5.T$OPER = a.T$OPER AND select_5.T$CAMP = 5) as KW__OPDYNAMICFIELD_5 FROM baan.ttisdp120650 a LEFT JOIN baan.ttisdp100650 b on a.T$idfc = b.T$idma LEFT JOIN baan.ttisdp110650 c on a.T$idfc = c.T$idfa AND a.T$MASC = c.T$MASC LEFT JOIN baan.ttisdp002650 e on b.T$ORNE = e.T$ORNE LEFT JOIN ( SELECT a.T$IDCO as ID, b.T$CPRJ as CPRJ, b.T$ITEM as ITEM, b.T$REVI as REVI, b.T$DSCA as DSCA FROM baan.ttisdp100650 a LEFT JOIN baan.ttisdp110650 b ON a.T$IDMA = b.T$IDFA WHERE TRIM(a.T$IDCO) IS NOT NULL AND TRIM(b.T$MASC) IS NULL GROUP BY a.T$IDCO, b.T$CPRJ, b.T$ITEM, b.T$REVI, b.T$DSCA ) d ON a.T$IDFC = d.ID LEFT JOIN ( SELECT a.T$IDFC, a.T$MASC, CONCAT(CONCAT(nvl(b.reparacionesFinalizadas, 0), '/'), nvl(c.totalReparaciones, 0)) as TotalReparaciones FROM baan.ttisdp141650 a LEFT JOIN ( SELECT a.T$IDFC, a.T$MASC, COUNT(a.T$SERE) as reparacionesFinalizadas FROM baan.ttisdp141650 a WHERE a.T$ESRE = 3 GROUP BY a.T$IDFC, a.T$MASC ) b ON a.T$IDFC = b.T$IDFC AND a.T$MASC = b.T$MASC LEFT JOIN ( SELECT a.T$IDFC, a.T$MASC, COUNT(a.T$SERE) as totalReparaciones FROM baan.ttisdp141650 a GROUP BY a.T$IDFC, a.T$MASC ) c ON a.T$IDFC = c.T$IDFC AND a.T$MASC = c.T$MASC GROUP BY a.T$IDFC, a.T$MASC, b.reparacionesFinalizadas, c.totalReparaciones ) e on a.T$IDFC = e.T$IDFC AND a.T$MASC = e.T$MASC WHERE (a.T$CELU = 10 ) AND (a.T$ESTA = 2 OR a.T$ESTA = 3)  AND b.T$ORNE = 3 ?ANDWHERE",
+
+    Row_Actions = {
+        fixed: true,
+        icon: 'menu2',
+        align: 'right',
+        actions: [
+            {
+                label: {
+                    icon: 'pencil',
+                    d: 'Editar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_PIVOT,
+                        payload: {accion: 'Editar'}
+                    }
+                ]
+            },
+            {
+                label: {
+                    icon: 'copy',
+                    d: 'Copiar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_PIVOT,
+                        payload: {accion: 'Copiar'}
+                    }
+                ]
+            },
+            {
+                label: {
+                    icon: 'paste',
+                    d: 'Pegar'
+                },
+                events:[
+                    {
+                        type: 'click',
+                        method: 'log',
+                        targetBusId: BUS_PIVOT,
+                        payload: {accion: 'Pegar'}
+                    }
+                ]
+            }
+        ]
+    },
+
+    IN0 = {
+        '?KWCLASS': 'test',
+        limit: 30,
+        rootElement: true,
+        multiselection: true,
+        getCount: true,
+        persistence:'remote',
+        schemaHeader: true,
+        hasPropertyVars: ['ID','OPERACION'],
+        code: CODE0,
+        schema : Table_Schema0,
+        rowactions: Row_Actions
+
+    },
+    % Schema segundo nivel
+	Table_Schema1 = [
+                {
+                    label: {
+                        d: 'Programa de Corte'
+                    },
+                    arc: 'PROGCORTE'
+                },
+                {
+                    label: {
+                        d: 'Artículo'
+                    },
+                    arc: 'ARTCHAPA'
+                },
+                {
+                    label: {
+                        d: 'Veces'
+                    },
+                    arc: 'VECES'
+                },
+				{
+                    label: {
+                        d: 'Proyecto Chapa'
+                    },
+                    arc: 'PROYCHAPA'
+                },
+
+                {
+                    label: {
+                        d: 'Revisión Chapa'
+                    },
+                    arc: 'REVCHAPA'
+                },
+                {
+                    label: {
+                        d: 'Descripción'
+                    },
+                    arc: 'DSCACHAPA'
+                },
+                {
+                    label: {
+                        d: 'Tiempo Operación'
+                    },
+                    arc: 'TIMEOPERACION'
+                }
+	],
+    CODE1 = "SELECT a.T$IDFC as ID, b.T$OPER as Operacion, a.T$OPNO as NumeroOperacion, e.T$NIVE as Nivel, TRIM(b.T$PCOR) as ProgCorte, b.T$SECU as Secuencia, a.T$ESTA as Disponibilidad, b.T$VECE as Veces, b.T$CHCP as ProyChapa, TRIM(b.T$CHIT) as ArtChapa, b.T$CHRE as RevChapa, TRIM(b.T$CHDS) as DscaChapa, b.T$SUTM as TimePreparacion, b.T$RUTM as TimeOperacion, ( SELECT COUNT(e.T$SEMA) as Markings FROM baan.ttisdp126650 e WHERE e.T$IDFC = a.T$IDFC AND e.T$MASC = a.T$MASC AND e.T$OPER = a.T$OPER AND e.T$PCOR = b.T$PCOR AND e.T$SECU = b.T$SECU AND e.T$EMIN = 123 AND E.T$MACE <> 0 ) as CurrentMarkings, ( SELECT COUNT(e.T$SEMA) as Markings FROM baan.ttisdp126650 e WHERE e.T$IDFC = a.T$IDFC AND e.T$MASC = a.T$MASC AND e.T$OPER = a.T$OPER AND e.T$PCOR = b.T$PCOR AND e.T$SECU = b.T$SECU AND e.T$EMIN <> 123 AND E.T$MACE <> 0 ) as OthersMarkings FROM baan.ttisdp120650 a LEFT JOIN baan.ttisdp123650 b on a.T$IDFC = b.T$IDCO AND a.T$OPER = b.T$OPER LEFT JOIN baan.ttisdp100650 c on a.T$idfc = c.T$idma LEFT JOIN baan.ttisdp110650 e on a.T$IDFC = e.T$IDFA AND a.T$MASC = e.T$MASC WHERE a.T$IDFC = '?ID' AND a.T$OPER = '?OPERACION' ORDER BY b.T$PCOR, b.T$SECU",
+
+    IN1 = {
+        limit: 30,
+        getCount: true,
+        persistence:'remote',
+        multiselection: true,
+        schemaHeader: true,
+        hasPropertyVars: ['ID','OPERACION','PROGCORTE'],
+        schema : Table_Schema1,
+        code: CODE1,
+        rowactions: Row_Actions
+
+    },
+    % Schema segundo nivel
+	Table_Schema21 = [
+                {
+                    label: {
+                        d: 'Artículo'
+                    },
+                    arc: 'ARTICULO'
+                },
+                {
+                    label: {
+                        d: 'Descripción'
+                    },
+                    arc: 'DESCRIPCION'
+                },
+                {
+                    label: {
+                        d: 'Cantidad'
+                    },
+                    arc: 'CANTIDAD',
+                    range: float,
+                    control:{
+                        type: text,
+                        inputtype: float,
+                        mask: '###.###,#',
+                        events:[
+                                {
+                                    type: 'change',
+                                    payload: { range: 'float', arc: 'CANTIDAD'},
+                                    method: 'refreshGUIOut',
+                                    p_exec: {
+                                            type: 'sequence',
+                                            hasProcess: [
+                                                { type: 'method', in: { propagate: '?PROPAGATE'}, name: 'generateCollectionFromRow', module: 'GenericUI'}
+                                            ]
+                                    }
+                                }
+                            ]
+                    }
+                }
+
+	],
+    CODE21 = "SELECT rownum as ID, a.T$OPER as Operacion, a.T$PCOR as ProgCorte, b.T$CPRJ as Proyecto, TRIM(b.T$ITEM) as Articulo, b.T$REVI as Revision, TRIM(b.T$DSCA) as Descripcion, b.T$CANT as Cantidad, b.T$CIRC as Circuito FROM baan.ttisdp123650 a LEFT JOIN baan.ttisdp124650 b on a.T$IDCO = b.T$IDCO AND a.T$OPER = b.T$OPER AND a.T$PCOR = b.T$PCOR WHERE a.T$IDCO = '?ID' AND (a.T$OPER = ?OPERACION AND a.T$PCOR = '?PROGCORTE')",
+    % CODE21 = "SELECT a.T$IDCO as ID, a.T$OPER as Operacion, a.T$PCOR as ProgCorte, b.T$CPRJ as Proyecto, TRIM(b.T$ITEM) as Articulo, b.T$REVI as Revision, TRIM(b.T$DSCA) as Descripcion, b.T$CANT as Cantidad, b.T$CIRC as Circuito FROM baan.ttisdp123650 a LEFT JOIN baan.ttisdp124650 b on a.T$IDCO = b.T$IDCO AND a.T$OPER = b.T$OPER AND a.T$PCOR = b.T$PCOR WHERE a.T$IDCO = '?ID' AND (a.T$OPER = ?OPERACION AND a.T$PCOR = '?PROGCORTE')",
+    IN21 = {
+        limit: 30,
+        getCount: true,
+        persistence:'remote',
+        multiselection: true,
+        schemaHeader: true,
+        schema : Table_Schema21,
+        code: CODE21,
+        rowactions: Row_Actions
+
+    },
+    % Schema segundo nivel
+	Table_Schema22 = [
+                {
+                    label: {
+                        d: 'Observaciones'
+                    },
+                    arc: 'OBSERVACION'
+                }
+
+	],
+    CODE22 = "SELECT a.T$PCOR as ProgCorte, a.T$LINE as Linea, TRIM(a.T$TEXT) as Observacion FROM baan.ttisdp042650 a WHERE a.T$PCOR = '?PROGCORTE'",
+    IN22 = {
+        limit: 30,
+        getCount: true,
+        persistence:'remote',
+        multiselection: true,
+        schemaHeader: true,
+        schema : Table_Schema22,
+        code: CODE22,
+        rowactions: Row_Actions
+
+    },
+    NAV = [
+        {hasProperty: 'PROGCORTE', in: [IN21,IN22]},
+        {hasProperty: 'OPERACION', in: IN1}
+    ],
+    Obj_searchdoc = {
+        in : IN0,
+        type : 'kpivotgrid',
+        busId: BUS_PIVOT,
+        resizable: true,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                    {type: 'method', in: {dbType:'oracle', dbConn:'sdp_des'}, name: 'getConnection', module: 'SqlServices' },
+                    {type: 'method', in: {type: '?KWCLASS'}, name: 'execSQL', module: 'SqlServices' }
+            ]
+        },
+        nav: NAV,
+        events: [
+            {
+                type: 'multiselection',
+                method: 'refreshGUIOut',
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [{ type: 'method', in: { propagate: '?PROPAGATE'}, name: 'generateCollectionFromRow', module: 'GenericUI' }]
+                }
+            }
+        ],
+        hasKw: rproc__4gl_sdp_pivotgrid1,
+        hasDsca: 'PIVOTGRID sobre SDP',
+        hasIcon: 'group',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_searchdoc,_,OBJ_out).
+
+'staber_pivotgrid_rproc_pattern::selectAndExpand_from_external_component'(_, _, _, OBJ_out):-
+    newKw('channel_pivot_', ChannelTree),
+    newKw('busId_pivot_', BusId_pivot),
+    newKw('channel_rprocess_', ButtonContainerChannel),
+    newKw('busId_rprocess_', ButtonContainerBusId),
+    Pivot_in = {
+        hasAgent: 'builderweb',
+        hasChannel: ChannelTree,
+        hasPivotBusId: BusId_pivot,
+        hasDataset: 'Default',
+        singleselection: true,
+        limit:100
+    },
+    Rproc = {
+        type: rprocess,
+        do_exec: true,
+        busId: ButtonContainerBusId,
+        hasChannel: ButtonContainerChannel,
+        gui_out: { type: function, name: 'staber_pivotgrid_rproc_pattern::selectAndExpand_from_external_component__gui_out', context: { delegatedTo: builderweb}},
+        evtPublish:[
+            {topic: selectAndExpand, channel: ButtonContainerChannel}
+        ],
+        in: Pivot_in,
+        hasKw: rproc__pivot_tree_selectAndExpand,
+        hasDsca: 'Suscripción a eventos externos para selección de fila',
+        hasIcon: 'tree',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_pivotgrid_rproc_pattern::selectAndExpand_from_external_component__gui_out'(_, Obj_in, _, Obj_out):-
+    obj_get(hasChannel, Obj_in, ButtonContainerChannel),
+'rc_gui_out:tree:testapp:contact'(_,Obj_in,_,Obj_pivot0),
+    PivotSuscribe = {
+        evtSubscribe: {topic: selectAndExpand, channel: ButtonContainerChannel }
+    },
+    obj_merge(Obj_pivot0, PivotSuscribe, Obj_pivot),
+    obj_get(in:hasPivotBusId, Obj_in, PivotBusId),
+    obj_get(busId, Obj_in, ButtonContainerBusId),
+    Button0 = {
+        type: button,
+        label:{
+            d: 'selectAndExpand de primer nivel (event)'
+        },
+        events:[
+            {
+                type: click,
+                targetBusId: PivotBusId,
+                method: selectAndExpand,
+                payload:{
+                    hasKw: 'testapp:contact'
+                }
+            }
+        ]
+    },
+    Button2 = {
+        type: button,
+        label:{
+            d: 'selectAndExpand de nivel 2 (testapp:contactAddress, en secuencia)'
+        },
+        events:[
+            {
+                type: click,
+                targetBusId: PivotBusId,
+                method: log,
+                payload:{
+                    hasKw: 'testapp:contactAddress'
+                },
+                p_exec:{
+                    type: sequence,
+                    hasProcess:[{type: method, name: selectAndExpand, busId: PivotBusId}]
+                }
+            }
+        ]
+    },
+    Button1 = {
+        type: button,
+        label:{
+            d: 'selectAndExpand de primer nivel (pub/sub)'
+        },
+        events:[
+            {
+                type: click,
+                targetBusId: ButtonContainerBusId,
+                method: publish,
+                payload:{
+                    topic: selectAndExpand,
+                    channel: ButtonContainerChannel,
+                    hasKw: 'contact:hasPhoneNumber'
+                }
+            }
+        ]
+    },
+    
+    Button4 = {
+        type: button,
+        label:{
+            d: 'Añade instancia a testapp:contact, selectTreePath path: testapp:contact -> hasPhone -> testapp:contact'
+        },
+        events:[
+            {
+                type: click,
+                targetBusId: ButtonContainerBusId,
+                method: exec,
+                p_exec:{
+                    type: sequence,
+                    hasProcess:[
+                        % "pivot__busId__pivot__33363081718032821__testapp_contacto_003__contact:hasAddress__0"
+                        { type: function, name: add_element_to_ontology, context:{ delegatedTo: builderweb}},
+                        { type: function, in:{kwi: 'testapp:contact/contact:hasPhoneNumber/testapp:contact'}, name: generateTreePath, context:{ delegatedTo: builderweb}},
+                        { type: method, name: selectTreePath, busId: PivotBusId}
+                        % { type: function, name: deleteSelectedTreePath, context:{ delegatedTo: builderweb}}
+                    ]
+                }
+            }
+        ]
+    },
+    Button5 = {
+        type: button,
+        label:{
+            d: 'Añade instancia a testapp:contactAddress y selectTreePath, sin treePath'
+        },
+        events:[
+            {
+                type: click,
+                targetBusId: ButtonContainerBusId,
+                method: exec,
+                p_exec:{
+                    type: sequence,
+                    hasProcess:[
+                        % "pivot__busId__pivot__33363081718032821__testapp_contacto_003__contact:hasAddress__0"
+                        { type: function, in:{hasKw: 'testapp:contactAddress'}, name: add_element_to_ontology, context:{ delegatedTo: builderweb}},
+                        { type: method, name: selectTreePath, busId: PivotBusId}
+                        % { type: function, name: deleteSelectedTreePath, context:{ delegatedTo: builderweb}}
+                    ]
+                }
+            }
+        ]
+    },
+    PivotAssembly = {
+        type: assembly,
+        children: [ Obj_pivot]
+    },
+    ButtonAssembly = {
+        type: assembly,
+        cols: 3,
+        children: [ Button0, Button1, Button2, Button4, Button5]
+    },
+    Obj_out = {
+        type: assembly,
+        cols: 2,
+        children: [ PivotAssembly, ButtonAssembly]
+    }.
+
+addNewPropertytoContact(_,Obj_in,_,Obj_in):-
+    property +$ 'contact:eraseProperty'
+    d [( es, 'Propiedad inválida' ),  ( en, 'Invalid property' )]
+    p [
+        domain  ¬> 'testapp:contact' º 11,
+        range   ¬> 'string',
+        cardMax ¬> 1
+    ].
+
+add_element_to_ontology(_,Obj_in,_,Obj_out):-
+    obj_get(hasKw, Obj_in, From, 'testapp:contact'),
+    newKw('property__', NewKw),
+    property +$ NewKw
+    d [( es, 'Propiedad inválida' ),  ( en, 'Invalid property' )]
+    p [
+        domain  ¬> From º 11,
+        range   ¬> 'string',
+        cardMax ¬> 1
+    ],
+    obj_set('selectedTreePath', Obj_in, NewKw, Obj_out).
+
+'staber_pivotgrid_rproc_pattern::deferredSelectAndExpand_persistencelocal::pivot'(Obj_pivot):-
+    newKw('busId__pivot_', BUS_PIVOT),
+    newKw('channel__pivot_', PivotChannel),
+    Schema_nav =[
+        {
+            label: {
+                d: 'Calle'
+            },
+            arc: 'contactAddress:hasAddressLine',
+            enabled: false
+        },     
+        {
+            label: {
+                d: 'Ciudad'
+            },
+            arc: 'contactAddress:hasCity',
+            inputtype: 'integer',
+            enabled: false
+        }
+    ],
+    In_nav = {
+        schema: Schema_nav,
+        expanded: false,
+        selectable: true,
+        multiselection: false,
+        persistence: local,
+        hasIncludedProperties: [
+            'contactAddress:hasAddressLine',
+            'contactAddress:hasCity'
+        ]
+    },
+    Nav = [{ hasProperty: 'contact:hasAddress', in: In_nav }],
+    In = {
+        % selectedTreePath: 'testapp_contacto_001',
+        singleselection: true,
+        hasAgent: 'builderweb',
+        hasDataset: 'Default',
+        hasKw: 'testapp:contact',
+        schema: [
+            {
+                label: {
+                    d: 'Nombre'
+                },
+                arc: 'contact:hasName',
+                enabled: false
+            },     
+            {
+                label: {
+                    d: 'Edad'
+                },
+                arc: 'contact:hasAge',
+                inputtype: 'integer',
+                enabled: false
+            }
+        ],
+        searchType: 'rem',
+        persistence: 'local',
+        selectable: true,
+        limit: 10,
+        multiselection: false,
+        page: 0,
+        orderByOneColumn: true,
+        pagination: true,
+        rootElement: true,
+        expanded: false,
+        schemaHeader: true,
+        resizable: true,
+        hasIncludedProperties: [
+            'contact:hasName',
+            'contact:hasAge',
+            'contact:hasAddress',
+            'contactAddress:hasAddressLine',
+            'contactAddress:hasCity'
+        ],
+        hasNavigableProperties: ['contact:hasAddress']
+    },
+    Obj_pivot = {
+        type: 'kpivotgrid',
+        busId: BUS_PIVOT,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                {
+                    type: 'method',
+                    name: 'schemaToQuery',
+                    module: 'QueryFilterService'
+                },
+                {
+                    type: 'function',
+                    name: 'remql',
+                    context: {
+                        delegatedTo: 'builderweb'
+                    }
+                }
+            ]
+        },
+        nav: Nav,
+        do_exec: true,
+        autoRows: true,
+        in: In,
+        evtPublish:[
+            {topic: setNode, channel: PivotChannel}
+        ]
+    }.
+
+'staber_pivotgrid_rproc_pattern::deferredSelectAndExpand_persistencelocal_rql::pivot'(Obj_pivot):-
+    newKw('busId__pivot_', BUS_PIVOT),
+    newKw('channel__pivot_', PivotChannel),
+    Schema_nav =[
+        {
+            label: {
+                d: 'Calle'
+            },
+            arc: 'contactAddress:hasAddressLine',
+            enabled: false
+        },     
+        {
+            label: {
+                d: 'Ciudad'
+            },
+            arc: 'contactAddress:hasCity',
+            inputtype: 'integer',
+            enabled: false
+        }
+    ],
+
+    In_nav = {
+        hasDataset: 'Default',
+        schema: Schema_nav,
+        hasInstance: 'testapp:contact',
+        hasProperty: 'contact:hasAddress',
+        predicate: 'testapp::contacts::get_elements',
+        expanded: false,
+        selectable: true,
+        singleselection: true,
+        multiselection: false,
+        persistence: local,
+        hasClass: 'testapp:hasAddress',
+        hasKw: "*",
+        hasIDI: "*",
+        hasDsca: "*"
+    },
+    Nav = [{ hasProperty: 'contact:hasAddress', in: In_nav }],
+    In = {
+        selectedTreePath: 'testapp_contacto_011/testapp:direccion__2__contacto_008',
+        hasInstance: 'testapp:contact',
+        hasClass: 'testapp:contact',
+        hasKw: "*",
+        hasIDI: "*",
+        hasDsca: "*",
+        hasAgent: 'builderweb',
+        hasDataset: 'Default',
+        hasKw: 'testapp:contact',
+        schema: [
+            {
+                label: {
+                    d: 'Nombre'
+                },
+                arc: 'contact:hasName',
+                enabled: false
+            },     
+            {
+                label: {
+                    d: 'Edad'
+                },
+                arc: 'contact:hasAge',
+                inputtype: 'integer',
+                enabled: false
+            }
+        ],
+        predicate: 'testapp::contacts::get_elements',
+        searchType: 'rem',
+        persistence: 'local',
+        selectable: true,
+        limit: 10,
+        multiselection: false,
+        singleselection: true,
+        page: 0,
+        orderByOneColumn: true,
+        pagination: true,
+        rootElement: true,
+        expanded: false,
+        schemaHeader: true,
+        resizable: true
+    },
+    Obj_pivot = {
+        type: 'kpivotgrid',
+        busId: BUS_PIVOT,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                {
+                    type: 'function',
+                    name: 'rql',
+                    context: {
+                        delegatedTo: 'builderweb'
+                    }
+                }
+            ]
+        },
+        nav: Nav,
+        do_exec: true,
+        autoRows: true,
+        in: In,
+        evtPublish:[
+            {topic: setNode, channel: PivotChannel}
+        ]
+    }.
+
+'testapp::contacts::get_elements_with_address'(_Ctx_in, _Obj_in, _Ctx_out, L_objs):-
+    findall({hasKw: I, hasDsca: Dsca, 'contact:hasAge': A, 'contact:hasName':N, 'contact:hasAddress':L_Address},
+        (
+            stmt(type, I, 'testapp:contact'),
+            get_dsca(I, Dsca),
+            stmt('contact:hasName', I, N),
+            stmt('contact:hasAge', I, A),
+            findall({hasKw: A_I, 'contactAddress:hasAddressLine': A_L,'contactAddress:hasCity': A_C},
+                (
+                    stmt(type, A_I, 'testapp:contactAddress'),
+                    stmt('contact:hasAddress', I, A_I),
+                    stmt('contactAddress:hasAddressLine', A_I, A_L),
+                    stmt('contactAddress:hasCity', A_I, A_C)
+                ), L_Address)
+        ), L_objs).
+
+'testapp::contacts::get_elements'(_,Obj_in,_,Obj_out):-
+    obj_get(hasDataset, Obj_in, DS, 'Default'),
+    call_in_dataset(DS, 'testapp::contacts::get_elements_with_address'(_Ctx_in, Obj_in, _Ctx_out, Obj_out)).
+
+'staber_pivotgrid_rproc_pattern::deferredSelectAndExpand_persistencelocal'(_, _, _, OBJ_out):-
+    newKw('busId_pivot_local', ButtonContainerBusId),
+    'staber_pivotgrid_rproc_pattern::deferredSelectAndExpand_persistencelocal::pivot'(Obj_pivot),
+    obj_get( busId, Obj_pivot, PivotBusId),
+    Button = {
+        type: button,
+        label:{
+            d: 'Añade instancia y selecciona'
+        },
+        events:[
+            {
+                type: click,
+                targetBusId: ButtonContainerBusId,
+                method: exec,
+                p_exec:{
+                    type: sequence,
+                    hasProcess:[
+                        { type: method, in:{defer: true, hasKw: 'testapp:direccion__1__contacto_008'}, name: selectAndExpand, busId: PivotBusId},
+                        { type: function, in:{kwi: 'testapp_contacto_002'}, name: addAddresstoContact, context:{ delegatedTo: builderweb}}
+                        
+                    ]
+                }
+            }
+        ]
+    },
+    
+    PivotAssembly = {
+        type: assembly,
+        children: [ Obj_pivot]
+    },
+    ButtonAssembly = {
+        type: assembly,
+        cols: 3,
+        children: [ Button]
+    },
+    Assembly = {
+        type: assembly,
+        cols: 2,
+        children: [ PivotAssembly, ButtonAssembly]
+    },
+    Rproc = {
+        type: rprocess,
+        do_exec: true,
+        busId: ButtonContainerBusId,
+        % hasChannel: ButtonContainerChannel,
+        gui_out: Assembly,
+        % evtPublish:[
+        %     {topic: selectAndExpand, channel: ButtonContainerChannel}
+        % ],
+        hasKw: rproc__pivot_table_selectAndExpand_local,
+        hasDsca: 'Suscripción a evento externo para selección de fila con datos locales',
+        hasIcon: 'tree',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_pivotgrid_rproc_pattern::deferredSelectAndExpand_persistencelocal_rql'(_, _, _, OBJ_out):-
+    newKw('busId_pivot_local', ButtonContainerBusId),
+    'staber_pivotgrid_rproc_pattern::deferredSelectAndExpand_persistencelocal_rql::pivot'(Obj_pivot),
+    obj_get( busId, Obj_pivot, PivotBusId),
+    Button = {
+        type: button,
+        label:{
+            d: 'Añade dirección a María y selectTreePath con path'
+        },
+        events:[
+            {
+                type: click,
+                targetBusId: ButtonContainerBusId,
+                method: exec,
+                p_exec:{
+                    type: sequence,
+                    hasProcess:[
+                        { type: function, in:{kwi: 'testapp_contacto_003'}, name: addNewAddressToContact, context:{ delegatedTo: builderweb}},
+                        { type: function, name: generateTreePath, context:{ delegatedTo: builderweb}},
+                        { type: method, name: selectTreePath, busId: PivotBusId}
+                        % { type: function, name: deleteSelectedTreePath, context:{ delegatedTo: builderweb}}
+                    ]
+                }
+            }
+        ]
+    },
+    Button2 = {
+        type: button,
+        label:{
+            d: 'Añade dirección a Carlos y selectTreePath sin path'
+        },
+        events:[
+            {
+                type: click,
+                targetBusId: ButtonContainerBusId,
+                method: exec,
+                p_exec:{
+                    type: sequence,
+                    hasProcess:[
+                        { type: function, in:{kwi: 'testapp_contacto_004'}, name: addNewAddressToContact, context:{ delegatedTo: builderweb}},
+                        { type: method, name: selectTreePath, busId: PivotBusId}
+                        % { type: function, name: deleteSelectedTreePath, context:{ delegatedTo: builderweb}}
+                    ]
+                }
+            }
+        ]
+    },
+    PivotAssembly = {
+        type: assembly,
+        children: [ Obj_pivot]
+    },
+    ButtonAssembly = {
+        type: assembly,
+        cols: 3,
+        children: [ Button, Button2]
+    },
+    Assembly = {
+        type: assembly,
+        cols: 2,
+        children: [ PivotAssembly, ButtonAssembly]
+    },
+    Rproc = {
+        type: rprocess,
+        do_exec: true,
+        busId: ButtonContainerBusId,
+        % hasChannel: ButtonContainerChannel,
+        gui_out: Assembly,
+        % evtPublish:[
+        %     {topic: selectAndExpand, channel: ButtonContainerChannel}
+        % ],
+        hasKw: rproc__pivot_table_selectAndExpand_localRQL,
+        hasDsca: 'Evento externo para selección de nueva fila con datos locales en rql',
+        hasIcon: 'list-add',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_pivotgrid_rproc_pattern::selectedTreePathInConfig_path'(_, _, _, OBJ_out):-
+    newKw('busId_pivot_local', ButtonContainerBusId),
+    concatConstants([ButtonContainerBusId, '__pibot'], PivotBusId),
+    concatConstants([ButtonContainerBusId, '__pibotChannel'], PivotChannel),
+    Rproc = {
+        type: rprocess,
+        do_exec: true,
+        busId: ButtonContainerBusId,
+        % hasChannel: ButtonContainerChannel,
+        gui_out: {type: function, name: 'staber_pivotgrid_rproc_pattern::selectedTreePathInconfig__gui_out', context: { delegatedTo: builderweb}},
+        % evtPublish:[
+        %     {topic: selectAndExpand, channel: ButtonContainerChannel}
+        % ],
+        in:{
+            pivotBusId: PivotBusId,
+            pivotChannel: PivotChannel,
+            selectedTreePath: 'pathFirstOnly'
+
+        },
+        hasKw: rproc__pivot_selectedTreePath_local_rql,
+        hasDsca: 'selectedTreePath in config with full path',
+        hasIcon: 'list-add',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_pivotgrid_rproc_pattern::selectedTreePathInConfig_expanded'(_, _, _, OBJ_out):-
+    newKw('busId_pivot_local', ButtonContainerBusId),
+    concatConstants([ButtonContainerBusId, '__pibot'], PivotBusId),
+    concatConstants([ButtonContainerBusId, '__pibotChannel'], PivotChannel),
+    Rproc = {
+        type: rprocess,
+        do_exec: true,
+        busId: ButtonContainerBusId,
+        % hasChannel: ButtonContainerChannel,
+        gui_out: {type: function, name: 'staber_pivotgrid_rproc_pattern::selectedTreePathInconfig__gui_out', context: { delegatedTo: builderweb}},
+        % evtPublish:[
+        %     {topic: selectAndExpand, channel: ButtonContainerChannel}
+        % ],
+        in:{
+            pivotBusId: PivotBusId,
+            pivotChannel: PivotChannel,
+            selectedTreePath: 'expandedFirstOnly'
+        },
+        hasKw: rproc__pivot_selectedTreePath_local_rql_expanded,
+        hasDsca: 'selectedTreePath in config no path',
+        hasIcon: 'list-add',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false
+    },
+    create_rprocess(_,Rproc,_,OBJ_out).
+
+'staber_pivotgrid_rproc_pattern::selectedTreePathInconfig__gui_out'(_, Obj_in, _, Obj_out):-
+'staber_pivotgrid_rproc_pattern::selectedTreePathInconfig__gui_out::pivot'(Obj_in, Obj_pivot),
+    obj_get( in:pivotBusId, Obj_in, PivotBusId),
+    obj_get( in:busId, Obj_in, ButtonContainerBusId),
+    Button = {
+        type: button,
+        label:{
+            d: 'Añade dirección a María y selectTreePath con path'
+        },
+        events:[
+            {
+                type: click,
+                targetBusId: ButtonContainerBusId,
+                method: exec,
+                p_exec:{
+                    type: sequence,
+                    hasProcess:[
+                        { type: function, in:{kwi: 'testapp_contacto_003'}, name: addNewAddressToContact, context:{ delegatedTo: builderweb}},
+                        { type: function, name: generateTreePath, context:{ delegatedTo: builderweb}},
+                        { type: method, name: selectTreePath, busId: PivotBusId},
+                        { type: method, name: merge_in, busId: ButtonContainerBusId}
+                    ]
+                }
+            }
+        ]
+    },
+    Button2 = {
+        type: button,
+        label:{
+            d: 'Añade dirección a Carlos y selectTreePath sin path'
+        },
+        events:[
+            {
+                type: click,
+                targetBusId: ButtonContainerBusId,
+                method: exec,
+                p_exec:{
+                    type: sequence,
+                    hasProcess:[
+                        { type: function, in:{kwi: 'testapp_contacto_004'}, name: addNewAddressToContact, context:{ delegatedTo: builderweb}},
+                        { type: method, name: selectTreePath, busId: PivotBusId},
+                        { type: method, name: merge_in, busId: ButtonContainerBusId}
+                    ]
+                }
+            }
+        ]
+    },
+    PivotAssembly = {
+        type: assembly,
+        children: [ Obj_pivot]
+    },
+    ButtonAssembly = {
+        type: assembly,
+        cols: 3,
+        children: [ Button, Button2]
+    },
+    Obj_out = {
+        type: assembly,
+        cols: 2,
+        children: [ PivotAssembly, ButtonAssembly]
+    }.
+
+'staber_pivotgrid_rproc_pattern::selectedTreePathInconfig__gui_out::pivot'(Obj_in, Obj_pivot):-
+    obj_get(in:pivotBusId, Obj_in, BUS_PIVOT),
+    obj_get(in:pivotChannel, Obj_in, PivotChannel),
+    obj_get(in:selectedTreePath, Obj_in, Selected, 'none'),
+    (Selected == 'pathFirstOnly' ->
+        Path = 'testapp_contacto_011/testapp:direccion__2__contacto_008'
+    ; Selected == 'expandedFirstOnly' ->
+        Path = 'testapp:direccion__2__contacto_008'
+    ; Path = Selected
+    ),
+    % newKw('channel__pivot_', PivotChannel),
+    Schema_nav =[
+        {
+            label: {
+                d: 'Calle'
+            },
+            arc: 'contactAddress:hasAddressLine',
+            enabled: false
+        },     
+        {
+            label: {
+                d: 'Ciudad'
+            },
+            arc: 'contactAddress:hasCity',
+            inputtype: 'integer',
+            enabled: false
+        }
+    ],
+
+    In_nav = {
+        hasDataset: 'Default',
+        schema: Schema_nav,
+        hasInstance: 'testapp:contact',
+        hasProperty: 'contact:hasAddress',
+        predicate: 'testapp::contacts::get_elements',
+        expanded: false,
+        selectable: true,
+        singleselection: true,
+        multiselection: false,
+        persistence: local,
+        hasClass: 'testapp:hasAddress',
+        hasKw: "*",
+        hasIDI: "*",
+        hasDsca: "*"
+    },
+    Nav = [{ hasProperty: 'contact:hasAddress', in: In_nav }],
+    In0 = {
+        hasInstance: 'testapp:contact',
+        hasClass: 'testapp:contact',
+        hasKw: "*",
+        hasIDI: "*",
+        hasDsca: "*",
+        hasAgent: 'builderweb',
+        hasDataset: 'Default',
+        hasKw: 'testapp:contact',
+        schema: [
+            {
+                label: {
+                    d: 'Nombre'
+                },
+                arc: 'contact:hasName',
+                enabled: false
+            },     
+            {
+                label: {
+                    d: 'Edad'
+                },
+                arc: 'contact:hasAge',
+                inputtype: 'integer',
+                enabled: false
+            }
+        ],
+        predicate: 'testapp::contacts::get_elements',
+        searchType: 'rem',
+        persistence: 'local',
+        selectable: true,
+        limit: 10,
+        multiselection: false,
+        singleselection: true,
+        page: 0,
+        orderByOneColumn: true,
+        pagination: true,
+        rootElement: true,
+        expanded: false,
+        schemaHeader: true,
+        resizable: true
+    },
+    (Path == 'none'->
+        In = In0
+    ;   obj_set(selectedTreePath, In0, Path, In)
+    ),
+    Obj_pivot = {
+        type: 'kpivotgrid',
+        busId: BUS_PIVOT,
+        hasChannel: PivotChannel,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                {
+                    type: 'function',
+                    name: 'rql',
+                    context: {
+                        delegatedTo: 'builderweb'
+                    }
+                }
+            ]
+        },
+        nav: Nav,
+        do_exec: true,
+        autoRows: true,
+        in: In,
+        evtPublish:[
+            {topic: setNode, channel: PivotChannel}
+        ]
+    }.
+
+
+
+addNewAddressToContact(_, Obj_in, _, Obj_out):-
+    obj_get(kwi, Obj_in, ContactInst),
+    newKw('testapp:contactAddress__', Kw_address),
+    'testapp:contactAddress' +$$ Kw_address
+        d [(es, 'Dirección falsa')]
+        p [ 'contactAddress:hasAddressLine'        ¬> string $ 'Fake street 123',
+            'contactAddress:hasPostalCode' ¬> 48300,
+            'contactAddress:hasCity'    ¬> 'Gernika',
+            'contactAddress:hasProvince'    ¬> 'testapp:province' $ 'testapp:city__bizkaia'
+    ],
+    Kwa= 'contact:hasAddress',
+    addStmt(Kwa, ContactInst, Kw_address),
+    obj_set('selectedTreePath', Obj_in, Kw_address, Obj_out).
+
+generateTreePath(_, Obj_in, _, Obj_out):-
+    obj_get('selectedTreePath', Obj_in, Elem),
+    obj_get('kwi', Obj_in, Father),
+    concatConstants([Father, '/',Elem], TreePath),
+    obj_set('selectedTreePath', Obj_in, TreePath, Obj_out).
+
+deleteSelectedTreePath(_, Obj_in, _, Obj_out):-
+    obj_delete(selectedTreePath, Obj_in, Obj_out).
+
+addAddresstoContact(_, Obj_in, _, Obj_in):-
+    obj_get(kwi, Obj_in, ContactInst),
+    obj_get(hasKw, Obj_in, AddressInst),
+    Kwa= 'contact:hasAddress',
+    setStmt(Kwa, ContactInst, AddressInst).
+    % 'contact:hasAddress' ª 0 ¬> 'testapp:contactAddress' $'testapp:direccion__1__contacto_008'.
+
+'staber_pivotgrid_rproc_pattern::rql__folders'(_, _, _, _):-
+     Title =  'Escenarios PIVOTs de Proyectos/Actividades/Tareas (RQL / BIG-DATASET)',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_rql_persistent,            
+            hasDsca: Title,            
+            hasIcon: 'folder',
+            isRoot: false, 
+            hasERCPart: [
+                rproc__4gl_pivotgrid_local,
+                rproc__4gl_pivotgrid_remote
+            ],     
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },_,_).
+
+'staber_pivotgrid_rproc_pattern::visibility__folders'(_, _, _, _):-
+     Title =  'Gestión de visibilidad de celda según contenido de la fila',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_visibility,            
+            hasDsca: Title,            
+            hasIcon: 'folder',
+            isRoot: false, 
+            hasERCPart: [
+                rproc__4gl_testappmodel_pivotgrid_raw_test,
+                rproc__4gl_testappmodel_pivotgrid_model_test
+            ],     
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },_,_).
+
+'staber_pivotgrid_rproc_pattern::externalEvent_refresh'(_, OBJ_in, _, OBJ_out) :-
+    newKw(canal__,CHANNEL_KPIVOTGRID_DEFAULT),
+    obj_get(channel, OBJ_in, CHANNEL_KPIVOTGRID, CHANNEL_KPIVOTGRID_DEFAULT),
+    newKw('bus__',BUS_PIVOT),
+    prepareQueryFromCombo(_, {value: 'testapp_contacto_001'}, _, QueryObj),
+    obj_get(value, QueryObj, Query),
+    Obj_pivot = {
+        type: 'kpivotgrid',
+        busId: BUS_PIVOT,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                {
+                    type: 'method',
+                    name: 'schemaToQuery',
+                    module: 'QueryFilterService'
+                },
+                {
+                    type: 'function',
+                    name: 'remql',
+                    context: {
+                        delegatedTo: 'builderweb'
+                    }
+                }
+            ]
+        },
+        do_exec: true,
+        autoRows: true,
+        selectable: false,
+        in: {
+            hasAgent: 'builderweb',
+            hasDataset: 'Default',
+            hasKw: 'testapp:contact',
+            query: Query,
+            schema: [
+                {
+                    label: {
+                        d: 'Nombre'
+                    },
+                    arc: 'contact:hasName',
+                    class: 'user',
+                    enabled: false
+                },     
+                {
+                    label: {
+                        d: 'Edad'
+                    },
+                    arc: 'contact:hasAge',                                        
+                    enabled: false
+                },
+                {
+                    label: {
+                        d: 'Email'
+                    },
+                    arc: 'contact:hasEmail',                                        
+                    enabled: false
+                }
+            ],
+            searchType: 'rem',
+            persistence: 'remote',
+            hasSearchKw: 'search__yc63026a9-4045-4ffc-88da-b12d633cadbf',
+            busId: 'bus__kresult_124922451692185878_result',
+            hasChannel: CHANNEL_KPIVOTGRID,
+            selectable: false,
+            enabled: true,
+            limit: 20,
+            cols: 4,
+            hasTemplate: false,
+            backButton: true,
+            layoutType: 'kpivotgrid',
+            multiselection: false,
+            page: 0,
+            inlineCount: true,
+            orderByOneColumn: true,
+            pagination: true,
+            rootElement: true,
+            expanded: false,
+            schemaHeader: true,
+            resizable: true,
+            hasIncludedProperties: [
+                'contact:hasEmail',
+                'contact:hasAge',
+                'contact:hasName',
+                'hasIcon'
+            ]
+        }
+    },
+    Obj_combo = {
+        type: combobox,
+        elements:[
+            { label: { d: 'Ana García' }, datavalue: 'testapp_contacto_001' },
+            { label: { d: 'Juan Martínez' }, datavalue: 'testapp_contacto_002' },
+            { label: { d: 'María Rodríguez' }, datavalue: 'testapp_contacto_003' },
+            { label: { d: 'Carlos López' }, datavalue: 'testapp_contacto_004' },
+            { label: { d: 'Laura Hernández' }, datavalue: 'testapp_contacto_005' }
+        ],
+        events:[{
+            type: change,
+            method: set_pv_exec,
+            targetBusId: BUS_PIVOT,
+            payload: {},
+            p_exec:{
+                type: sequence,
+                hasProcess:[
+                    { type: function, name: prepareQueryFromCombo, context:{delegatedTo: builderweb}}
+                ]
+            }
+        }]
+    },
+    OBJ_Main={
+        type:'rprocess',
+        hasKw: kpivotgrid_external_set_pv_exec,
+        hasDsca: 'Pivot con refresco externo',
+        hasIcon: 'zoom-search',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true,
+        do_exec: true,
+        gui_out: {
+            type: assembly,
+            children: [
+                {
+                    type: 'assembly',
+                    children:[Obj_combo, Obj_pivot]
+                }
+            ]
+        }
+    },
+
+    create_rprocess(_,OBJ_Main,_,OBJ_out).
+
+prepareQueryFromCombo(_, IN, _, OUT):-
+    obj_fetch( value, IN, INST, false),
+    L_inst = [INST],
+    format_to_codes( "~q", [L_inst] , Lkw),
+    codes_append( [
+            "stmt(type, HASKW, 'testapp:contact'), member(HASKW, ", Lkw, ")"
+    ], Codes),
+    atom_codes( Query, Codes),
+    OUT = {
+        property: query,
+        value: Query
+    }.
+
+% Motorized auxiliary predicates
+modifyRealHour(Obj_ctx, Obj_in, Obj_ctx, Obj_out):-
+    obj_fetch(hasKw, Obj_in, Kw),
+    obj_fetch(hasDataset, Obj_in, DS),
+
+    random( 1, 999, NewValueInt),
+
+    r_setStmt(DS, realHours, Kw, float, NewValueInt, 0),
+    Obj_out = Obj_in.
+
+externalActionAddActivity(Obj_ctx, Obj_in, Obj_ctx, Obj_out):-
+
+    obj_fetch(hasDataset, Obj_in, DS),
+    obj_fetch(hasKwc, Obj_in, Kwc),
+
+    openDatasetSafe(DS),
+
+    %% Proyecto para copiar
+    OldKw = 'ss:project_21266021702783036',
+    PropsToIgnore = [hasDsca],
+
+    call_in_dataset(DS, (
+
+        Kwc +$$ Kw
+		d [( es, 'Nuevo proyecto' ), ( en, 'New project' ) ],
+
+        applyall((
+            stmt(Prop, OldKw, Range, Value, Orda),
+            nonmember(Prop, PropsToIgnore),
+            addStmt(Prop, Kw, Range, Value, Orda)    
+        ))
+
+    )),
+    ppd(DS,Kw),
+    closeDataset(DS),
+    obj_set(hasKw, Obj_in, Kw, Obj_out).
+
+showSelected(Obj_ctx, Obj_in, Obj_ctx, Obj_out):-
+    obj_fetch(hasKw, Obj_in, KwLst),
+    length(KwLst, N),
+    wAddInfoMsgML('Aviso', 'Se han seleccionado, <b>?a{1}</b> registros', [N], {showTime:10}),
+    Obj_out = Obj_in.
+
+'staber_pivotgrid_rproc_pattern::customization_columns_simple'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    I_dataset = 'dataset__test_5gl_server',
+    
+    newKw('channel__rprocess', ChannelRprocess),
+    newKw('bus__rprocess', BusIdRprocess),
+
+    newKw('channel__table', ChannelKpivot),
+    newKw('bus__table', BusIdKpivot),
+
+    SCHEMA = [
+        {
+            label: {
+                d: 'Nombre'
+            },
+            class: 'user',
+            arc: 'contact:hasName'
+        },
+        {
+            label: {
+                d: 'Email'
+            },
+            arc: 'contact:hasEmail',
+            mandatory: true
+        },
+        {
+            label: {
+                d: 'Teléfono'
+            },
+            arc: 'contact:hasPhoneNumber'
+        },
+        {
+            label: {
+                d: 'Edad'
+            },
+            arc: 'contact:hasAge'
+        }
+    ],
+	IN_TABLE = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        schema: SCHEMA,
+        includedProperties: [
+            'contact:hasName',
+            'contact:hasEmail',
+            'contact:hasPhoneNumber',
+            'contact:hasAge'
+        ],
+        enabled: false,
+        schemaHeader: true,
+        searchType: 'rem',
+        limit: 5
+    },
+    Obj_table = {
+        type : 'kpivotgrid',
+        hasChannel: ChannelKpivot,
+        busId: BusIdKpivot,
+        proc: {
+        type: "sequence",
+        hasProcess: [
+            {
+                type: "method",
+                name: "schemaToQuery",
+                module: "QueryFilterService"
+            },
+            {
+                type: "function",
+                name: "remql",
+                context: { delegatedTo: I_agent }
+            }
+        ]
+        },
+        in : IN_TABLE,
+        hasDlg: true,
+        hasCustomization: {
+            hasCustomizationId: "my_kpivot_simple_customization",
+            showInToolbar: true,
+            refreshPivot: true,
+            columns: true
+        },
+        evtPublish: [ { topic: "customizationApplied", channel: ChannelKpivot} ]
+    },
+
+    Obj_main = {
+        type: 'assembly',
+        children: [
+            Obj_table
+        ]        
+    },
+	Obj_class = {
+        in : {},
+        type : 'rprocess',
+        busId: BusIdRprocess,
+        hasChannel: ChannelRprocess,
+        isSession: true,
+        hasDlg : true,
+        hasKw: kpivot_columns_customization_simple,
+        hasDsca: 'kpivot_columns_customization_simple_uiML',
+        hasIcon: 'grid',
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        gui_out: Obj_main  
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).   
+
+'staber_pivotgrid_rproc_pattern::externalEvents__folders'(_, _, _, _):-
+    Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_pivotgrid_external_events,
+        hasDsca: 'Eventos externos para seleccionar',
+        hasIcon: 'folder',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            % rproc__4gl_pivotgrid_expanded,
+            rproc__pivot_tree_selectAndExpand,
+            rproc__pivot_table_selectAndExpand_local,
+            % rproc__pivot_table_selectAndExpand_localRQL,
+            rproc__pivot_selectedTreePath_local_rql,
+            rproc__pivot_selectedTreePath_local_rql_expanded,
+            kpivotgrid_external_set_pv_exec
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).
+
+
+'staber_pivotgrid_rproc_pattern::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_pivotgrid_rproc,
+        hasDsca: 'kpivotgrid (Radcore)',
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            rproc__4gl_testappmodel_pivotgrid,
+            rproc__4gl_proyects_pivotgrid,
+            kpivot_columns_customization_simple,
+            folder__repositorioTests_pivotgrid_external_events,
+            folder__repositorioTests_rql_persistent,
+            folder__repositorioTests_visibility
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

@@ -1,0 +1,15 @@
+
+'kworkspace_state_machine'(O_sm):-
+    'kworkspace_state::state_init'(State_init),    
+    'kworkspace_transition::transition_init'(Transition_init),
+    O_sm = {
+        type: 'stateMachine',
+        hasKw: 'sm__kworkspace',
+        hasInitState: 'state_browser',
+        hasState:[
+            { state_browser: State_init }            
+        ],
+        hasTransition: [
+            { e_init: Transition_init }           
+        ]
+   }.

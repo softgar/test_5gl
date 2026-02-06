@@ -1,0 +1,127 @@
+﻿/**
+@descr	staber_kchat <br>
+		staber_kchat
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kchat') :-
+	class +$ 'staber_kchat' d ( es,'Patrón rproc para kchat') sc function,
+    % chat
+   %% 'staber_kchat::usecase__001'(_, _, _, _),
+    'staber_kchat::usecase__002'(_, _, _, _),
+    'staber_kchat::folders'(_, _, _, _).
+
+'staber_kchat::usecase__001'(_, _OBJ_in, _, OBJ_out) :-
+        
+    %% Generacion de contenidos fijos
+    newKw('bus_', MYBUS),
+    Title =  'Chat Proyectos I+D (repcon_IMASD_GPT)',  
+    IN =  {
+        hasService: 'ssdoc',
+        requestMethod: {
+                type : 'function',
+                name : 'assistant_execCommand',
+                context: { 
+                    delegatedTo : { logicalAgent: 'repconRAG'}}
+        },
+        executeOnTextChange: true
+    },
+
+    CHANNEL = 'channel__chat_test1',
+    OBJ_out_aux = {
+        type: 'kchat',        
+        busId: MYBUS,
+        hasChannel : CHANNEL,
+        in: IN        
+    },    
+     OBJ_out = {
+        type: 'rprocess',        
+        hasKw: kchat_test_001,
+        hasDsca: Title,
+        hasIcon: 'chat-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],        
+        gui_out: OBJ_out_aux
+        
+        
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+'staber_kchat::usecase__002'(_, _OBJ_in, _, OBJ_out) :-
+
+
+    %% Generacion de contenidos fijos
+    newKw('bus_', MYBUS),
+    Title =  'Chat Tutoriales Desarrollo (doc_md)',  
+    IN =  {
+        hasService: 'sscode',
+        requestMethod: {
+                type : 'function',
+                name : 'assistant_execCommand',
+                context: { 
+                    delegatedTo : { logicalAgent: 'repconRAG'}}
+        },
+        executeOnTextChange: true
+    },
+
+    CHANNEL = 'channel__chat_test2',
+    OBJ_out_aux = {
+        type: 'kchat',        
+        busId: MYBUS,
+        hasChannel : CHANNEL,
+        in: IN        
+    },    
+     OBJ_out = {
+        type: 'rprocess',        
+        hasKw: kchat_test_002,
+        hasDsca: Title,
+        hasIcon: 'chat-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],        
+        gui_out: OBJ_out_aux        
+        
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+'chat::execCommand'(Ctx_in, Obj_in, Ctx_out, Obj_out):-
+    %% Responder por staber_execute
+    obj_get(hasChannel, Obj_in, Channel,'channel__broadcast'),
+    obj_get(hasSessionContext:hasUser:hasDsca, Ctx_in, User, 'usuario'),
+    %% Parrafo 0    
+    concatAtoms(['Hola <b> ', User, '<b>,\n'], Msg),    
+    Obj_pub1 = [{
+        topic: 'msgShow',
+        channel: Channel,      
+        in: {message: Msg}
+    }],
+    'pubsub::publish'(Ctx_in, Obj_pub1, Ctx_out, _),
+    %% Parrafo 1    
+    Msg1 = 'Este es un ejemplo de generación de respuesta de <b> IA Generativa </b>...',
+    Obj_pub2 = [{
+        topic: 'msgShow',
+        channel: Channel,      
+        in: {message: Msg1}
+    }],
+    'pubsub::publish'(Ctx_in, Obj_pub2, Ctx_out, Obj_out).
+
+
+
+
+
+'staber_kchat::folders'(_, _, _, _):-    
+     Title =  'kchat  [Asistentes RAG]',              
+     create_rprocess(_, 
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_kchat,            
+            hasDsca: Title,            
+            hasIcon: 'chat-line',
+            isRoot: false,            
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [                                                
+                        kchat_test_002
+            ]
+    },_,_).
+
+

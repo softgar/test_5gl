@@ -1,0 +1,175 @@
+﻿/**staber_k
+@descr	staber_kapp <br>
+		staber_kapp
+@author ccp
+@date	2023_03_02
+**/
+rc_class('staber_kapp') :-
+	class +$ 'staber_kapp' d ( es,'Patrón rproc para kapp') sc function,
+    % configuración básica
+    'staber_kapp::usecase__001'(_, _, _, _),
+    'staber_kapp::usecase__002'(_, _, _, _),
+    'staber_kapp::usecase__003'(_, _, _, _),
+    'staber_kapp::folders'(_, _, _, _).
+
+'staber_kapp::usecase__001'(_, _OBJ_in, _, OBJ_out) :-
+    Title = 'kapp__001 Aplicación vacia',
+	OBJ_kapp = {
+        type : 'kapp',
+        hasKw: kapp_test_001,
+        hasDsca: Title,
+        hasIcon: 'app',
+        hasAppChannel: {
+            header: 'channel__header',
+            workspace: 'channel__workspace',
+            navbar: 'channel__navbar'
+        },
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,OBJ_kapp,_,OBJ_out).
+
+'staber_kapp::usecase__002'(_, _OBJ_in, _, OBJ_out) :-
+    Title = 'kapp__002 Aplicación con navegación por carpetas',
+     IN = {    
+        hasArea: {
+            workspace: {
+                isEmpty: true
+            }
+        }    
+    },
+	OBJ_kapp = {
+        type : 'kapp',
+        hasKw: kapp_test_002,
+        hasDsca: Title,
+        hasIcon: 'app',
+        hasAppChannel: {
+            header: 'channel__header',
+            workspace: 'channel__workspace',
+            navbar: 'channel__navbar'
+        },
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        in: IN,
+        isSession: true,
+        hasNavbar: true
+    },    
+    create_rprocess(_,OBJ_kapp,_,OBJ_out).
+
+
+'staber_kapp::usecase__003'(_, _OBJ_in, _, OBJ_out) :-
+    Title = 'kapp__001 Aplicación vacia con configuración de header y footer',
+	OBJ_kapp = {
+        type : 'kapp',
+        hasKw: kapp_test_003,
+        hasDsca: Title,
+        hasIcon: 'app',        
+        in:{
+            hasArea:{
+                header:{
+                    hasUser: 'Usuario ejemplo',
+                    imgLogo:'img/semantic-systems.png'
+
+                },
+                footer:{
+                    footerLogo: 'img/semantic-systems.png'
+                }
+            }
+        },
+        hasAppChannel: {
+            header: 'channel__header',
+            workspace: 'channel__workspace',
+            navbar: 'channel__navbar'
+        },
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: true
+    },
+    create_rprocess(_,OBJ_kapp,_,OBJ_out).
+
+'staber_kapp::folders'(_, _, _, _):-
+    Title = 'kapp Componente Aplicación',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kapp,
+        hasDsca: Title,
+        hasIcon: 'app',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            kapp_test_001,
+            kapp_test_002,
+            kapp_test_003
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).
+
+/* sacamos directamente un kmgt */
+
+'staber_kapp::show'(CTX, _,CTX,OBJ_out):-
+    I_dataset = 'dataset__test_5gl_server',
+    I_agent = 'builderweb', 
+    newKw('kmgt_test_001_', BusId),
+	IN = {
+        hasTitle: 'Contactos modelo de Tests',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp:contact',
+        hasKwc: 'testapp:contact',        
+        selectable: true,
+        hasArea: {
+            detail: {
+                hasAccessCondition: {
+                    kdetail__new: false,
+                    kdetail__delete: false
+                }, 
+                navigationFilter: 'all',
+                showAllProperties: false,
+                allowNavigation: false
+            },
+            result: {
+                includedProperties:['hasIcon','contact:hasName', 'contact:hasEmail'],
+                schema : {
+                    data: [
+                        {
+                            label: {
+                                d: 'Nombre'
+                            },
+                            class: 'user',
+                            arc: 'contact:hasName',
+                            sorted: true
+                        },
+                        {
+                            label: {
+                                d: 'Email'
+                            },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+            },
+            search: {
+                fieldsToSearchFromSchema: true
+            }
+        },
+        resizable: true
+    },
+    OBJ_elem = {
+        type: 'kmgt',
+        busId: BusId,
+        isSession: true,
+        in: IN        
+    },  
+    OBJ_in = {
+        type: 'method',
+        name: 'executeProcess',
+        busId: 'bus__explorer',
+        in: OBJ_elem
+    },
+
+    'executeInBrowser'(CTX,OBJ_in,CTX,OBJ_out).
+

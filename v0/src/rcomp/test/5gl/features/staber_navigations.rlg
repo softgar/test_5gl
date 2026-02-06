@@ -1,0 +1,1025 @@
+﻿/**staber_k
+@descr	staber_navigations <br>
+		staber_navigations
+@author ccp
+@date	2023_03_02
+**/
+rc_class('staber_navigations') :-
+	class +$ 'staber_navigations' d ( es,'Navegación entre componentes') sc function,
+    'staber_navigations::kmgtorigin'(_, _, _, _),
+    'staber_navigations::kresultorigin'(_, _, _, _),
+    'staber_navigations::kdetailorigin'(_, _, _, _),
+    'staber_navigations::fromrprocesstotag'(_, _, _, _),
+    'staber_navigations::fromrprocesstorprocess'(_, _, _, _),
+    'staber_navigations::from_rprocess_to_kmgt_tag'(_, _, _, _),
+    'staber_navigations::fromkchart'(_, _, _, _),
+    'staber_navigations::folders'(_, _, _, _).
+
+'staber_navigations::kmgtorigin'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb', 
+    newKw(bus__tab, BUS_KMGT),
+    TOOLBAR_OVERRIDES = [          
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function',
+                        name: 'staber_kmgt::rc_gui_out::buttonnav', 
+                        context: { delegatedTo: 'builderweb' } 
+                    }
+                ]
+            }
+        }         
+    ],
+	IN = {
+        hasTitle: 'Componente kmgt de origen',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_001',
+        hasKwc: 'testapp:contact'
+    },   
+    Title =  'Componente kMgt de origen',
+    OBJ_class = {
+        type: 'kmgt',      
+        busId: BUS_KMGT,      
+        in: IN,
+        hasKw: navigation_test_kmgt_origin,            
+        hasDsca: Title,            
+        hasIcon: 'layout03',
+        isRoot: false,     
+        isSession: true,
+        hasNavbar: true,
+        hasAppOverride:{
+            toolbar : TOOLBAR_OVERRIDES
+        },  
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]          
+    },
+    create_rprocess(_,OBJ_class,_,OBJ_out).
+
+'staber_navigations::kresultorigin'(_, _OBJ_in, _, OBJ_out) :-
+    I_agent = 'builderweb',
+    newKw('channel__result', CHANNEL_RESULT),  
+    newKw('channel__pivot', CHANNEL_PIVOT),  
+    newKw('bus__kresult', BUSID_RESULT),  
+    newKw('bus__kpivot', BUS_PIVOT),      
+    
+    /*Result configuration*/
+    SCHEMA = { data: [
+        {
+            label: {
+                d: 'Id. de Contacto'
+            },
+            arc: 'hasKw',
+            events: [{
+                type: 'click',
+                method: 'nav',
+                targetBusId: '$.busId',
+                payload:{
+                    hasTag :'myProfile',
+                    navOptions: {
+                        isSession: true
+                    }
+                }
+            }]
+        },
+        {
+            label: {
+                d: 'Descripción'
+            },
+            arc: 'hasDsca',
+            selectable: true,            
+            events: [{
+                type: 'click',
+                method: 'nav',
+                targetBusId: '$.busId',
+                payload:{
+                    hasTag :'myProfile',
+                    navOptions: {
+                        isSession: true
+                    }
+                }
+            }]
+        },
+        {
+            label: {
+                d: 'Nombre del contacto (template)'
+            },
+            width: '200px',
+            arc: 'contact:hasName',
+            selectable: true,
+            template: '<div>##_.contact:hasName##</div>',
+            events: [{
+                type: 'click',
+                method: 'nav',
+                targetBusId: '$.busId',
+                payload:{
+                    hasTag :'myProfile',
+                    navOptions: {
+                        isSession: true
+                    }
+                }
+            }]
+        },
+        {
+            label: {
+                d: 'Edad (control)'
+            },
+            arc: 'contact:hasAge',
+            selectable: false,
+            control: {
+                type: 'label',
+                d: '_.contact:hasAge',
+                events: [{
+                    type: 'click',
+                    method: 'nav',
+                    targetBusId: '$.busId',
+                    payload:{
+                        hasTag :'myProfile',
+                        navOptions: {
+                            isSession: true
+                        }
+                    }
+                }]
+            }
+        }       
+    ]},     
+    Row_Actions = {
+        fixed: true,
+        icon: 'nav',
+        align: 'right',
+        actions: [
+            {
+                label: {
+                    icon: 'navigate'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'nav',
+                    targetBusId: '$.busId',
+                    payload:{
+                        hasTag :'myProfile',
+                        navOptions: {
+                            isSession: true
+                        }
+                    }
+                }]
+            }
+        ]
+    },
+	IN_RESULT = {
+        hasAgent: I_agent,
+        rootElement: false,
+        hasDataset: 'Default',    
+        hasKw: 'testapp:contact',
+        schema: SCHEMA,
+        rowactions: Row_Actions,
+        hasIncludedProperties: ['hasKw', 'hasDsca', 'contact:hasName', 'contact:hasAge']
+    },
+    Title = 'Navegación desde celda en tabla de resultados kResult (en desarrollo)',
+	Obj_result = {  
+        type : 'kresult',
+        in : IN_RESULT,          
+        hasChannel: CHANNEL_RESULT,
+        busId :BUSID_RESULT       
+    },
+
+    /*Pivot configuration*/    
+    IN_PIVOT = {
+        enabled:false,
+        hasDataset: 'Default',
+        query: 'stmt( hasDsca, HASKW, _), member( HASKW,[\'testapp:contact\'])',
+        searchType: 'rql',
+        hasDsca: '*',
+        rql_before: 'staber_kmgt::ontology::get_root_classes',
+        predicate: 'staber_kmgt::ontology::get_elements',
+        expanded: false,
+        hasOntologyItems:['classes', 'properties', 'instances'],
+        hasIncludedProperties:  ['hasKw', 'hasDsca', 'hasIDI', 'type'],
+        hasClass: 'testapp:contact',
+        schemaHeader: false,
+        limit: 10,
+        case: false,
+        fullWord: '',
+        persistence: 'remote',
+        getCount: false,
+        hasConfiguration: 'noConfig',
+        schema:[
+            {
+                label: {
+                    d: 'Keyword'
+                },
+                arc: 'hasKw',
+                events: [{
+                    type: 'click',
+                    method: 'nav',
+                    targetBusId: '$.busId',
+                    payload:{
+                        hasTag :'myProfile',
+                        navOptions: {
+                            isSession: true
+                        }
+                    }
+                }]
+            },
+            {
+                label: {
+                    d: 'Descripción'
+                },
+                arc: 'hasDsca',
+                selectable: true,                  
+                events: [{
+                    type: 'click',
+                    method: 'nav',
+                    targetBusId: '$.busId',
+                    payload:{
+                        hasTag :'myProfile',
+                        navOptions: {
+                            isSession: true
+                        }
+                    }
+                }]
+            },            
+            {
+                label: {
+                    d: 'Tipo de la propiedad (control)'
+                },
+                arc: 'type',
+                selectable: false,
+                control: {
+                    type: 'label',
+                     d: '_.type',
+                    events: [{
+                        type: 'click',
+                        method: 'nav',
+                        targetBusId: '$.busId',
+                        payload:{
+                            hasTag :'myProfile',
+                            navOptions: {
+                                isSession: true
+                            }
+                        }
+                    }]
+                }
+            }        
+        ]
+    },
+    NAV = [{ hasProperty: 'children', in: IN_PIVOT}],
+    Obj_pivot = {
+        type: 'kpivotgrid',
+        enabled:false,
+        hasChannel: CHANNEL_PIVOT,
+        busId:BUS_PIVOT,
+        in: IN_PIVOT,
+        do_exec: true,
+        nav: NAV,
+        proc: {
+            type: 'sequence',
+            hasProcess: [
+                { type: 'function', name: 'rql', context: { delegatedTo: I_agent } }
+            ]
+        },
+        autoRows: true
+    },
+    Obj_out_with_kresult_kpivotgrid = {  
+        type: 'assembly',
+        id: 'assembly_kresult_kpivotgrid',      
+        children: [ 
+            {
+                type: 'assembly',
+                id: 'assembly_kresult',   
+                label: {
+                    d: 'Ejemplo de navegación en tabla de resultados (por columna y como acciones de fila)'
+                },
+                children: [
+                    Obj_result
+                ]  
+            },
+            {
+                type: 'assembly',
+                id: 'assembly_kpivot',   
+                label: {
+                    d: 'Ejemplo de navegación en arbol'
+                },
+                children: [
+                    Obj_pivot
+                ]  
+            }          
+        ]
+    },
+    Obj_class = {
+        type: 'rprocess',
+        hasKw: navigation_test_kresult_origin,
+        hasDsca: Title,
+        hasIcon: 'table',    
+        isRoot: false,
+        isSession: true,
+        hasNavbar: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_out_with_kresult_kpivotgrid
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_navigations::kdetailorigin'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('channel__detail__', CHANNEL_DETAIL),
+    newKw('bus__detail__', BUS_DETAIL),
+
+    Extra_Actions ={
+        state_noedit:[
+            {
+                type: 'es6button',
+                icon: 'navigate',
+                enabled: true,
+                classList:[
+                    'text-button'
+                ],
+                events: [{
+                    type: 'click',
+                    method: 'nav',                            
+                    targetBusId: '$.busId',
+                    payload:{
+                        hasTag :'myProfile',                               
+                        navOptions: {
+                            isSession: true
+                        }
+                    }                                                                           
+                }]
+            }
+        ]
+    },
+	IN = {        
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_001',
+        hasKwc: 'testapp:contact',
+        extraAction: Extra_Actions
+    },
+	Obj_class = {  
+        in : IN,
+        type : 'kdetail',
+        hasKw: navigation_test_kdetail_origin,
+        hasDsca: [('es', 'Navegando desde un kdetail a Mi Perfil')],
+        hasIcon: 'document',
+        hasChannel: CHANNEL_DETAIL,
+        busId: BUS_DETAIL,
+        isSession: true,
+        hasNavbar: true,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view:[permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_,Obj_class,_, OBJ_out).
+
+'staber_navigations::fromrprocesstotag'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel', CHANNEL_PROCESS),
+    newKw('bus__execprocess__', BUS_PROCESS),
+    Title = 'Navegaciones a assemblies y mantenimientos',
+    'staber_navigations::tag_machines'(L_machines),
+    Obj_proc = {
+        type: 'rprocess',
+        hasKw: navigation_test_rproc_origin,
+        hasDsca: Title,
+        isSession: true,
+        hasNavbar: true,
+        hasChannel: CHANNEL_PROCESS,
+        busId: BUS_PROCESS,
+        hasIcon: 'navigate',
+        in: {
+            hasTag : 'screenorigin'
+        },
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],                
+        hasAvailableStateMachine: L_machines
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_navigations::fromrprocesstorprocess'(_, _OBJ_in, _, OBJ_out) :-
+    % newKw('channel', CHANNEL_PROCESS),
+    % newKw('bus__execprocess__', BUS_PROCESS),
+    Title = 'Navegaciones a rprocess',
+    'staber_navigations::tag_machines'(L_machines),
+    Obj_proc = {
+        type: 'rprocess',
+        hasKw: navigation_test_rproc_to_rproc,
+        hasDsca: Title,
+        isSession: true,
+        hasNavbar: true,
+        hasChannel: 'channel_rproc_initial_001',
+        busId: 'busid_rproc_initial_001',
+        hasIcon: 'navigate',
+        in: {
+            hasTag : 'screenrprocess'
+        },
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],                
+        hasAvailableStateMachine: L_machines
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_navigations::fromkchart'(_, _OBJ_in, _, OBJ_out) :-
+    Title = 'Navegando desde un kchart (en desarrollo)',           
+    newKw('bus_', MYBUS),
+    I_dataset = 'dataset__oOrder_test',
+    I_agent = 'builderweb',     
+    OBJ_schema = [                   
+        {
+            label: {
+                d: 'Dsca Cliente'
+            },
+            path: '_.order_hasCustomer.hasDsca',
+            arc: 'hasDsca'                    
+        },                                                                         
+        {
+            label: {
+                d: 'KW Cliente'
+            },            
+            path: '_.order_hasCustomer.hasKw',
+            arc: 'hasKw'
+        }
+	],
+    Dimensions = [
+        {arc: 'hasDsca'},    
+        {arc: 'hasKw'}
+    ],
+    Ticks = {
+        hasLabel: 'hasDsca',
+        hasDataValue: 'hasKw'
+    },
+    Metrics = {
+        arc: 'hasKw',
+        aggregate: 'count',        
+        ascending: false
+    },   
+    IN = {
+        searchType: 'rem',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'oOrder',
+        limit: 0,
+        hasIncludedProperties: ['order_hasCustomer', 'hasDsca'],
+        hasNavigableProperties: ['order_hasCustomer'],
+        query: 'stmt(isRoot, HASKW, true), stmt(order_hasCustomer, HASKW, CUSTOMER)',
+        hasDimension: Dimensions,
+        hasMetric: Metrics,
+        hasTick : Ticks,
+        schema: OBJ_schema,
+        hasLayout: 'donut',
+        options: {
+            rowLimit: 10
+        }
+    },            
+    Obj_class = {
+        type: 'kchart',        
+        hasKw: navigation_test_kchart_origin,
+        hasDsca: Title,
+        hasIcon: 'chart-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        busId: MYBUS,
+        in: IN,
+        evtPublish: [{
+            topic:'setNode', channel: 'channel_kchart_test_002'
+        }]  
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+
+
+'staber_navigations::tag_machines'(L_machines):-
+    'staber_navigations::screenorigin'(ScreenOrigin),
+    'staber_navigations::screendestiny'(ScreenDestiny),
+    'staber_navigations::mymaintenance'({ hasNavbar: false, isSession: false }, MyMaintenance),
+    'staber_navigations::myrprocess'(ScreenRprocess),
+
+    L_machines = [
+        { hasKw: 'screenorigin_000', hasDsca: 'Mi pantalla de origen', hasTag: 'screenorigin', hasControl: ScreenOrigin },
+        { hasKw: 'screendestiny_000', hasDsca: 'Mi pantalla de destino', hasTag: 'screendestiny', hasControl: ScreenDestiny },
+        { hasKw: 'maintenance_000', hasDsca: 'Mi componente de mantenimiento', hasTag: 'mymaintenance', hasControl: MyMaintenance },
+        { hasKw: 'screenrprocess_000', hasDsca: 'Mi pantalla rprocess', hasTag: 'screenrprocess', hasControl: ScreenRprocess }
+    ].
+
+
+
+'staber_navigations::screenorigin'(Obj_out) :-
+
+    Obj_out = {           
+        type: 'assembly',
+        label: {
+            d: 'Pantalla Origen',
+            icon: '$.in.hasTag'
+        },
+        block: true,
+        cols: 2,     
+        children: [
+            {
+                type: 'text',
+                label: {
+                    d: 'Elemento 1'
+                }
+            },           
+            {
+                type: 'assembly',
+                classList: [
+                    'toolButtonBar'
+                ],
+                id: 'buttons_assembly',
+                children: [
+                    {
+                        type: 'button',
+                        label: {
+                            d: 'Navegar pantalla destino'
+                        },
+                        events: [{
+                            type: 'click',
+                            method: 'nav',                            
+                            targetBusId: '$.busId',
+                            payload:{
+                                hasTag :'screendestiny',                               
+                                navOptions: {
+                                    navbar: 'reset'
+                                }
+                            }                                                                           
+                        }]
+                    },
+                    {
+                        type: 'button',
+                        label: {
+                            d: 'Navegar componente de mantenimiento'
+                        },
+                        events: [{
+                            type: 'click',
+                            method: 'nav',                            
+                            targetBusId: '$.busId',
+                            payload:{
+                                hasTag :'mymaintenance', 
+                                hasDsca: 'Mi Mantenimiento',
+                                hasIcon: 'folder',                               
+                                navOptions: {
+                                    navbar: 'add'
+                                }
+                            }                                                                           
+                        }]
+                    },
+                    {
+                        type: 'button',
+                        label: {
+                            d: 'Contactos'
+                        },
+                        events: [{
+                            type: 'click',
+                            method: 'nav',                            
+                            targetBusId: '$.busId',
+                            payload:{                                
+                                hasTag :'contactMgt', 
+                                hasDsca: 'Mantenimiento Contactos',
+                                hasIcon: 'user',                                                               
+                                navOptions: {
+                                    isSession: true
+                                }
+                            }                                                                           
+                        }]
+                    },
+                    {
+                        type: 'button',
+                        label: {
+                            d: 'Navegar Mi Perfil'
+                        },
+                        events: [{
+                            type: 'click',
+                            method: 'nav',                            
+                            targetBusId: '$.busId',
+                            payload:{
+                                hasTag :'myProfile',
+                                hasDsca: 'Mi Perfil',
+                                hasIcon: 'user',                               
+                                navOptions: {
+                                    isSession: true
+                                }
+                            }                                                                           
+                        }]
+                    },
+                    {
+                        type: 'button',
+                        label: {
+                            d: 'Quitar Mi Perfil'
+                        },
+                        events: [{
+                            type: 'click',
+                            method: 'log',                            
+                            targetBusId: '$.busId',
+                            p_exec: {
+                                type: 'sequence',
+                                hasProcess: [            
+                                    { type: 'method', name: 'publish', module: 'PubSub', 
+                                        in: { publish:[
+                                                { topic: 'close', channel: 'channel__broadcast', hasTag:'myProFile', hasKw: 'session__profile'}
+                                            ]
+                                        }                        
+                                    }                   
+                                ]
+                            }                            
+                        }]
+                    }
+                ]
+            }
+        ]
+    }.
+
+'staber_navigations::screendestiny'(Obj_out) :-    
+    Obj_out = {           
+        type: 'assembly',
+        label: {
+            d: 'Pantalla Destino',
+            icon: '$.in.hasTag'
+        },
+        block: true,
+        cols: 2,     
+        children: [
+            {
+                type: 'text',
+                label: {
+                    d: 'Elemento 1'
+                }
+            },            
+            {
+                type: 'assembly',
+                classList: [
+                    'toolButtonBar'
+                ],
+                id: 'buttons_assembly',
+                children: [                   
+                    {
+                        type: 'button',
+                        label: {
+                            d: 'Navegar anterior pantalla'
+                        },
+                        events: [{
+                            type: 'click',
+                            method: 'nav',                            
+                            targetBusId: '$.busId',
+                            payload:{
+                                hasTag :'screenorigin',                               
+                                navOptions: {
+                                    navbar: 'reset'
+                                }
+                            }                                                                           
+                        }]
+                    }
+                ]
+            }
+        ]
+    }.
+
+
+
+'staber_navigations::mymaintenance'(Obj_in, Obj_out) :-
+    obj_get(isSession, Obj_in, Session, true),
+    obj_get(hasNavbar, Obj_in, Navbar, true),
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+    newKw('kmgt_test_000_', BusId),
+
+    IN = {
+        hasTitle: 'Contactos modelo de Tests',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKwc: 'testapp:contact',
+        selectable: true,
+        collapsible: { floating: true },
+        hasArea: {
+            detail: {
+                navigationFilter: 'all',
+                showAllProperties: false,
+                stylesVars:{ cols: 2, width: '75%' }
+            },
+            result: {
+                includedProperties:['hasIcon','contact:hasName', 'contact:hasEmail'],
+                schema: {
+                    data: [
+                        {
+                            label: { d: 'Nombre' },
+                            arc: 'contact:hasName',
+                            class: 'user',
+                            sorted: true
+                        },
+                        {
+                            label: { d: 'Email' },
+                            arc: 'contact:hasEmail'
+                        }
+                    ]
+                }
+            },
+            search: { fieldsToSearchFromSchema: true }
+        }
+    },
+
+    Title =  'Mantenimiento de Contactos',
+    newKw('kmgt__test', KW),
+
+    Obj_out = {
+        type: 'kmgt',
+        busId: BusId,
+        in: IN,
+        hasKw: KW,
+        hasDsca: Title,
+        hasIcon: 'document',
+        isRoot: false,
+        isSession: Session,
+        hasNavbar: Navbar
+    },
+    create_rprocess(_,Obj_out,_,_).
+
+
+
+'staber_navigations::myrprocess'(Obj_out) :-
+    Obj_out_with_assembly = {
+        type: 'sequence',
+        context: { delegatedTo: 'builderweb' },
+        hasProcess: [
+            {
+                type: 'function',
+                name: 'staber_navigations::get_guiout_from_sequence',
+                context: { delegatedTo: 'builderweb' }
+            }
+        ]
+    },
+
+    Obj_process = {
+        type: 'rprocess',
+        hasKw: navigation_test_myrprocess,
+        hasDsca: 'Titualo del rprocess ccp',
+        hasIcon: 'table',
+        isRoot: false,
+        isSession: false,
+        hasNavbar: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_out_with_assembly
+    },
+
+    create_rprocess(_, Obj_process, _, _),
+
+    Obj_out = {
+        type: 'assembly',
+        children: [Obj_process]
+    }.
+
+
+
+'staber_kmgt::rc_gui_out::buttonnav'(Ctx_in, _Obj_in, Ctx_in, Obj_out):-
+    Obj_out = {
+        type: 'assembly',
+        id: 'buttons_assembly',
+        children: [
+            {
+                type: 'button',                
+                label: {
+                    icon: 'navigate'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'nav',                            
+                    targetBusId: '$.busId',
+                    payload:{
+                        hasTag :'myProfile',
+                        hasDsca: 'Mi Perfil',
+                        hasIcon: 'user',                               
+                        navOptions: {                            
+                            isSession: true
+                        }
+                    }                                                                           
+                }]
+            }                                           
+        ]
+    }.
+
+
+'staber_navigations::from_rprocess_to_kmgt_tag'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel', CHANNEL_PROCESS),
+    newKw('bus', BUS_PROCESS),
+
+    'staber_navigations::kmgt_tag_machines'(L_machines),
+
+    Obj_proc = {
+        type: 'rprocess',
+        hasKw: navigation_test_rproc_kmgt,
+        hasDsca: 'Navegando desde un rprocess a un control de tipo kmgt',
+        hasChannel: CHANNEL_PROCESS,
+        busId: BUS_PROCESS,
+        hasIcon: 'navigate',
+        in: {
+            hasTag : 'screenKmgt_001'
+        },
+        hasAvailableStateMachine: L_machines
+    },
+
+    create_rprocess(_, Obj_proc, _, OBJ_out).
+
+
+'staber_navigations::kmgt_tag_machines'(L_machines) :-
+    'staber_navigations::screenkmgt_1'(ScreenKmgt_1),
+    'staber_navigations::screenkmgt_2'(ScreenKmgt_2),
+
+    L_machines = [
+        { hasKw: 'screenKmgt_001', hasDsca: 'Pantalla Kmgt 1', hasTag: 'screenKmgt_001', hasControl: ScreenKmgt_1 },
+        { hasKw: 'screenKmgt_002', hasDsca: 'Pantalla Kmgt 2', hasTag: 'screenKmgt_002', hasControl: ScreenKmgt_2 }
+    ].
+
+
+'staber_navigations::screenkmgt_1'(Obj_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+
+    IN = {
+        hasTitle: 'Componente kmgt 1',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_001',
+        hasKwc: 'testapp:contact'
+    },
+
+    newKw('bus', BUS_KMGT),
+
+    TOOLBAR_OVERRIDES = [
+        {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    {
+                        type: 'function',
+                        in: {
+                            hasTag: 'screenKmgt_002',
+                            hasText: 'Ir a ventana 2'
+                        },
+                        name: 'staber_kmgt::rc_gui_out::buttonnavtoScreen',
+                        context: { delegatedTo: 'builderweb' }
+                    }
+                ]
+            }
+        }
+    ],
+
+    Obj_data = {
+        type: 'kmgt',
+        do_exec: true,
+        busId: BUS_KMGT,
+        in: IN,
+        hasAppOverride:{
+            toolbar : TOOLBAR_OVERRIDES
+        }
+    },
+
+    Obj_out = {
+        type: 'assembly',
+        children: [ Obj_data ]
+    }.
+
+
+'staber_navigations::screenkmgt_2'(Obj_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',
+
+    IN = {
+        hasTitle: 'Componente kmgt 2',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'testapp_contacto_002',
+        hasKwc: 'testapp:contact'
+    },
+
+    newKw('bus', BUS_KMGT),
+
+    TOOLBAR_OVERRIDES = [
+        {
+            type: 'getUIControls',
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    {
+                        type: 'function',
+                        in: {
+                            hasTag: 'screenKmgt_001',
+                            hasText: 'Volver a ventana 1'
+                        },
+                        name: 'staber_kmgt::rc_gui_out::buttonnavtoScreen',
+                        context: { delegatedTo: 'builderweb' }
+                    }
+                ]
+            }
+        }
+    ],
+
+    Obj_data = {
+        type: 'kmgt',
+        busId: BUS_KMGT,
+        do_exec: true,
+        in: IN,
+        hasAppOverride:{
+            toolbar : TOOLBAR_OVERRIDES
+        }
+    },
+
+    Obj_out = {
+        type: 'assembly',
+        children: [ Obj_data ]
+    }.
+
+
+'staber_kmgt::rc_gui_out::buttonnavtoScreen'(Obj_ctx, Obj_in, Obj_ctx, Obj_out):-
+    obj_fetch(hasTag, Obj_in, Tag),
+    obj_fetch(hasText, Obj_in, Text),
+
+    Obj_out = {
+        type: 'assembly',
+        children: [
+            {
+                type: 'button',
+                label: {
+                    d: Text,
+                    icon: 'navigate'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'nav',
+                    targetBusId: '$.busId',
+                    payload:{
+                        hasTag :Tag,
+                        navOptions: {
+                            navbar: 'add'
+                        }
+                    }
+                }]
+            }
+        ]
+    }.
+
+'staber_navigations::get_guiout_from_sequence'(Obj_ctx, _Obj_in, Obj_ctx, Obj_out):-
+    % Obj_button_with_nav = {  
+    Obj_out = {  
+        type: 'assembly',
+        id: 'assembly_kresult_kpivotgrid',
+        children: [
+            {
+                type: 'button',
+                label: {
+                    d: 'Navegar pantalla destino'
+                },
+                events: [{
+                    type: 'click',
+                    method: 'nav',                            
+                    targetBusId: 'busid_rproc_initial_001',
+                    payload:{
+                        hasTag :'screendestiny',                               
+                        navOptions: {
+                            navbar: 'add'
+                        }
+                    }                                                                           
+                }]
+            }
+        ]
+    }.
+    % Obj_out = {
+    %     type: 'rprocess',
+    %     busId: 'busId_navigation_test_myrprocess',
+    %     hasChannel: 'channel_navigation_test_myrprocess',
+    %     hasKw: navigation_get_guiout_from_sequence,
+    %     hasDsca: 'navigation_test_myrprocess',
+    %     hasIcon: 'table',    
+    %     isRoot: false,
+    %     isSession: false,
+    %     hasNavbar: false,
+    %     security_edit: [permissionProfile__repositorioTests_KRP],
+    %     security_view: [permissionProfile__repositorioTests_KRP],
+    %     gui_out: Obj_button_with_nav
+    % },
+    % create_rprocess(_,Obj_out,_,_).
+
+'staber_navigations::folders'(_, _, _, _):-
+    Title = 'Navegación entre componentes',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_navigation,
+        hasDsca: Title,
+        hasIcon: 'navigate',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            navigation_test_rproc_origin,
+            navigation_test_rproc_to_rproc,
+            navigation_test_rproc_kmgt,
+            navigation_test_kdetail_origin,           
+            navigation_test_kmgt_origin,
+            navigation_test_kresult_origin
+            % TODO, revisar ejemplo
+            % navigation_test_kchart_origin
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

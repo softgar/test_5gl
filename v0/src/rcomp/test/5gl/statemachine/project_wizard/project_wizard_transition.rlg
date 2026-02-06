@@ -1,0 +1,74 @@
+﻿
+/* Estados de la mÃ¡quina */
+'project_wizard_transition::transition_init'(Transition):-
+    Transition = {
+        type: 'transition',
+        stateTo: 'state_init'
+
+    }.
+
+'project_wizard_transition::transition_start'(Transition):-
+    Transition = {
+        type: 'transition',
+        stateTo: 'state_step1',
+        proc: {
+            type: 'sequence',
+            payload: {
+                hasKwc: '$.hasKwc',
+                hasKw: '$.hasKw',
+                hasDataset: '$.hasDataset',
+                applyRules: '$.in.applyRules'
+            },
+            hasProcess: [              
+                { type: 'function', name: 'new_instance_wizard', context: {delegatedTo: '$.hasAgent'}}
+            ]
+        }
+    }.
+
+
+'project_wizard_transition::transition_step1'(Transition):-
+    Transition = {
+        type: 'transition',
+        stateTo: 'state_step1'
+    }.
+
+'project_wizard_transition::transition_step2'(Transition):-
+    Transition= {
+        type: 'transition',
+        stateTo: 'state_step2'
+    }.
+
+
+'project_wizard_transition::transition_finish'(Transition):-
+    Transition = {
+        type: 'transition',
+        stateTo: 'state_finish'
+    }.
+
+
+'company::get5gl_schema_instances'(_CTX, _OBJ_in, _CTX, OBJ_out):-
+    'class::get5gl_schema_instances'(_CTX, _OBJ_in, _CTX, OBJ_out).
+
+new_instance_wizard(_, Obj_in,  _, Obj_in):-
+    obj_ppd(Obj_in),
+    obj_get(hasKwc, Obj_in, KWC),
+    obj_get(hasKw, Obj_in, KW),
+    getTimeInMillis(NOW),
+        KWC *$$ KW d[(es,'Nuevo proyecto')] 
+            p [ 'ss:revisionDate' ¬> date $ NOW ,
+            proj_hasCustomer   ¬> company
+          ].
+
+
+updStmt_wizard(_,Obj_in, _, Obj_out):-
+    obj_ppd(Obj_in),
+    obj_get(from, Obj_in, From),
+    obj_get(arc, Obj_in, Arc),
+    obj_get(cto, Obj_in, Cto),
+    obj_get(to, Obj_in, To),
+    obj_get(orda, Obj_in, Orda),
+    upd_stmt_event_rules( Arc, From, Cto, To, Orda),
+    Obj_out = Obj_in.
+
+
+

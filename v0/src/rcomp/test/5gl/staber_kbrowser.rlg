@@ -1,0 +1,855 @@
+﻿/**
+@descr	staber_kbrowser <br>
+		staber_kbrowser
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kbrowser') :-
+	class +$ 'staber_kbrowser' d ( es,'Patrón rproc para kbrowser') sc function,
+    % configuración con servicio de directorio
+    'staber_kbrowser::usecase__000'(_, _, _, _),
+    'staber_kbrowser::usecase__001'(_, _, _, _),
+    'staber_kbrowser::usecase__002'(_, _, _, _),
+    'staber_kbrowser::usecase__003'(_, _, _, _),
+    'staber_kbrowser::usecase__004'(_, _, _, _),
+    'staber_kbrowser::folders'(_, _, _, _).
+
+'staber_kbrowser::usecase__000'(_, _, _, _):-
+    newKw('bus_', MYBUS),
+    'staber_kbrowser::contents_000'(Result),
+    IN = {
+        fixedHeight: false,
+        layout: 'grid'
+    },
+    Title =  'Cuadro de mando',
+    OBJ_out_aux = {
+        type: assembly,
+        children: [
+            {
+                type: 'kbrowser',
+                busId: MYBUS,
+                in: IN,
+                out: Result,
+                %% Se permite la publicación en una canal broadcast
+                evtPublish: [{topic: 'addNode', channel: 'channel__browser'}]
+            }
+        ]
+    },
+     OBJ_out = {
+        type: 'rprocess',        
+        hasKw: kbrowser_test_000,
+        hasDsca: Title,
+        hasIcon: 'chart-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest],
+        gui_out: OBJ_out_aux
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+'clean_elements_for_showing_in_explorer'(OBJ_IN, OBJ_OUT):-
+    % stringML hasDsca comes in a format not compatible with json and causes problems in staber calls' return object, and is unnecessary at this point.
+    obj_delete(hasDsca, OBJ_IN, OBJ_OUT0),
+    % These elements are showing within a kbrowser and should not have these parameters as true to avoid appearing in the session tab.
+    obj_set(isSession, OBJ_OUT0, false, OBJ_OUT1),
+    obj_set(hasNavbar, OBJ_OUT1, false, OBJ_OUT).
+
+'staber_kbrowser::contents_000'(Lresults):-
+    'staber_kchart::contact_age_bar'(_, _, _, OBJ_out_chart0),
+    'clean_elements_for_showing_in_explorer'(OBJ_out_chart0, OBJ_out_chart),
+    Title1 =  'Distribución de Edades',
+    Obj_chart1 = {
+        type: assembly,
+        label:{
+            d:Title1
+        },
+        children:[OBJ_out_chart]
+    },
+    Obj_graph =  {    
+        type: 'rprocess',
+        size: {
+            rows: 2
+        },
+        execConfig: true,
+        hasKw: folder__content__000_1,
+        busId: busId__folder__content__000_1,
+        gui_out:Obj_chart1
+    },
+    Title2 =  'Datos de Contactos',
+    'staber_kresult_pivotgrid::usecase__000'(_, _OBJ_in, _, OBJ_result0),
+    'clean_elements_for_showing_in_explorer'(OBJ_result0, OBJ_result),
+    Obj_table = {
+        type: 'rprocess',
+        size: {
+            cols: 2,
+            rows: 2
+        },
+        hasKw: folder__content__000_2,
+        busId: busId__folder__content__000_2,
+        execConfig: true,
+        gui_out: {
+            type: assembly,
+            label:{
+                d:Title2,
+                icon:'list'
+            },
+            children:[
+                OBJ_result
+            ]
+        }         
+    },
+    Lresults = {resultset: [Obj_table,Obj_graph]}.
+
+% Contenidos- Ejemplo libre
+'staber_kbrowser::usecase__001'(_, _OBJ_in, _, OBJ_out) :-
+    I_dataset = 'Default',
+    I_agent = 'builderweb',     
+    %% Generacion de contenidos fijos
+    
+    newKw('bus_', MYBUS),
+    'staber_kbrowser::contents_001'(Result, I_agent, MYBUS),
+    IN = { 
+        fixedHeight: false,
+        hasBackgroundImage: '/testapp/img/manual/wallpaper-repcon.jpg',    
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: Result
+    },       
+
+    Title =  'Cajas de servicio de directorio personalizados',
+    OBJ_out = {
+        type: 'kbrowser',                    
+        in: IN,
+        busId: MYBUS,           
+        hasKw: kbrowser_test_001,            
+        hasDsca: Title,
+        hasIcon: 'folder-open',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],     
+        proc: {
+			type:'sequence',
+			hasProcess:[
+				{ type: 'method', name: 'getContextInfo', module: 'SessionContext'},
+				{ type: 'function', name: 'execute_security_search', context: { delegatedTo: I_agent } }
+			]
+		},
+        %% Se permite la publicación en una canal broadcast
+        evtPublish: [{topic: 'addNode', channel: 'channel__browser'}],
+        hasNavbar: true
+    },    
+    create_rprocess(_,OBJ_out,_,_).
+
+
+% Contenidos- Configurador
+'staber_kbrowser::usecase__002'(_, _OBJ_in, _, OBJ_out) :-
+        
+    %% Generacion de contenidos fijos
+    newKw('bus_', MYBUS),
+    % 'staber_kbrowser::contents_002'(Result, MYBUS),
+    IN = { 
+        fixedHeight: false,
+        hasBackgroundImage: '/testapp/img/manual/background_mueble.jpg'
+    },
+    Title =  'Cajas personalizadas sin servicio de directorio',
+    OBJ_out = {
+        type: 'kbrowser',
+        busId: MYBUS,
+        in: IN,
+        % out: Result,
+        hasKw: kbrowser_test_002,
+        hasDsca: Title,
+        hasIcon: 'app',
+        proc: {type: function, name:'staber_kbrowser::contents_002', context: {delegatedTo:builderweb}},
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+         %% Se permite la publicación en una canal broadcast
+        evtPublish: [{topic: 'addNode', channel: 'channel__browser'}],
+        hasNavbar: true
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+% Contenidos- Configurador
+'staber_kbrowser::usecase__003'(_, _OBJ_in, _, OBJ_out) :-
+        
+    %% Generacion de contenidos fijos
+    newKw('bus_', MYBUS),
+    'staber_kbrowser::contents_003'(Result, MYBUS),
+    IN = { 
+        fixedHeight: false,
+        layout: 'grid'
+    },       
+    Title =  'Ejemplo Cuadro de Mando (DashBoard)',             
+    OBJ_out_aux = {
+        type: 'kbrowser',                    
+        busId: MYBUS,
+        in: IN,                   
+        out: Result,       
+         %% Se permite la publicación en una canal broadcast
+        evtPublish: [{topic: 'addNode', channel: 'channel__browser'}]        
+    },    
+     OBJ_out = {
+        type: 'rprocess',        
+        hasKw: kbrowser_test_003,
+        hasDsca: Title,
+        hasIcon: 'chart-line',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: OBJ_out_aux
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+'staber_kbrowser::usecase__004'(_, _OBJ_in, _, OBJ_out) :-
+        
+    %% Generacion de contenidos fijos usando rprocess
+    newKw('bus_', MYBUS),
+    'staber_kbrowser::contents_004'(Result, MYBUS),
+    IN = { 
+        fixedHeight: false,
+        layout: 'grid'
+    },       
+    Title =  'Ejemplo Cuadro de Mando (DashBoard) con rprocess',             
+    OBJ_out_aux = {
+        type: 'kbrowser',                    
+        busId: MYBUS,
+        in: IN,                   
+        out: Result,       
+         %% Se permite la publicación en una canal broadcast
+        evtPublish: [{topic: 'addNode', channel: 'channel__browser'}]        
+    },    
+     OBJ_out = {
+        type: 'rprocess',        
+        hasKw: kbrowser_test_004,
+        hasDsca: Title,
+        hasIcon: 'reports',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: OBJ_out_aux
+    },
+    create_rprocess(_,OBJ_out,_,_).
+
+'staber_kbrowser::folders'(_, _, _, _):-    
+     Title =  'kbrowser  [Navegación por contenidos]',              
+     create_rprocess(_, 
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_kbrowser,            
+            hasDsca: Title,            
+            hasIcon: 'folder-line',
+            isRoot: false,            
+            security_edit: [permissionProfile__repositorioTests_KRP],
+            security_view: [permissionProfile__repositorioTests_KRP],
+            hasERCPart: [
+                        kbrowser_test_001,
+                        kbrowser_test_002,
+                        kbrowser_test_003,
+                        kbrowser_test_004
+            ]
+    },_,_).
+
+% Tipos de contenido soportados
+'staber_kbrowser::contents_001'(Result, I_agent, _BusId):-
+    % Cajas con imagen
+     Title11 =  'Lovre por dentro',     
+     Obj_content11 = {
+            type: 'krp:folder',
+            hasKw: folder__content__0011,            
+            hasDsca: Title11,            
+            hasImage: '/testapp/img/manual/louvre_inside.jpg',
+            isRoot: false,                                  
+            security_edit: [permissionProfile__repositorioTests_KRP], 
+            security_view: [permissionProfile__repositorioTests_KRP]
+     },
+     create_rprocess(_,Obj_content11,_,_),
+     Title1 =  'Contenido con Imagen',     
+     Obj_content1 = {
+            type: 'krp:folder',
+            hasKw: folder__content__001,            
+            hasDsca: Title1,            
+            hasImage: '/testapp/img/manual/louvre.jpg',
+            isRoot: false,
+            hasERCPart: [
+                   folder__content__0011
+            ],                        
+            security_edit: [permissionProfile__repositorioTests_KRP], 
+            security_view: [permissionProfile__repositorioTests_KRP],
+            isSession: false,
+            hasNavbar: false
+    },    
+    create_rprocess(_,Obj_content1,_,_),
+    Title2 =  'Contenido con subtítulo, Imagen y acciones',
+    newKw('content2_busId_',BUS2),
+    Subtitle2 =  '04/05/2023',
+     Obj_content2 = {
+            type: 'krp:folder',
+            busId: BUS2,
+            hasKw: folder__content__002,            
+            hasDsca: Title2,
+            hasDscaIcon: '/testapp/img/manual/attention.png',
+            hasCaption:  Subtitle2,            
+            hasImage: '/testapp/img/manual/lake.jpg',            
+            hasActions:[
+                {
+                    'label': {
+                        'icon': 'share2',
+                        'events':[
+                            {
+                                type: click,
+                                method: log,
+                                targetBusId: BUS2
+                            }
+                        ]
+                    }
+                }
+            ],
+            isRoot: false,            
+            security_edit: [permissionProfile__repositorioTests_KRP], 
+            security_view: [permissionProfile__repositorioTests_KRP],
+            isSession: false,
+            hasNavbar: false
+     },
+    create_rprocess(_,Obj_content2,_,_),
+    Title3 =  'Contenido Sólo Icono y label',         
+     Obj_content3 = {
+            type: 'krp:folder',
+            hasKw: folder__content__003,
+            hasDsca: Title3,
+            hasDscaIcon: '/testapp/img/manual/default_female.png',
+            isRoot: false,
+            security_edit: [permissionProfile__repositorioTests_KRP], 
+            security_view: [permissionProfile__repositorioTests_KRP],
+            isSession: false,
+            hasNavbar: false
+     },
+    create_rprocess(_,Obj_content3,_,_),
+     Title4 =  'Contenido Con botones',         
+     Obj_content4 = {
+            type: 'krp:folder',
+            hasKw: folder__content__004,            
+            hasDsca: Title4,
+            hasDscaIcon: '/testapp/img/manual/default_female.png',
+            isRoot: false,          
+            hasFooter: [
+                {
+                    'type': 'button',
+                    'class': 'grey-bg',
+                    'label': {
+                    'd': 'Compilar',
+                    'events': [
+                        {
+                        'type': 'click'
+                        }
+                    ]
+                    }
+                },
+                {
+                'type': 'button',
+                'class': 'grey-bg',
+                'label': {
+                    'd': 'Reiniciar',
+                    'events': [
+                    {
+                        'type': 'click'
+                    }
+                    ]
+                }
+                }  
+            ],
+            security_edit: [permissionProfile__repositorioTests_KRP], 
+            security_view: [permissionProfile__repositorioTests_KRP],
+            isSession: false,
+            hasNavbar: false
+     },     
+     create_rprocess(_,Obj_content4,_,_),
+      Title5 =  'Contenido Con componentes hijo',         
+     Obj_content5 = {
+            type: 'krp:folder',
+            hasKw: folder__content__005,            
+            hasDsca: Title5,
+            hasDscaIcon: '/testapp/img/manual/default_male.png',
+            isRoot: false, 
+            hasCaption: 'Subtítulo de la caja',    
+            children: [{
+                'type': 'label',
+                'd': 'Texto libre que podemos indicar como abstract de información y donde se puede meter cualquier control'  
+            }],
+            hasActions : [
+                {
+                    'label': {
+                        'text': 'Compartir',
+                        'icon': 'share2',
+                        'events': [
+                            {
+                                'type': 'click'
+                            } 
+                        ]
+                    }
+                },
+                {
+                     'label': {
+                        'd': 'Enviar por correo',
+                        'icon': 'email'
+                    }
+                }
+            ],
+            hasFooter: [
+                {
+                    'type': 'button', 
+                    appearance: 'flat',
+                    'label': {
+                        'd': 'Buscar',
+                        icon: 'search'
+                    }
+                }
+            ],
+            security_edit: [permissionProfile__repositorioTests_KRP], 
+            security_view: [permissionProfile__repositorioTests_KRP],
+            isSession: false,
+            hasNavbar: false
+     },
+     create_rprocess(_,Obj_content5,_,_),
+     Title6 =  'Contenido Con componentes Hijo2',         
+     Obj_content6 = {
+            type: 'krp:folder',
+            hasKw: folder__content__006,            
+            hasDsca: Title6,
+            hasDscaIcon: '/testapp/img/manual/default_male.png',
+            isRoot: false,          
+            hasFooter: [
+                    {
+                        'type': 'button',                    
+                        'label': {
+                            'd': 'Salir de Tofu',
+                            'events': [
+                                {
+                                'type': 'click'
+                                }
+                            ]
+                        }
+                    }
+            ],
+            children: [
+                {
+                    type: 'label',
+                    d: 'Ya estás tardando en montar uno de estos',
+                    events: [
+                        {
+                            'type': 'click'
+                        }  
+                    ]
+                },
+                {
+                    'type': 'clock'                    
+                }
+            ],            
+            security_edit: [permissionProfile__repositorioTests_KRP], 
+            security_view: [permissionProfile__repositorioTests_KRP],
+            isSession: false,
+            hasNavbar: false
+     },
+     create_rprocess(_,Obj_content6,_,_),
+     Title7 =  'Navegación por rproc',         
+     Obj_content7 = {
+            type: 'kcontent',
+            hasKw: folder__content__007,            
+            hasDsca: Title7,            
+            isRoot: false,          
+            proc: {
+                type:'sequence',
+                hasProcess:[
+                    { type: 'method', name: 'getContextInfo', module: 'SessionContext'},
+                    { type: 'function', name: 'staber_kbrowser::execute_my_search', context: { delegatedTo: I_agent } }
+                ]
+			},                      
+            security_edit: [permissionProfile__repositorioTests_KRP], 
+            security_view: [permissionProfile__repositorioTests_KRP],
+            isSession: false,
+            hasNavbar: false
+     },
+     create_rprocess(_,Obj_content7,_,_),
+     Title0 =  'Contenido Con componentes Hijo',         
+     Obj_content0 = {
+            type: 'krp:folder',
+            hasKw: folder__content__000,            
+            hasDsca: Title0,            
+            hasERCPart: [
+                folder__content__001,
+                folder__content__002,
+                folder__content__003,
+                folder__content__004,
+                folder__content__005,
+                folder__content__006,
+                folder__content__007
+            ],
+            security_edit: [permissionProfile__repositorioTests_KRP], 
+            security_view: [permissionProfile__repositorioTests_KRP],
+            isSession: false,
+            hasNavbar: false
+     },
+     create_rprocess(_,Obj_content0,_,_),
+     Result = folder__content__000.
+
+% Tipos de contenido soportados
+'staber_kbrowser::contents_002'(_,_OBJIN,_,Lresults):-
+    % Al devolver el contenido no es necesario ejecutar create_rprocess
+    % obj_get(busId, OBJIN, BusId),
+    % Cajas con imagen
+    Title1 =  'Bienvenido al configurador del Mueble',     
+    Obj_content1 = {
+        type: 'krp:folder',
+        hasKw: folder__content__002_1,            
+        hasDsca: Title1,            
+        hasImage: '/testapp/img/manual/welcome.jpg'    
+    },
+
+    Title2 =  'Por favor, Seleccione una opción',         
+    Obj_content2 = {
+        type: 'krp:folder',
+        hasKw: folder__content__002_2,            
+        hasDsca: Title2,                    
+        hasDscaIcon: '/testapp/img/manual/info.png',
+        hasFooter: [
+            {
+                type: 'button',                    
+                label: {
+                    d: 'Nuevo Proyecto',
+                    icon: 'new'
+                    
+                },
+                events:[{
+                    type: 'click',
+                    method: 'publish',
+                    targetBusId: '$.busId',
+                    payload:{ 
+                        topic: 'addNode',
+                        channel: 'channel__browser',
+                        type: 'clock',
+                        busId: 'bus__clock000',
+                        hasDsca: 'Nuevo proyecto'
+                    }
+                }]
+            },
+            {
+                type: 'button',                    
+                label: {
+                    d: 'Consultar Proyectos',
+                    icon: 'search'                            
+                }
+            }
+        ]
+    },
+
+    Title3 =  'Proyectos más recientes',         
+    Obj_content3 = {
+        type: 'krp:folder',
+        hasKw: folder__content__002_3,            
+        hasDsca: Title3,
+        hasDscaIcon: '/testapp/img/manual/default_male.png',
+        children:[
+            {
+                type: 'list',                    
+                elements: [
+                    {
+                        label: {
+                            d: 'Proyecto 1823189323',
+                            icon: 'user'
+                        }
+                    },
+                    {
+                        label: {
+                            d: 'Proyecto 18231fsddsf3',
+                            icon: 'user'
+                        }
+                    },
+                    {
+                        label: {
+                            d: 'Proyecto 1823189dsafd3',
+                            icon: 'user'
+                        }
+                    }
+                ]
+            }
+        ]    
+    },   
+
+     Lresults = {resultset: [Obj_content1, Obj_content2,Obj_content3]}.
+
+/* Contenido con varios componentes */
+'staber_kbrowser::contents_003'(Lresults, BusId):-
+    % Al devolver el contenido no es necesario ejecutar create_rprocess   
+    newKw('bus_', MYBUS),
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__ssa_test',    
+        Dimensions = [
+        {arc: 'hasKw'},
+        {arc: 'dsca_project'},
+        {arc: 'kw_activity'},
+        {arc: 'kw_task'}
+    ],
+    Ticks = {
+        hasLabel: 'dsca_project',
+        hasDataValue: 'hasKw'
+    },
+    Metrics = {
+        arc: 'hours_r',
+        aggregate: 'sum',        
+        ascending: false
+    },
+    PREDICATE = 'staber_kchart::usecase__003::rql',
+    IN = {
+        searchType: 'rql',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss_project',
+        limit: 0,
+        predicate: PREDICATE,
+        hasDimension: Dimensions,
+        hasMetric: Metrics,    
+        hasTick: Ticks,  
+        hasDirection: 'vertical',
+        hasLayout: 'bar',
+        hasColors: true,        
+        legend: true,
+        options: {
+            rowLimit: 10
+        }
+    },         
+    OBJ_out_aux = {
+        type: 'kchart',               
+        busId: MYBUS,
+        in: IN,
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: MYBUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+
+        }]     
+    },
+    Title1 =  'Gráfica 1',         
+    Obj_content1 =  {    
+        type: 'krp:folder',
+        size: {
+            rows: 2
+        },    
+        hasDsca: Title1,                    
+        hasKw: folder__content__003_1,
+        children:[
+            OBJ_out_aux
+        ]
+    },
+
+    Title2 =  'Contenido 2',    
+    'staber_kresult_pivotgrid::usecase__000'(_, _OBJ_in, _, OBJ_result0),
+    'clean_elements_for_showing_in_explorer'(OBJ_result0, OBJ_result),
+    Obj_content2 = {
+            type: 'krp:folder',
+            size: {
+                cols: 2
+            },
+            hasKw: folder__content__003_3,            
+            hasDsca: Title2,
+            hasDscaIcon: '/testapp/img/manual/default_male.png',
+            children:[                
+                OBJ_result
+            ]            
+    },
+
+    Title3 =  'Contenido 3',         
+    Obj_content3 = {
+        type: 'krp:folder',
+        size: {
+            cols: 2,
+            rows: 'auto'
+        },
+        hasKw: folder__content__003_2,            
+        hasDsca: Title3,
+        hasDscaIcon: '/testapp/img/manual/info.png',
+        hasFooter: [
+            {
+                type: 'button',  
+                label: {
+                    'd': 'Nuevo Proyecto',
+                    icon: 'new'
+                    
+                },
+                events:[{
+                    type: 'click',
+                    method: 'publish',
+                    targetBusId: BusId,
+                    payload:{ 
+                        topic: 'addNode',
+                        channel: 'channel__browser',
+                        type: 'clock',
+                        busId: 'bus__clock000',
+                        hasDsca: 'Nuevo proyecto'
+                    }
+                }]
+            },
+            {
+                type: 'button',       
+                label: {
+                    d: 'Consultar Proyectos',
+                    icon: 'search'                            
+                }
+            }
+        ]
+    },
+
+    Lresults = {resultset: [Obj_content1, Obj_content2,Obj_content3]}.
+
+'staber_kbrowser::contents_004'(Lresults, BusId):-
+    newKw('bus_', MYBUS),
+    I_agent    = 'builderweb',
+    I_dataset  = 'dataset__ssa_test',    
+        Dimensions = [
+        {arc: 'hasKw'},
+        {arc: 'dsca_project'},
+        {arc: 'kw_activity'},
+        {arc: 'kw_task'}
+    ],
+    Ticks = {
+        hasLabel: 'dsca_project',
+        hasDataValue: 'hasKw'
+    },
+    Metrics = {
+        arc: 'hours_r',
+        aggregate: 'sum',        
+        ascending: false
+    },
+    PREDICATE = 'staber_kchart::usecase__003::rql',
+    IN = {
+        searchType: 'rql',
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasKw: 'ss_project',
+        limit: 0,
+        predicate: PREDICATE,
+        hasDimension: Dimensions,
+        hasMetric: Metrics,    
+        hasTick: Ticks,  
+        hasDirection: 'vertical',
+        hasLayout: 'bar',
+        hasColors: true,        
+        legend: true,
+        options: {
+            rowLimit: 10
+        }
+    },         
+    OBJ_out_aux = {
+        type: 'kchart',               
+        busId: MYBUS,
+        in: IN,
+        events:[{
+            type: 'click',
+            method: 'setNode',
+            targetBusId: MYBUS,
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [                                
+                    { type: 'function', name: 'staber_kchart::doSelect', context: { delegatedTo: 'builderweb' } }
+                ]
+            }
+
+        }]     
+    },
+
+    Title1 =  'Gráfica 1',
+    Obj_chart1 = {
+        type: assembly,
+        label:{
+            d:Title1
+        },
+        children:[OBJ_out_aux]
+    },
+
+    Obj_content1 =  {
+        type: 'rprocess',
+        size: {
+            rows: 2
+        },
+        hasKw: folder__content__004_1,
+        busId: busId__folder__content__004_1,
+        gui_out:Obj_chart1
+    },
+
+    Title2 =  'Contenido 2',    
+    'staber_kresult_pivotgrid::usecase__000'(_, _OBJ_in, _, OBJ_result0),
+'clean_elements_for_showing_in_explorer'(OBJ_result0, OBJ_result),
+    Obj_content2 = {
+        type: 'rprocess',
+        size: {
+            cols: 2
+        },
+        hasKw: folder__content__004_2,
+        busId: busId__folder__content__004_2,
+        gui_out: {
+            type: assembly,
+            label:{
+                d:Title2,
+                icon:'/testapp/img/manual/default_male.png'
+            },
+            children:[
+                OBJ_result
+            ]
+        }         
+    },
+
+    Title3 =  'Contenido 3',         
+    Obj_content3 = {
+        type: 'rprocess',
+        size: {
+            cols: 2,
+            rows: 'auto'
+        },
+        hasKw: folder__content__004_3,
+        busId: busId__folder__content__004_3,
+        gui_out: {
+            type: assembly,
+            label: {
+                d: Title3,                    
+                icon: '/testapp/img/manual/info.png'
+            },
+            children: [
+                {
+                    type: 'button',  
+                    label: {
+                        'd': 'Nuevo Proyecto',
+                        icon: 'new'
+                        
+                    },
+                    events:[{
+                        type: 'click',
+                        method: 'publish',
+                        targetBusId: BusId,
+                        payload:{ 
+                            topic: 'addNode',
+                            channel: 'channel__browser',
+                            type: 'clock',
+                            busId: 'bus__clock000',
+                            hasDsca: 'Nuevo proyecto'
+                        }
+                    }]
+                },
+                {
+                    type: 'button',       
+                    label: {
+                        d: 'Consultar Proyectos',
+                        icon: 'search'                            
+                    }
+                }
+            ]
+        }
+    },
+
+    Lresults = {resultset: [Obj_content1, Obj_content2,Obj_content3]}.
+
+'staber_kbrowser::execute_my_search'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_get(busId, Obj_in, BusId),
+    'staber_kbrowser::contents_003'(Obj_out, BusId).

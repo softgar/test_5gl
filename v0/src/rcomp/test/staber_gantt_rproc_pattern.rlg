@@ -1,0 +1,122 @@
+﻿/**
+@descr	staber_gantt_rproc_pattern <br>
+		staber_gantt_rproc_pattern
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_gantt_rproc_pattern') :-
+	class +$ 'staber_gantt_rproc_pattern' d ( es,'Patrón rproc para gantt') sc function,
+    'staber_gantt_rproc_pattern::usecase__1'(_, _, _, _),
+    'staber_gantt_rproc_pattern::folders'(_, _, _, _).
+
+'staber_gantt_rproc_pattern::getColors'(PH, TaskColors):-
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/ganttColors.json',
+    'staber_gantt_rproc_pattern::getColors'(PH, File, TaskColors).
+
+'staber_gantt_rproc_pattern::getColors'(PH, File, TaskColors):-
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes),
+    json_read(Codes, Collection),
+    obj_get(data, Collection, TaskColors).
+
+'staber_gantt_rproc_pattern::getResources'(PH, Resources):-
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/ganttResources.json',
+    'staber_gantt_rproc_pattern::getResources'(PH, File, Resources).
+
+'staber_gantt_rproc_pattern::getResources'(PH, File, Resources):-
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes),
+    json_read(Codes, Collection),
+    obj_get(data, Collection, Resources).
+
+'staber_gantt_rproc_pattern::getTestData'(PH, File, ArrayData, Schema, Dependencies, Assignments):-
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes),
+    json_read(Codes, Collection),
+    obj_get(dataSource, Collection, ArrayData),
+    obj_get(columns, Collection, Schema, []),
+    obj_get(dependencies, Collection, Dependencies, []),
+    obj_get(assignments, Collection, Assignments, {'datasources':[]}).
+
+'staber_gantt_rproc_pattern::usecase__1'(_, _OBJ_in, _, OBJ_out) :-
+    
+    % LECTURA DE DATOS
+
+    getPathHome(PH),
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/ganttCase1.json',
+    'staber_gantt_rproc_pattern::getColors'(PH, TaskColors),
+    'staber_gantt_rproc_pattern::getResources'(PH, Resources),
+    'staber_gantt_rproc_pattern::getTestData'(PH, File, ArrayData, Schema, Dependencies, Assignments),
+    newKw('rproc_gantt__', BUSID),
+    OBJ_form =  {
+        'type': 'gantt',
+        'height': 500,
+        'editable': false,
+        'showWorkHours': false,
+        'showWorkDays': false,
+        'resizable': true,
+        'snap': false,
+        'taskColors': TaskColors,
+        'columns': Schema,
+        'dataSource': ArrayData,
+        'dependencies': Dependencies,
+        'resources': Resources,
+        'assignments': Assignments,
+        'views': [
+            {
+                'type': 'day',
+                'title': 'Día'
+            },
+            {
+                'type': 'week',
+                'title': 'Semana',
+                'selected': true
+            },
+            {
+                'type': 'month',
+                'title': 'Mes'
+            }
+        ],
+        'messages': {
+            'actions': {
+                'addChild': 'Crear tarea anidada',
+                'insertAfter': 'Crear detrás',
+                'insertBefore': 'Crear delante',
+                'append': 'Crear Tarea'
+            }
+        }
+    },
+    OBJ = {
+        type: 'assembly',
+        children:[
+            OBJ_form
+        ]
+    },
+    OBJ_PROC = {
+        type: 'rprocess',
+        busId: BUSID,
+        gui_out : OBJ,
+        hasDsca: 'Planificación',
+        hasKw: rproc__4gl_gantt__001,
+        hasIcon: 'task',
+        isSession: true,
+        hasNavbar:true,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest]
+    },
+    create_rprocess(_, OBJ_PROC, _, OBJ_out).
+
+'staber_gantt_rproc_pattern::folders'(_, _, _, _):-
+	Conf_folder = {
+		type: 'krp:folder',
+        hasDsca: 'gantt (Radcore)',
+        hasKw: folder__repositorioTests_rproc_gantt,
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            rproc__4gl_gantt__001
+        ]
+	},
+    create_rprocess(_, Conf_folder, _, _).

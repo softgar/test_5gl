@@ -1,0 +1,124 @@
+{
+    "dataSource": [
+        {
+            "id": 1,
+            "orderId": 0,
+            "title": "Task1",
+            "start": "2014/6/17 9:00",
+            "end": "2014/6/17 11:00",
+            "percentComplete": 0.234,
+            "micolumna": "aaa"
+        },
+        {
+            "id": 2,
+            "orderId": 1,
+            "title": "Task2",
+            "start": "2014/6/17 12:00",
+            "end": "2014/6/17 16:00",
+            "micolumna": "bbb",
+            "percentComplete": 0.5,
+            "summary": true,
+            "expanded": true
+        },
+        {
+            "id": 3,
+            "orderId": 1,
+            "title": "Task2.1",
+            "parentId": 2,
+            "start": "2014/6/17 12:00",
+            "percentComplete": 0.5,
+            "end": "2014/6/17 14:00",
+            "micolumna": "bbb.aaa"
+        },
+        {
+            "id": 4,
+            "orderId": 0,
+            "parentId": 2,
+            "title": "Task2.2",
+            "start": "2014/6/17 14:00",
+            "percentComplete": 0.5,
+            "end": "2014/6/17 16:00",
+            "micolumna": "bbb.bbb"
+        }
+    ],
+    "columns": [
+        {
+            "field": "id",
+            "title": "ID"
+        },
+        {
+            "field": "title",
+            "title": "Title",
+            "editable": true,
+            "sortable": true
+        },
+        {
+            "field": "percentComplete",
+            "title": "Porcentaje",
+            "editable": true
+        },
+        {
+            "field": "start",
+            "title": "Start Time",
+            "editable": true,
+            "sortable": true
+        },
+        {
+            "field": "end",
+            "title": "End Time",
+            "editable": true,
+            "sortable": true
+        },
+        {
+            "field": "micolumna",
+            "title": "Micolumna",
+            "editable": true,
+            "sortable": true
+        },
+        {
+            "field": "resources",
+            "title": "Recursos",
+            "editable": false,
+            "sortable": false
+        }
+    ],
+    "dependencies": [
+        {
+            "id": 1,
+            "predecessorId": 1,
+            "successorId": 2,
+            "type": 1
+        },
+        {
+            "id": 2,
+            "predecessorId": 3,
+            "successorId": 4,
+            "type": 1
+        },
+        {
+            "id": 3,
+            "predecessorId": 2,
+            "successorId": 3,
+            "type": 3
+        }
+    ],
+    "assignments": {
+        "dataSource": [
+            {
+                "taskId": 1,
+                "resourceId": 1,
+                "value": 1
+            },
+            {
+                "taskId": 3,
+                "resourceId": 1,
+                "value": 1
+            },
+            {
+                "taskId": 4,
+                "resourceId": 2,
+                "value": 1
+            }
+        ]
+    }
+}

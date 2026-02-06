@@ -1,0 +1,1300 @@
+﻿getContactAgrupation(LAYOUT, Obj_Agrupations):-
+    Data_groups = {
+        rson: {
+        protocol: "graph",
+        version: "1.0"
+        },
+        contact_gui:{
+            type: class_gui,
+            hasStyle: contact_style,
+            hasAggrupation:[
+                {to: 'propertyGUIGroup_contact1', orda: 0},
+                {to: 'propertyGUIGroup_contact2', orda: 1}
+            ]
+        },
+        contact_style:{
+            type: styleVars,
+            cols: 2,
+            showIcons: true,
+            color: green,
+            fontFamily: "arial",
+            width: 50%
+        },
+        propertyGUIGroup_contact1:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'INFORMACION BÁSICA'
+                }
+            },
+            columns: 'auto',
+            layout: LAYOUT,
+            properties: [
+                {
+                to: hasDsca,
+                orda: 0
+                },
+                {
+                to: hasEmail,
+                orda: 1
+                },
+                {
+                to: hasStateC,
+                label: {
+                    d: 'Estado'
+                },                
+                orda: 2
+                },
+                {
+                to: hasCOrigin,
+                orda: 3
+                },
+                {
+                to: numPhone,
+                orda: 4
+                },
+                {
+                to: hasSocialNetwork,
+                orda: 5
+                },
+                {
+                    to: 'contact:hasAddress',
+                orda: 6
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact2:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'INFORMACION PROFESIONAL'
+                }
+            },
+            expanded: true,
+            columns: 'auto',
+            layout: LAYOUT,
+            properties: [
+                {
+                to: 'contact:hasResidenceCountry',
+                orda: 0
+                },
+                {
+                to: 'contact:hasBirthCountry',
+                orda: 1
+                },
+                {
+                to: isResponsible,
+                orda: 2
+                },
+                {
+                to: hasDepartment,
+                orda: 3
+                },
+                {
+                to: hasPosition,
+                orda: 4
+                },
+                {
+                to: hasVip,
+                orda: 5
+                },
+                {
+                to: hasERPRelation,
+                orda: 6
+                },
+                {
+                to: hasBusinessObject,
+                orda: 7
+                }
+            ],
+            pathFunctions: []
+        }
+    },
+    rg_get(contact_gui, Data_groups, {format: 'rson'}, Obj_Agrupations).
+
+getArupationTableWithHelp(LAYOUT, Obj_Agrupations):-
+Data_groups = {
+        rson: {
+        protocol: "graph",
+        version: "1.0"
+        },
+        'testapp:contact_gui':{
+            type: class_gui,
+            display: 'table',
+            hasAggrupation:[
+                {to: 'propertyGUIGroup_testappcontact1', orda: 0}
+            ]
+        },
+        propertyGUIGroup_testappcontact1:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'Form-table con ayudas'
+                }
+            },
+            columns: 'auto',
+            layout: LAYOUT,
+            properties: [
+                {
+                to: hasDsca,
+                orda: 0
+                },
+                {
+                to: "{\"arc\": \"contact:hasEmail\", \"hasHelp\": \"true\", \"hasInfo\": \"true\"}",
+                orda: 1
+                },
+                {
+                to: "{\"arc\": \"contact:hasResidenceCountry\", \"hasHelp\": \"true\", \"hasInfo\": \"true\"}",
+                orda: 2
+                },
+                {
+                to: "{\"arc\": \"contact:hasPhoneNumber\", \"hasHelp\": \"true\", \"hasInfo\": \"true\"}",
+                orda: 3
+                },
+                {
+                to: "{\"arc\": \"contact:hasFileAttachment\", \"hasHelp\": \"true\", \"hasInfo\": \"true\"}",
+                orda: 4
+                },
+                {
+                to: "{\"arc\": \"contact:hasAddress\", \"hasHelp\": \"true\", \"hasInfo\": \"true\"}",
+                orda: 5
+                }
+            ],
+            pathFunctions: []
+        }
+    },
+    rg_get('testapp:contact_gui', Data_groups, {format: 'rson'}, Obj_Agrupations).
+
+
+getContactAgrupationTable(LAYOUT, Obj_Agrupations):-
+    Data_groups = {
+        rson: {
+        protocol: "graph",
+        version: "1.0"
+        },
+        contact_gui:{
+            type: class_gui,
+            display: 'table',
+            hasAggrupation:[
+                {to: 'propertyGUIGroup_contact1', orda: 0},
+                {to: 'propertyGUIGroup_contact2', orda: 1}
+            ]
+        },
+        propertyGUIGroup_contact1:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'INFORMACION BÁSICA'
+                }
+            },
+            columns: 'auto',
+            layout: LAYOUT,
+            properties: [
+                {
+                to: hasDsca,
+                orda: 0
+                },
+                {
+                to: "{\"arc\": \"hasEmail\", \"hasHelp\": \"true\", \"hasInfo\": \"true\"}",
+                orda: 1
+                },
+                {
+                to: hasStateC,
+                orda: 2
+                },
+                {
+                to: hasCOrigin,
+                orda: 3
+                },
+                {
+                to: numPhone,
+                orda: 4
+                },
+                {
+                to: hasSocialNetwork,
+                orda: 5
+                },
+                {
+                    to: hasAddress,
+                    orda:6
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact2:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'INFORMACION PROFESIONAL'
+                }
+            },
+            expanded: true,
+            columns: 'auto',
+            layout: LAYOUT,
+            properties: [
+                {
+                to: hasCompany,
+                orda: 0
+                },
+                {
+                to: hasContactCompany,
+                orda: 1
+                },
+                {
+                to: isResponsible,
+                orda: 2
+                },
+                {
+                to: hasDepartment,
+                orda: 3
+                },
+                {
+                to: hasPosition,
+                orda: 4
+                },
+                {
+                to: hasVip,
+                orda: 5
+                },
+                {
+                to: hasERPRelation,
+                orda: 6
+                },
+                {
+                to: hasBusinessObject,
+                orda: 7
+                }
+            ],
+            pathFunctions: []
+        }
+    },
+    rg_get(contact_gui, Data_groups, {format: 'rson'}, Obj_Agrupations).
+getContactAgrupationDiv(Obj_Agrupations):-
+    Data_groups = {
+        rson: {
+        protocol: "graph",
+        version: "1.0"
+        },
+        contact_gui:{
+            type: class_gui,
+            hasAggrupation:[
+                {to: 'propertyGUIGroup_contact31', orda: 0},
+                {to: 'propertyGUIGroup_contact32', orda: 1}
+            ]
+        },
+        propertyGUIGroup_contact31:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'INFORMACION BÁSICA'
+                }
+            },
+            properties: [
+                {
+                to: hasDsca,
+                orda: 0
+                },
+                {
+                to: hasEmail,
+                orda: 1
+                },
+                {
+                to: hasStateC,
+                orda: 2
+                },
+                {
+                to: hasCOrigin,
+                orda: 3
+                },
+                {
+                to: numPhone,
+                orda: 4
+                },
+                {
+                to: hasSocialNetwork,
+                orda: 5
+                },
+                {
+                    to: hasAddress,
+                orda: 6
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact32:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            expanded: true,
+            columns: 'auto',
+            properties: [
+                {
+                to: hasCompany,
+                orda: 0
+                },
+                {
+                to: hasContactCompany,
+                orda: 1
+                },
+                {
+                to: isResponsible,
+                orda: 2
+                },
+                {
+                to: hasDepartment,
+                orda: 3
+                },
+                {
+                to: hasPosition,
+                orda: 4
+                },
+                {
+                to: hasVip,
+                orda: 5
+                },
+                {
+                to: hasERPRelation,
+                orda: 6
+                },
+                {
+                to: hasBusinessObject,
+                orda: 7
+                }
+            ],
+            pathFunctions: []
+        }
+    },
+    rg_get(contact_gui, Data_groups, {format: 'rson'}, Obj_Agrupations).
+
+getContactAgrupationDivTable(Obj_Agrupations):-
+    Data_groups = {
+        rson: {
+        protocol: "graph",
+        version: "1.0"
+        },
+        contact_gui:{
+            type: class_gui,
+            display: 'table',
+            hasAggrupation:[
+                {to: 'propertyGUIGroup_contact31', orda: 0},
+                {to: 'propertyGUIGroup_contact32', orda: 1}
+            ]
+        },
+        propertyGUIGroup_contact31:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'INFORMACION BÁSICA'
+                }
+            },
+            properties: [
+                {
+                to: hasDsca,
+                orda: 0
+                },
+                {
+                to: hasEmail,
+                orda: 1
+                },
+                {
+                to: hasStateC,
+                orda: 2
+                },
+                {
+                to: hasCOrigin,
+                orda: 3
+                },
+                {
+                to: numPhone,
+                orda: 4
+                },
+                {
+                to: hasSocialNetwork,
+                orda: 5
+                },
+                {
+                    to: hasAddress,
+                    orda:6
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact32:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            expanded: true,
+            columns: 'auto',
+            properties: [
+                {
+                to: hasCompany,
+                orda: 0
+                },
+                {
+                to: hasContactCompany,
+                orda: 1
+                },
+                {
+                to: isResponsible,
+                orda: 2
+                },
+                {
+                to: hasDepartment,
+                orda: 3
+                },
+                {
+                to: "{\"arc\": \"hasPosition\", \"hasIcon\": \"unprotected_resources/img/eus.jpg\"}",
+                orda: 4
+                },
+                {
+                    to: "{\"arc\": \"hasVip\", \"hasIcon\": \"unprotected_resources/img/eus.jpg\"}",
+                orda: 5
+                },
+                {
+                to: hasERPRelation,
+                orda: 6
+                },
+                {
+                to: hasBusinessObject,
+                orda: 7
+                }
+            ],
+            pathFunctions: []
+        }
+    },
+    rg_get(contact_gui, Data_groups, {format: 'rson'}, Obj_Agrupations).
+
+getContactAgrupationInitab(Obj_Agrupations):-
+    Data_groups = {
+        rson: {
+        protocol: "graph",
+        version: "1.0"
+        },
+        contact_gui:{
+            type: class_gui,
+            hasAggrupation:[
+                {to: 'propertyGUIGroup_contact11', orda: 0},
+                {to: 'propertyGUIGroup_contact12', orda: 1},
+                {to: 'propertyGUIGroup_contact13', orda: 2},
+                {to: 'propertyGUIGroup_contact14', orda: 3},
+                {to: 'propertyGUIGroup_contact15', orda: 4}
+            ]
+        },
+        propertyGUIGroup_contact11:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'Basica 1'
+                }
+            },
+            columns: 'auto',
+            layout: initab,
+            properties: [
+                {
+                to: hasDsca,
+                orda: 0
+                },
+                {
+                to: hasEmail,
+                orda: 1
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact12:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'Basica 2'
+                }
+            },
+            expanded: true,
+            columns: 'auto',
+            layout: tab,
+            properties: [
+                {
+                to: hasStateC,
+                orda: 0
+                },
+                {
+                to: hasCOrigin,
+                orda: 1
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact13:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'Contacto'
+                }
+            },
+            columns: 'auto',
+            layout: tab,
+            properties: [
+                {
+                to: numPhone,
+                orda: 0
+                },
+                {
+                to: hasSocialNetwork,
+                orda: 1
+                },
+                {
+                    to: hasAddress,
+                    orda:2
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact14:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'INFORMACION PROFESIONAL 1'
+                }
+            },
+            expanded: false,
+            columns: 'auto',
+            layout: initab,
+            properties: [
+                {
+                to: hasCompany,
+                orda: 0
+                },
+                {
+                to: hasContactCompany,
+                orda: 1
+                },
+                {
+                to: isResponsible,
+                orda: 2
+                },
+                {
+                to: hasDepartment,
+                orda: 3
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact15:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'INFORMACION PROFESIONAL 2'
+                }
+            },
+            expanded: false,
+            columns: 'auto',
+            layout: tab,
+            properties: [
+                {
+                to: hasPosition,
+                orda: 0
+                },
+                {
+                to: hasVip,
+                orda: 1
+                },
+                {
+                to: hasERPRelation,
+                orda: 2
+                },
+                {
+                to: hasBusinessObject,
+                orda: 3
+                }
+            ],
+            pathFunctions: []
+        }
+    },
+    rg_get(contact_gui, Data_groups, {format: 'rson'}, Obj_Agrupations).
+
+getContactAgrupationComplexLayout(Obj_Agrupations):-
+    RegExp = '^\\d{3}(\\s{1}\\d{3}){2}$',
+    NumPhone_obj = {
+        arc: numPhone,
+        type: text,
+        validation: {
+            pattern: RegExp,
+            altText: {
+                d: 'kform_test_numPhone_validation_uiML',
+                i18n: 'd',
+                targets: [
+                tip, info, placeholder
+                ]
+            }
+        }
+    },
+    json_write(NumPhone_obj, NumPhone),
+    Data_groups = {
+        rson: {
+        protocol: "graph",
+        version: "1.0"
+        },
+        contact_gui:{
+            type: class_gui,
+            stylesVars: {layout: 'box'},
+            hasAggrupation:[
+                %tab
+                
+                %collapsible
+                {to: 'propertyGUIGroup_contact103', orda: 0},
+                {to: 'propertyGUIGroup_contact101', orda: 1},
+                {to: 'propertyGUIGroup_contact102', orda: 2},
+                {to: 'propertyGUIGroup_contact104', orda: 3},
+                %div
+                {to: 'propertyGUIGroup_contact105', orda: 4},
+                %initab
+                {to: 'propertyGUIGroup_contact106', orda: 5},
+                {to: 'propertyGUIGroup_contact107', orda: 6},
+                %initab
+                {to: 'propertyGUIGroup_contact108', orda: 7}
+            ]
+        },
+        propertyGUIGroup_contact101:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'TAB 1'
+                }
+            },
+            columns: 'auto',
+            layout: tab,
+            properties: [
+                {
+                to: hasDsca,
+                orda: 0
+                },
+                {
+                to: hasEmail,
+                orda: 1
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact102:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'TAB 2'
+                }
+            },
+            columns: 'auto',
+            layout: tab,
+            properties: [
+                {
+                to: NumPhone,
+                orda: 4
+                },
+                {
+                to: hasSocialNetwork,
+                orda: 5
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact103:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'COLLAPSIBLE 1'
+                }
+            },
+            columns: 'auto',
+            layout: collapsible,
+            properties: [
+                {
+                to: hasDsca,
+                orda: 0
+                },
+                {
+                to: hasEmail,
+                orda: 1
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact104:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'COLLAPSIBLE 2'
+                }
+            },
+            columns: 'auto',
+            layout: collapsible,
+            properties: [
+                {
+                to: numPhone,
+                orda: 4
+                },
+                {
+                to: hasSocialNetwork,
+                orda: 5
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact105:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            columns: 'auto',
+            properties: [
+                {
+                to: hasCompany,
+                orda: 0
+                },
+                {
+                to: hasContactCompany,
+                orda: 1
+                },
+                {
+                to: isResponsible,
+                orda: 2
+                },
+                {
+                to: hasDepartment,
+                orda: 3
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact106:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'INITAB 1'
+                }
+            },
+            columns: 'auto',
+            layout: initab,
+            properties: [
+                {
+                to: hasCompany,
+                orda: 0
+                },
+                {
+                to: hasContactCompany,
+                orda: 1
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact107:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'INITAB 2'
+                }
+            },
+            expanded: true,
+            columns: 'auto',
+            layout: tab,
+            properties: [
+                {
+                to: isResponsible,
+                orda: 2
+                },
+                {
+                to: hasDepartment,
+                orda: 3
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact108:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'INITAB 3'
+                }
+            },
+            columns: 'auto',
+            layout: initab,
+            properties: [
+                {
+                to: hasPosition,
+                orda: 4
+                },
+                {
+                to: hasVip,
+                orda: 5
+                },
+                {
+                to: hasERPRelation,
+                orda: 6
+                },
+                {
+                to: hasBusinessObject,
+                orda: 7
+                }
+            ],
+            pathFunctions: []
+        }
+    },
+    rg_get(contact_gui, Data_groups, {format: 'rson'}, Obj_Agrupations).
+
+getContactAgrupationComplexTemplate(Obj_Template):-
+RegExp = '^\\d{3}(\\s{1}\\d{3}){2}$',
+Obj_Template = {
+    type: assembly,
+    children: [
+        {
+            id: contact_gui_agrupations_0,
+            type: collapsible,
+            children: [
+                {
+                    id: propertyGUIGroup_contact103,
+                    type: collapsiblechild,
+                    label: {
+                        d: 'COLLAPSIBLE 1'
+                    },
+                    cols: 2,
+                    children: [
+                        {
+                            arc: hasDsca
+                        },
+                        {
+                            arc: hasEmail
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            id: contact_gui_agrupations_1,
+            scroll: true,
+            type: tab,
+            children: [
+                {
+                    id: propertyGUIGroup_contact101,
+                    type: tabchild,
+                    label: {
+                        d: 'TAB 1'
+                    },
+                    cols: 2,
+                    children: [
+                        {
+                            arc: hasDsca
+                        },
+                        {
+                            arc: hasEmail
+                        }
+                    ]
+                },
+                {
+                    id: propertyGUIGroup_contact102,
+                    type: tabchild,
+                    label: {
+                        d: 'TAB 2'
+                    },
+                    cols: 2,
+                    children: [
+                        {
+                            arc: numPhone,
+                            type: text,
+                            validation: {
+                                pattern: RegExp,
+                                altText: {
+                                    d: 'kform_test_numPhone_validation_uiML',
+                                    i18n: 'd',
+                                    targets: [
+                                    tip, info, placeholder
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            arc: hasSocialNetwork
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            id: contact_gui_agrupations_2,
+            type: collapsible,
+            children: [
+                {
+                    id: propertyGUIGroup_contact104,
+                    type: collapsiblechild,
+                    label: {
+                        d: 'COLLAPSIBLE 2'
+                    },
+                    cols: 2,
+                    children: [
+                        {
+                            arc: numPhone
+                        },
+                        {
+                            arc: hasSocialNetwork
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            id: contact_gui_agrupations_3,
+            type: assembly,
+            children: [
+                {
+                    id: propertyGUIGroup_contact105,
+                    type: assembly,
+                    label: {
+                        d: ''
+                    },
+                    cols: 2,
+                    children: [
+                        {
+                            arc: hasCompany
+                        },
+                        {
+                            arc: hasContactCompany
+                        },
+                        {
+                            arc: isResponsible
+                        },
+                        {
+                            arc: hasDepartment
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            id: contact_gui_agrupations_4,
+            scroll: true,
+            type: tab,
+            children: [
+                {
+                    id: propertyGUIGroup_contact106,
+                    type: tabchild,
+                    label: {
+                        d: 'INITAB 1'
+                    },
+                    cols: 2,
+                    children: [
+                        {
+                            arc: hasCompany
+                        },
+                        {
+                            arc: hasContactCompany
+                        }
+                    ]
+                },
+                {
+                    id: propertyGUIGroup_contact107,
+                    type: tabchild,
+                    label: {
+                        d: 'INITAB 2'
+                    },
+                    cols: 2,
+                    children: [
+                        {
+                            arc: isResponsible
+                        },
+                        {
+                            arc: hasDepartment
+                        }
+                    ],
+                    active: true
+                }
+            ]
+        },
+        {
+            id: contact_gui_agrupations_5,
+            scroll: true,
+            type: tab,
+            children: [
+                {
+                    id: propertyGUIGroup_contact108,
+                    type: tabchild,
+                    label: {
+                        d: 'INITAB 3'
+                    },
+                    cols: 2,
+                    children: [
+                        {
+                            arc: hasPosition
+                        },
+                        {
+                            arc: hasVip
+                        },
+                        {
+                            arc: hasERPRelation
+                        },
+                        {
+                            arc: hasBusinessObject
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}.
+
+getAgrupationforConfigurator(Obj_Agrupations):-
+    Data_groups = {
+        rson: {
+        protocol: "graph",
+        version: "1.0"
+        },
+        contact_gui:{
+            type: class_gui,
+            hasAggrupation:[
+                {to: 'propertyGUIGroup_config1', orda: 0},
+                {to: 'propertyGUIGroup_config2', orda: 1}
+            ]
+        },
+        propertyGUIGroup_config1:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'INFORMACION BÁSICA'
+                }
+            },
+            expanded: true,
+            columns: 'auto',
+            layout: collapsible,
+            properties: [
+                {
+                to: "{\"arc\": \"hasDsca\", \"inputtype\": \"password\", \"label\":{\"d\": \"Nombre\"}}",
+                orda: 0
+                },
+                {
+                to: "{\"arc\": \"hasEmail\", \"class\": \"r-error\"}",
+                orda: 1
+                },
+                {
+                to: hasStateC,
+                orda: 2
+                },
+                {
+                to: "{\"arc\": \"hasCOrigin\", \"type\": \"gallery\"}",
+                orda: 3
+                },
+                {
+                to: "{\"arc\":\"numPhone\", \"legendleft\": {\"d\": \"+34\"}}",
+                orda: 4
+                },
+                {
+                to: hasSocialNetwork,
+                orda: 5
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_config2:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                    es: 'PROPIEDADES CON ACCIONES'
+                }
+            },
+            expanded: true,
+            columns: 'auto',
+            layout: collapsible,
+            properties: [
+                {
+                to: "{\"arc\": \"hasCompany\",\"label\":{\"d\": \"Compañia\"},\"actions\":[{\"newAction\":{\"collapse\": false, \"label\": {\"icon\": \"project\"}}}]}",
+                orda: 0
+                },
+                {
+                to: "{\"arc\": \"isResponsible\",\"label\":{\"d\": \"Responsable\"},\"actions\":[{\"zoom\": false, \"navigate\": false}]}",
+                orda: 1
+                },
+                {
+                to: "{\"arc\": \"hasContactCompany\",\"label\":{\"d\": \"Contacto en la Compañía\"},\"actions\":[{\"newAction\":{\"collapse\": false,\"label\": {\"icon\": \"project\"}}}]}",
+                orda: 2
+                },                  
+                {
+                to: "{\"arc\": \"hasAddress\",\"label\":{\"d\": \"Dirección\"}}",
+                orda: 3
+                }                                    
+            ],
+            pathFunctions: []
+        }
+    },
+    rg_get(contact_gui, Data_groups, {format: 'rson'}, Obj_Agrupations).
+
+'staber_kmgt::result::simple'(IN_result):-
+    Table_Schema = [
+                    {
+                    label: {
+                        d: 'Palabra clave'
+                    },
+                    arc: 'hasKw',
+                    selectable: true,
+                    enabled: false,
+                    sorted: true,
+                    filter: true                    
+                },
+                {
+                    label: {
+                        d: 'Descripción'
+                    },
+                    arc: 'hasDsca',                    
+                    enabled: false,
+                    sorted: true,
+                    filter: true,
+                    control: {
+                        type: 'label',
+                        d: '$.hasDsca'                        
+                    }
+                }               				                
+	],
+    IN_result = {
+        data: Table_Schema
+    }.
+
+inv_properties_aggrupation(AGGRUPATION):-
+    Data_groups = {
+        rson: {
+        protocol: "graph",
+        version: "1.0"
+        },
+        contact_gui:{
+            type: class_gui,
+            hasAggrupation:[
+                {to: 'propertyGUIGroup_contact1', orda: 0},
+                {to: 'propertyGUIGroup_contact2', orda: 1}
+            ]
+        },
+        propertyGUIGroup_contact1:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'CONTACTO'
+                }
+            },
+            columns: 'auto',
+            % layout: LAYOUT,
+            properties: [
+                {
+                to: 'contact:hasName',
+                orda: 0
+                },
+                {
+                to: 'contact:hasIdNumber',
+                orda: 1
+                },
+                {
+                to: 'contact:hasEmail',
+                orda: 2
+                },
+                {
+                to: 'contact:hasPhoneNumber',
+                orda: 2
+                }
+            ],
+            pathFunctions: []
+        },
+        propertyGUIGroup_contact2:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'PERMISOS'
+                }
+            },
+            expanded: true,
+            columns: 'auto',
+            % layout: LAYOUT,
+            properties: [
+                {
+                to: 'contact:hasPermission',
+                orda: 0
+                }
+            ],
+            pathFunctions: []
+        }
+    },
+    rg_get(contact_gui, Data_groups, {format: 'rson'}, AGGRUPATION).
+
+getContactAgrupationWithStylesvars(LAYOUT, Obj_Agrupations):-
+    Data_groups = {
+        rson: {
+        protocol: "graph",
+        version: "1.0"
+        },
+        contact_gui:{
+            type: class_gui,
+            hasStyle: contact_style,
+            hasAggrupation:[
+                {to: 'propertyGUIGroup_contact1', orda: 0}
+            ]
+        },
+        contact_style:{
+            type: styleVars,
+            cols: 2,
+            showIcons: true,
+            color: green,
+            fontFamily: "arial"
+        },
+        propertyGUIGroup_contact1:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: '',
+            expanded: true,
+            columns: 'auto',
+            layout: LAYOUT,
+            properties: [
+                {
+                to: 'contact:hasResidenceCountry',
+                orda: 0
+                },
+                {
+                to: 'contact:hasBirthCountry',
+                orda: 1
+                }
+            ],
+            pathFunctions: []
+        }
+    },
+    rg_get(contact_gui, Data_groups, {format: 'rson'}, Obj_Agrupations).

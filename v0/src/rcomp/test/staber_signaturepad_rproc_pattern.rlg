@@ -1,0 +1,180 @@
+﻿/**
+@descr	staber_signaturepad_rproc_pattern <br>
+		staber_signaturepad_rproc_pattern
+@author ccp
+@date	2022_09_09
+**/
+rc_class('staber_signaturepad_rproc_pattern') :-
+
+	class +$ 'staber_signaturepad_rproc_pattern' d ( es,'Ejemplos firma digitales') sc function,
+    'staber_signaturepad_rproc_pattern::firma_digital'(_, _, _, _),
+    'staber_signaturepad_rproc_pattern::signaturepad_basic_test'(_, _, _, _),
+    'staber_signaturepad_rproc_pattern::signaturepad_disable_test'(_, _, _, _),
+    'staber_signaturepad_rproc_pattern::signaturepad_change_test'(_, _, _, _),
+    'staber_signaturepad_rproc_pattern::folders'(_, _, _, _).
+
+'staber_signaturepad_rproc_pattern::firma_digital'(_, _, _, OBJ_out) :-
+    newKw('bus__signaturePad', BUSID),
+    ObjChildren ={
+        type: assembly,
+        classList:['test-rcomponent-content'],
+        width: 50,
+        label: {
+            d: 'Firme aquí'
+        },
+        children: [{
+            type: 'signaturePad',
+            height: 100,
+            enabled: true,
+            actions: [{
+                label: {
+                    text : 'Guardar'
+                },
+                method: save,
+                events: [
+                    {
+                        type: 'click',
+                        targetBusId: BUSID,
+                        method: 'log',
+                        p_exec:{
+                            type: 'sequence',
+                            hasProcess:[
+                                {type: function, name: 'signaturePad:actionNotification', context:{ delegatedTo: builderweb} }
+                            ]
+                        }
+                    }]
+                },
+                {
+                    label: {
+                        icon : 'eraser'
+                    },
+                    method: 'clean',
+                    events:[{
+                        type: 'click',
+                        targetBusId: BUSID,
+                        method: 'log'
+                    }]
+                }
+            ]
+            }
+        ]
+    },
+    OBJ = {
+        type: 'rprocess',
+        busId: BUSID,
+        gui_out: ObjChildren,
+        hasKw: rproc__digital_signature,
+        hasDsca: 'Firma digital',
+        hasIcon: 'digital-signature',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP, permissionProfile__guest]
+    },
+    create_rprocess(_, OBJ, _, OBJ_out).
+
+    'signaturePad:actionNotification'(Ctx, Obj_in, Ctx, Obj_out):-
+        wAddInfoMsgML('Aviso', 'Se ha guardado su firma digital', [],{showTime:3}),
+        Obj_out = Obj_in.
+
+'staber_signaturepad_rproc_pattern::signaturepad_basic_test'(_, _OBJ_in, _, OBJ_out) :-
+    getPathHome(PH),
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/signaturepad_basic_test.json',
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes),
+    json_read(Codes, Collection),
+    obj_get(data, Collection, ObjChildren),
+    Obj_console = {
+        in: {},
+        busId: 'bus__console_0',
+        gui_out: { type: 'method', name: 'console_out', module: 'GenericUI'}            
+    },          
+    new_rprocess(_, Obj_console,_,Obj_console_proc),
+    OBJ = {
+        type: 'assembly',
+        classList:['test-rcomponent-content'],
+        children: [ObjChildren, Obj_console_proc]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ,
+        hasKw: rproc__signaturepad__001,
+        hasDsca: 'Signaturepad Basic Test',
+        hasIcon: 'map',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_, Rproc, _, OBJ_out).
+
+'staber_signaturepad_rproc_pattern::signaturepad_disable_test'(_, _OBJ_in, _, OBJ_out) :-
+    getPathHome(PH),
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/signaturepad_disable_test.json',
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes),
+    json_read(Codes, Collection),
+    obj_get(data, Collection, ObjChildren),
+    Obj_console = {
+        in: {},
+        busId: 'bus__console_0',
+        gui_out: { type: 'method', name: 'console_out', module: 'GenericUI'}            
+    },          
+    new_rprocess(_, Obj_console,_,Obj_console_proc),
+    OBJ = {
+        type: 'assembly',
+        classList:['test-rcomponent-content'],
+        children: [ObjChildren, Obj_console_proc]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ,
+        hasKw: rproc__signaturepad__002,
+        hasDsca: 'Signaturepad disable Test',
+        hasIcon: 'map',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_, Rproc, _, OBJ_out).
+
+'staber_signaturepad_rproc_pattern::signaturepad_change_test'(_, _OBJ_in, _, OBJ_out) :-
+    getPathHome(PH),
+    File = 'test_5gl_server/v0/src/rcomp/test/data/json-control/signaturepad_change_test.json',
+    concatAtoms([PH, File], AbsoluteFileDir),
+    rc_read_file_codes( AbsoluteFileDir, [encoding('utf8')], Codes),
+    json_read(Codes, Collection),
+    obj_get(data, Collection, ObjChildren),
+    Obj_console = {
+        in: {},
+        busId: 'bus__console_0',
+        gui_out: { type: 'method', name: 'console_out', module: 'GenericUI'}            
+    },          
+    new_rprocess(_, Obj_console,_,Obj_console_proc),
+    OBJ = {
+        type: 'assembly',
+        classList:['test-rcomponent-content'],
+        children: [ObjChildren, Obj_console_proc]
+    },
+    Rproc = {
+        type: 'rprocess',
+        gui_out: OBJ,
+        hasKw: rproc__signaturepad__003,
+        hasDsca: 'Signaturepad update on change Test',
+        hasIcon: 'map',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+    },
+    create_rprocess(_, Rproc, _, OBJ_out).
+
+'staber_signaturepad_rproc_pattern::folders'(_, _, _, _):-
+    Conf_folder = {
+		type: 'krp:folder',
+        hasKw: folder__repositorioTests_rproc_signaturepad,
+        hasDsca: 'Signaturepad (RADCORE)',
+        hasIcon: 'dinamic',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__signaturepad__001,
+            rproc__signaturepad__002,
+            rproc__signaturepad__003
+        ]
+	},
+    create_rprocess(_, Conf_folder, _, _).

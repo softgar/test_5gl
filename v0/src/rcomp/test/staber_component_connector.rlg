@@ -1,0 +1,557 @@
+﻿/**
+@descr	staber_component_connector <br>
+		staber_component_connector
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_component_connector') :-
+
+	class +$ 'staber_component_connector' d ( es,'Ejemplos de conexión entre componentes') sc function,
+    'staber_component_connector::usecase_001'(_, _, _, _),
+    'staber_component_connector::usecase_002'(_, _, _, _),
+    'staber_component_connector::usecase_003'(_, _, _, _),
+    'staber_component_connector::usecase_005'(_, _, _, _),
+    'staber_component_connector::folders'(_, _, _, _).
+
+'staber_component_connector::usecase_001'(_, _OBJ_in, _, OBJ_out) :-	
+    newKw('bus__execprocess__', BUS_PROCESS),
+    IN = {
+        resultFunction : 'hola'
+    },  
+    ACTIONS = [
+                {
+                    label: {
+                    icon: 'add',
+                        d: 'Acción 1'
+                    },
+                    collapse: true,
+                    events:[{
+                        type: 'click',
+                        method: 'set_propertyValue_exec',
+                        payload: {property: 'resultFunction', value : 'ACCION 1'},
+                        targetBusId: BUS_PROCESS
+                    }
+                    ]
+                }
+    ],
+    PROC = {
+            type: 'sequence',
+                context: {
+                   delegatedTo: 'builderweb'
+                },                       
+                hasProcess: [
+                    {
+                        type: 'function',                              
+                        name: 'staber_component_connector::execute',
+                        context: {
+                            delegatedTo: 'builderweb'
+                        }
+                    }                    
+                ]                                
+    },  
+    GUI_IN = {
+        type: 'text',
+        label: {
+                d: 'Introduzca su dato de entrada'
+        },  
+        actions: ACTIONS,                    
+        value: '',
+        events: [
+            {
+                type: 'change',
+                method: 'set_propertyValue_exec',
+                targetBusId: BUS_PROCESS,
+                payload: {property: 'resultFunction'}
+            }
+        ]                
+    },              
+    newKw('channel', CHANNEL),
+    Title = 'Conexión entre controles',    
+    Obj_proc = {        
+        type: 'rprocess',        
+        in: IN,
+        busId: BUS_PROCESS,
+        hasDsca: Title,
+        hasKw: rproc__controls__connection,
+        hasChannel: CHANNEL,
+        hasIcon: 'conect',
+        do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_in: GUI_IN,        
+        gui_out: PROC,
+        isSession: false,
+        hasNavbar: false
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_component_connector::execute'(Ctx, Obj_in, Ctx, Obj_out):-
+    obj_get(in:resultFunction, Obj_in, Value, ''),
+    Obj_out= {
+            type: 'text',
+            % enabled: false,
+            value: Value,                
+            label: {
+                d: 'Control de salida'
+            }                
+     }.
+
+/* Caso de uso de kform conectado a kresult a través de rprocess*/
+'staber_component_connector::usecase_002'(_, _OBJ_in, _, OBJ_out) :-	
+%    'testapp:contact' *$$ I_contact,
+    I_contact = testapp_contacto_001,
+    I_agent = 'builderweb',
+    I_dataset = 'Default',    
+    
+    PROC = {
+            type: 'sequence',
+                context: {
+                   delegatedTo: 'builderweb'
+                },                       
+                hasProcess: [
+                    {
+                        type: 'function',                              
+                        name: 'staber_execprocess_rproc_pattern::execute2',
+                        context: {
+                            delegatedTo: 'builderweb'
+                        }
+                    }                                  
+                ]                                
+    },
+      
+    PROC_FORM = {
+        type: 'sequence',
+        hasProcess: [
+            {  type: 'function', in: { options: {getSchema: true}}, name :'get_formInfo', context: {delegatedTo: 'builderweb'}},                                   
+            {  type: 'method',   name: 'import',  module: 'Dataset' }
+        ]
+    },
+    newKw('bus__execprocess__', BUS_PROCESS),    
+    newKw('bus__execprocess__form', BUS_PROCESS_FORM),    
+
+    newKw('channel', CHANNEL),
+    newKw('channel__execprocess__form', CHANNEL_FORM),
+
+    % Establecer plantilla para sacar solo las propiedades por las que se va a filtrar 
+    'staber_execprocess_rproc_pattern::templateForm'(collapsible, Obj_agrupation),
+    IN = {
+        hasAgent: I_agent,
+        hasDataset: I_dataset,
+        hasCKDIStatusFrom: ckdiStatusNo,
+        hasCKDIStatusArc: ckdiStatusD,
+        hasCKDIStatusArc: ckdiStatusD,
+        hasKwc: 'testapp:contact',
+        hasKw: I_contact,
+        enabled: true,
+        applyRules: true,
+        navigationFilter: 'all',
+        hasAggrupation: Obj_agrupation     
+        
+    }, 
+    % Formulario para la búsqueda     
+    GUI_IN = {
+        type: 'kform',        
+        busId:  BUS_PROCESS_FORM,   
+        hasChannel: CHANNEL_FORM,        
+        in: IN,
+        hasDlg: true,
+        proc: PROC_FORM,
+        events: [
+            {
+                type: 'updateStmt',
+                method: 'updateStmt',
+                targetBusId: BUS_PROCESS_FORM,
+                payload: {
+                    hasDataset: I_dataset,
+                    applyRules: true
+                },
+                p_exec: {
+                    type: 'sequence',
+                    hasProcess: [{
+                        type: 'function',
+                        name: 'builder50_updStmt',
+                        context: {
+                            delegatedTo: I_agent
+                        }
+                    }]
+                }
+            }      
+        ]
+    },                  
+    Title = 'Ejemplo rProcess con kform, ejecución secuencia y kresult para ver resultado',   
+    RPROC = {
+        type: 'rprocess',        
+        in: IN,
+        busId: BUS_PROCESS,
+        hasChannel: CHANNEL,       
+        do_exec: true,
+        gui_in: GUI_IN,        
+        gui_out: PROC,
+        evtSubscribe: [{topic: 'refreshNode', channel: CHANNEL_FORM}]
+    },
+    % Como gui_out tenemos el proceso y al ejecutarlo nos dará el resultado,
+    % Esto se desacoplará en otro test
+    Obj_proc = {        
+        type: 'rprocess',
+        hasDsca: Title,
+        hasKw: rproc__formtokresult__connection,        
+        hasIcon: 'conect',        
+        do_exec: true,
+        isRoot: false,        
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        gui_out: RPROC,
+        isSession: false,
+        hasNavbar: false
+    },  
+      
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_execprocess_rproc_pattern::templateForm'(LAYOUT, Obj_Agrupations):-
+    Data_groups = {
+        rson: {
+        protocol: "graph",
+        version: "1.0"
+        },
+        contact_gui:{
+            type: class_gui,
+            hasAggrupation:[
+                {to: 'propertyGUIGroup_contact1', orda: 0}
+            ]
+        },
+        propertyGUIGroup_contact1:{
+            hasClass: contact,
+            type: propertyGUIGroup,
+            hasDsca: {
+                cto: stringML,
+                to: {
+                es: 'BUSCAR'
+                }
+            },
+            layout: LAYOUT,
+            properties: [
+                {
+                    to: 'contact:hasName',                                    
+                    orda: 0
+                },
+                {
+                    to: 'contact:hasResidenceCountry',
+                    autocomplete: true,
+                    orda: 1
+                }
+            ],
+            pathFunctions: []
+        }      
+    },
+    rg_get(contact_gui, Data_groups, {format: 'rson'}, Obj_Agrupations).
+
+'staber_execprocess_rproc_pattern::execute2'(Ctx, Obj_in, Ctx, Obj_out):-
+    %% Esquema del Resultado    
+    Table_Schema = [                   
+        {
+            label: {
+                d: 'Nombre del Contacto'
+            },
+            arc: 'contact:hasName',                                            
+            enabled: false,
+            sorted: true,
+            order: desc
+        },     
+        {
+            label: {
+                d: 'Pais de Origen'
+            },
+            arc: 'contact:hasResidenceCountry',                                
+            control: {
+                type: 'label',
+                d: '_.contact:hasResidenceCountry.hasDsca'             
+            },
+            enabled: false,                                
+            sorted: true
+        },                                                                             
+        {
+            label: {
+                d: 'Edad'
+            },
+            arc: 'contact:hasAge',                    
+            enabled: false,                                
+            sorted: true
+        }           
+	],
+    %% Aplicar el filtro sobre el esquema, en este caso nos llega en la entrada un KW que ya tenemos en memoria con datos 
+    obj_get(in:hasKw, Obj_in, Kw),   
+    'staber_execprocess_rproc_pattern::schema::usecase__002'(Table_Schema, Kw, Schema),    
+    
+    CHANNEL_RESULT = 'channel__result__staber_execprocess_rproc_pattern_usecase__004',  
+    BUS_RESULT     = 'bus__result__staber_execprocess_rproc_pattern_usecase__004',    
+
+    obj_get(in:hasAgent, Obj_in, I_agent, 'builderweb'),
+    % De estas propiedades necesitamos la dsca para presentar en la columna '_.contact:hasResidenceCountry.hasDsca'             
+    NP = ['contact:hasResidenceCountry'],
+        
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: 'dataset__test_5gl_server',
+        hasKw: 'testapp:contact',
+        searchType: 'rem',        
+        schema: Schema,        
+        selectable: true,
+        navigableProperties: NP
+    },
+	Obj_out = {  
+        type : 'kresult',
+        in : IN, 
+        do_exec: true,
+        busId: BUS_RESULT,
+        hasChannel: CHANNEL_RESULT
+    }.
+
+'staber_execprocess_rproc_pattern::schema::usecase__002'(Properties, Kw, Obj_out):-   
+  ( 
+    foreach(Prop, Properties),
+    foreach( Obj_prop, L_filter),
+    param(Kw)
+        do (
+            obj_get(arc, Prop, Arc),
+            stmt(range, Arc, Range),            
+            
+            ((stmt(Arc, Kw, Value), Value  \= Range, Range == 'string') ->            
+                Obj_status ={
+                    operator: 'contains',
+                    value: Value
+                },
+                obj_set(filterStatus, Prop, Obj_status, Obj_prop)
+            ;(stmt(Arc, Kw, Value), Value  \= Range) ->            
+                (stmt(type, Range, 'class')
+                 -> 
+                     stmt(hasDsca, Value, Value_d)
+                ;
+                     Value_d = Value
+                ),
+                Obj_status ={
+                    operator: 'equal',
+                    value: Value_d
+                },
+                obj_set(filterStatus, Prop, Obj_status, Obj_prop)
+            ;
+                Obj_prop = Prop
+            )
+    )
+  ),
+  Obj_out = {data: L_filter}.
+
+/* Caso de uso de assembly con gestión de habilitación de botones*/
+'staber_component_connector::usecase_003'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel', CHANNEL_PROCESS),
+    newKw('bus__execprocess__', BUS_PROCESS),  	
+    GUIOUT_OVERRIDES = [          
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function', 
+                        in: { bus_proccess: BUS_PROCESS }, 
+                        name: 'staber_connectors::rc_gui_out::buttons', 
+                        context: { delegatedTo: 'builderweb' } 
+                    }
+                ]
+            }
+        }         
+    ], 
+    Title = 'Configurando gui_out con gestión de estado en botones',             
+    Obj_proc = {        
+        type: 'rprocess',  
+        hasKw: rproc__manager_button_states,
+        hasDsca: Title,
+        hasChannel: CHANNEL_PROCESS,
+        busId: BUS_PROCESS,
+        overrides: GUIOUT_OVERRIDES,
+        hasIcon: 'conect',
+        in: {
+            enabledButtonB: false
+        }        
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_connectors::rc_gui_out::buttons'(_, Obj_in, _, Obj_out) :-
+    obj_get(bus_proccess, Obj_in, BUS_PROCESS),
+    Obj_out = {           
+        type: 'assembly',
+        block: true,
+        cols: 2,     
+        children: [
+            {
+                type: 'text',
+                label: {
+                    d: 'Elemento 1'
+                }
+            },
+            {
+                type: 'text',
+                label: {
+                    d: 'Elemento 2'
+                },
+                inputtype: 'date',
+                actions: [
+                    {
+                        calendar: true
+                    }
+                ]          
+            },
+            {
+                type: 'assembly',
+                classList: [
+                    'toolButtonBar'
+                ],
+                id: 'buttons_assembly',
+                children: [
+                    {
+                        type: 'button',
+                        appearance: 'line',
+                        label: {
+                            d: 'Botón secundario'
+                        },
+                        enabled: '$.in.enabledButtonB'
+                    },
+                    {
+                        type: 'button',
+                        label: {
+                            d: 'Botón Principal'
+                        },
+                        events: [{
+                            type: 'click',
+                            method: 'set_propertyValue',
+                            targetBusId: BUS_PROCESS,
+                            value: true,                     
+                            payload:{
+                                properties: [
+                                    {
+                                        property: 'enabledButtonB',
+                                        value: true
+                                    }
+                                ]
+                            }                                                       
+                        }]
+                    }
+                ]
+            }
+        ]
+    }.
+
+/* Caso de uso de assembly con gestión de habilitación de botones*/
+'staber_component_connector::usecase_005'(_, _OBJ_in, _, OBJ_out) :-
+    newKw('channel', CHANNEL_PROCESS),
+    newKw('bus__execprocess__', BUS_PROCESS),  	
+    GUIOUT_OVERRIDES = [          
+        {
+            type: 'getUIControls',            
+            p_exec: {
+                type: 'sequence',
+                hasProcess: [
+                    { 
+                        type: 'function', 
+                        in: { bus_proccess: BUS_PROCESS }, 
+                        name: 'staber_connectors::rc_gui_out::lock_guiout_from_button', 
+                        context: { delegatedTo: 'builderweb' } 
+                    }
+                ]
+            }
+        }         
+    ], 
+    Title = 'Simulando bloqueo de interfaz desde un botón',             
+    Obj_proc = {        
+        type: 'rprocess',  
+        hasKw: rproc__lock_gui_from_button,
+        hasDsca: Title,
+        hasChannel: CHANNEL_PROCESS,
+        busId: BUS_PROCESS,
+        overrides: GUIOUT_OVERRIDES,
+        hasIcon: 'conect'
+    },
+    create_rprocess(_,Obj_proc,_,OBJ_out).
+
+'staber_connectors::rc_gui_out::lock_guiout_from_button'(_, Obj_in, _, Obj_out) :-
+    obj_get(bus_proccess, Obj_in, BUS_PROCESS),
+    Obj_out = {    
+        id: 'preview',
+        type: 'assembly',
+        block: true,
+        cols: 2,
+        children: [
+            {
+                type: 'text',
+                label: {
+                    d: 'Elemento 1'
+                }
+            },
+            {
+                type: 'assembly',
+                classList: [
+                    'toolButtonBar'
+                ],
+                id: 'buttons_assembly',
+                children: [
+                    {
+                        type: 'button',
+                        label: {
+                            d: 'Botón Principal'
+                        },
+                        events: [
+                            {
+                                type: 'click',
+                                method: 'log',
+                                targetBusId: BUS_PROCESS,
+                                p_exec: {
+                                    hasProcess: [
+                                        { 
+                                            type: 'method', 
+                                            name: 'lock', 
+                                            module: 'Lock' 
+                                        },
+                                        {
+                                            type: 'function',                                    
+                                            name: 'staber_print_idlock',
+                                            context: {
+                                                delegatedTo: 'builderweb'
+                                            }
+                                        }                                           
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }.
+
+'staber_print_idlock'(Obj_ctx, Obj_in, Obj_ctx, Obj_out) :-
+    Obj_out = {},
+    % staber_exectute{
+    %     delegateTo {
+    %         host: 'localhost',
+    %         path: '/staber/execute',
+    %         transport: "ws"
+    %     }
+    % }
+    obj_ppd(Obj_in).
+
+'staber_component_connector::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_component_connector,
+        hasDsca: 'Test Conexión entre Componentes',
+        hasIcon: 'conect',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            rproc__controls__connection,
+            rproc__formtokresult__connection,
+            rproc__manager_button_states,
+            rproc__lock_gui_from_button,            
+            rproc__kresult_to_form__connection
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

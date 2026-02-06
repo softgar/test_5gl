@@ -1,0 +1,354 @@
+﻿/**
+@descr	staber_kgraph <br>
+		staber_kgraph
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kgraph') :-
+	class +$ 'staber_kgraph' d ( es,'Patrón rproc para diálogos') sc function,
+    'staber_kgraph::usecase__001'(_, _, _, _),
+    'staber_kgraph::usecase__002'(_, _, _, _),
+    'staber_kgraph::usecase__003'(_, _, _, _),
+    'staber_kgraph::usecase__004'(_, _, _, _),
+    'staber_kgraph::usecase__005'(_, _, _, _),
+    'staber_kgraph::usecase__006'(_, _, _, _),
+    'staber_kgraph::usecase__007'(_, _, _, _),
+    'staber_kgraph::folders'(_, _, _, _).
+
+'staber_kgraph::folders'(_, _, _, _):-    
+     Title =  'kgraph (Interactive Diagrams)',
+     create_rprocess(_,
+        {
+            type: 'krp:folder',
+            hasKw: folder__repositorioTests_kgraph,            
+            hasDsca: Title,            
+            hasIcon: 'graph',
+            isRoot: false, 
+            hasERCPart: [
+                kgraph_test_001,
+                kgraph_test_002,
+                kgraph_test_003,
+                kgraph_test_004,
+                kgraph_test_005,
+                kgraph_test_006,
+                kgraph_test_007
+            ],     
+            security_edit: [permissionProfile__repositorioTests_KRP], 
+            security_view: [permissionProfile__repositorioTests_KRP]
+    },_,_).
+
+/* Interactive Graphs - Ontology */
+'staber_kgraph::usecase__001'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    Title =  'kgraph (Ontology)',
+    IN = {                
+        enabled: false,
+        hasAgent: 'builderweb',
+        hasDataset: 'dataset__semantic_test',
+        hasKw: 'ss:project_44684441580283647'
+    },    
+	Obj_class = {
+        type: 'kgraph',
+        busId: BUS,
+        hasDsca: Title,
+        hasKw: kgraph_test_001,
+        hasIcon: 'graph',       
+        do_exec: true,
+        diagramType:'ontology',
+        in: IN,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_kgraph::usecase__002'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    Title =  'kgraph template dark (Ontology)',
+    IN = {                
+        enabled: false,
+        scroll: 'main',
+        template: 'dark',
+        %colors: {instancia: 'orange'},
+        hasAgent: 'builderweb',
+        hasDataset: 'dataset__semantic_test',
+        hasKw: 'ss:project_44684441580283647'
+    },    
+	Obj_class = {
+        type: 'kgraph',
+        busId: BUS,
+        hasDsca: Title,
+        hasKw: kgraph_test_002,
+        hasIcon: 'graph',       
+        do_exec: true,
+        diagramType:'ontology',
+        in: IN,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+/* KGraph legacy version */
+'staber_kgraph::usecase__003'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+     Title =  'kgraph (Legacy)',
+    IN = {                
+        enabled: false,
+        hasAgent: 'builderweb',
+        hasDataset: 'dataset__semantic_test',
+        hasKw: 'ss:project_44684441580283647'
+    },    
+	Obj_class = {
+        type: 'kgraph',
+        busId: BUS,
+        hasDsca: Title,
+        hasKw: kgraph_test_003,
+        hasIcon: 'graph',       
+        do_exec: true,
+        in: IN,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+ 
+
+ /* Interactive Graphs - BPM Model */
+'staber_kgraph::usecase__004'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    Title =  'kgraph (BPMN Graph)',
+    IN = {                
+        enabled: false,
+        hasAgent: 'builderweb',
+        hasDataset: 'Default',
+        hasKw: 'p_workflow__6_2'
+    },    
+	Obj_class = {
+        type: 'kgraph',
+        busId: BUS,
+        hasDsca: Title,
+        hasKw: kgraph_test_004,
+        hasIcon: 'graph',       
+        do_exec: true,
+        diagramType:'bpmn',
+        in: IN,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+    
+
+
+ /* Interactive Graphs - BPM Object */
+'staber_kgraph::usecase__005'(_, _, _, OBJ_out):-
+    newKw('bus', BUS),
+    Title =  'kgraph (BPMN Object)',    
+    'rc_test_5gl_kgraph_model:object_sequence'(_Ctx_in, _Obj_in, _Ctx_out, Obj_rg),
+	Obj_class = {
+        type: 'kgraph',
+        busId: BUS,
+        hasDsca: Title,
+        hasKw: kgraph_test_005,
+        hasIcon: 'graph',       
+        do_exec: true,
+        diagramType:'bpmn',
+        in: Obj_rg,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP]
+     },
+     create_rprocess(_,Obj_class,_,OBJ_out).
+
+
+
+/* Interactive Graphs With Configuration - Ontology */
+'staber_kgraph::usecase__006'(_, _, _, Obj_out):-
+    newKw('bus', BusProc),
+    newKw('bus', BusGraph1),
+    newKw('bus', BusGraph2),
+
+    I_dataset1 = 'Default',
+    I_dataset2 = 'dataset__test_5gl_server',
+    getMyRasUrl( URL ),
+
+    I_config = {
+        hasRoot: testapp_config,
+        data: [
+            {
+                type: configuration,
+                hasKw: testapp_config,
+                hasModule: ['builder'],
+
+                hasLocation: testapp_Location,
+                hasLocation_edit: testapp_Location,
+                hasLocation_schema: testapp_Location,
+
+                enabled: false,
+                locksEnabled: false,
+                journalingEnabled: false,
+                ontologyControledByDSMetadata: false,
+                modellingBranchesEnabled: false,
+                changeControlEnabled: false
+            },
+            {
+                type: location,
+                hasKw: testapp_Location,
+                delegatedTo: testapp_ras,
+                hasDataset: I_dataset2
+            },
+            {
+                type: rasAgent,
+                hasKw: testapp_ras,
+                logicalAgent: testapp,
+                hasUrl: URL
+            }
+        ]
+    },
+
+    IN1 = {
+        enabled: false,
+        hasAgent: 'builderweb',
+        hasDataset: I_dataset1,
+        hasKw: 'testapp_contacto_001'
+    },
+
+    obj_set(hasConfiguration, IN1, I_config, IN2),
+
+    Obj_proc = {
+        type: 'rprocess',
+        busId: BusProc,
+        hasKw: kgraph_test_006,
+        hasDsca: kgraph_test_contactos_with_config,
+        hasIcon: 'graph',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: {
+            type: 'assembly',
+            scroll: 'main',
+            classList: ['cols-2'],
+            children: [
+                {
+                    type: 'assembly',
+                    label: { d: 'Without Configuration' },
+                    children: [
+                        {
+                            type: 'kgraph',
+                            busId: BusGraph1,
+                            do_exec: true,
+                            in: IN1
+                        }
+                    ]
+                },
+                {
+                    type: 'assembly',
+                    label: { d: 'With Configuration' },
+                    children: [
+                        {
+                            type: 'kgraph',
+                            busId: BusGraph2,
+                            do_exec: true,
+                            in: IN2
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    create_rprocess(_, Obj_proc, _, Obj_out).
+
+
+
+'staber_kgraph::usecase__007'(_, _, _, Obj_out) :-
+    newKw('bus', BusProc),
+    newKw('bus', BusGraph1),
+    newKw('bus', BusGraph2),
+
+    I_dataset1 = 'Default',
+    I_dataset2 = 'dataset__test_5gl_server',
+    getMyRasUrl( URL ),
+
+    I_config = {
+        hasRoot: testapp_config,
+        data: [
+            {
+                type: configuration,
+                hasKw: testapp_config,
+                hasModule: ['builder'],
+
+                hasLocation: testapp_Location,
+                hasLocation_edit: testapp_Location,
+                hasLocation_schema: testapp_Location,
+
+                enabled: false,
+                locksEnabled: false,
+                journalingEnabled: false,
+                ontologyControledByDSMetadata: false,
+                modellingBranchesEnabled: false,
+                changeControlEnabled: false
+            },
+            {
+                type: location,
+                hasKw: testapp_Location,
+                delegatedTo: testapp_ras,
+                hasDataset: I_dataset2
+            },
+            {
+                type: rasAgent,
+                hasKw: testapp_ras,
+                logicalAgent: testapp,
+                hasUrl: URL
+            }
+        ]
+    },
+
+    IN1 = {
+        enabled: false,
+        hasAgent: 'builderweb',
+        hasDataset: I_dataset1,
+        hasKw: 'testapp_contacto_001'
+    },
+
+    obj_set(hasConfiguration, IN1, I_config, IN2),
+
+    Obj_proc = {
+        type: 'rprocess',
+        busId: BusProc,
+        hasKw: kgraph_test_007,
+        hasDsca: kgraph_test_contactos_diagramType_with_config,
+        hasIcon: 'graph',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: {
+            type: 'assembly',
+            scroll: 'main',
+            classList: ['cols-2'],
+            children: [
+                {
+                    type: 'assembly',
+                    label: { d: 'Without Configuration', caption: 'DiagramType ontology' },
+                    children: [
+                        {
+                            type: 'kgraph',
+                            busId: BusGraph1,
+                            do_exec: true,
+                            diagramType:'ontology',
+                            in: IN1
+                        }
+                    ]
+                },
+                {
+                    type: 'assembly',
+                    label: { d: 'With Configuration', caption: 'DiagramType ontology' },
+                    children: [
+                        {
+                            type: 'kgraph',
+                            busId: BusGraph2,
+                            do_exec: true,
+                            diagramType:'ontology',
+                            in: IN2
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    create_rprocess(_, Obj_proc, _, Obj_out).

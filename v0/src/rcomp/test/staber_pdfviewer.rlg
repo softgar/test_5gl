@@ -1,0 +1,113 @@
+﻿/**staber_k
+@descr	staber_pdfviewer <br>
+		staber_pdfviewer
+@author ccp
+@date	2024_04_11
+**/
+rc_class('staber_pdfviewer') :-
+	class +$ 'staber_pdfviewer' d ( es,'Visualización de PDF') sc function,
+    'staber_pdfviewer::view_pdf_from_kdetail'(_, _, _, _),
+    'staber_pdfviewer::folders'(_, _, _, _).
+
+'staber_pdfviewer::view_pdf_from_kdetail'(_, _OBJ_in, _, OBJ_out) :-
+ I_agent = 'builderweb',
+    newKw('channel__pdfviewer', CHANNEL_PDFVIEWER),
+    newKw('bus__pdfviewer', BUSID_PDFVIEWER),
+	IN = {
+        hasAgent: I_agent,
+        hasDataset: 'Default',
+        hasKw: 'testapp_contacto_001',
+        hasKwc: 'testapp:contact',
+        excludedProperties: [
+            'type', 
+            'hasIcon',
+            'hasDsca',
+            'contact:hasTag',
+            'contact:hasBackgroundColor',
+            'contact:hasIdNumber',
+            'contact:hasIdPhoto',
+            'contact:hasMaster',
+            'contact:hasPassword',
+            'contact:hasPermission',
+            'contact:hasPermissionEmpty'
+        ],
+        hasAccessCondition: {
+            kdetail__new: false,
+            kdetail__delete: false,
+            kdetail__save: false
+        }
+    },
+    Title = 'Formulario de contacto con visor de PDF',
+	Obj_detail = {  
+        type : 'kdetail',
+        in: IN,
+        hasChannel: CHANNEL_PDFVIEWER,
+        busId : BUSID_PDFVIEWER,
+        hasAccessPrivilege: 'all',
+        security_edit: [
+            permissionProfile__repositorioTests_KRP
+        ],
+        security_view: [
+            permissionProfile__repositorioTests_KRP, 
+            permissionProfile__guest
+        ]
+    },
+    Obj_pdfviewer_and_detail = {  
+        type: 'assembly',
+        id: 'assembly_pdfviewer_and_detail',      
+        children: [
+            {
+                type: 'assembly',
+                id: 'assembly_detail',                
+                collapsible: {
+                    floating: true
+                }, 
+                width: 30,
+                children: [
+                    Obj_detail
+                ]
+            },
+            {
+                type: 'assembly',
+                id: 'assembly_pdf',
+                width: 60,  
+                style: {padding: '0'},
+                children: [
+                    {
+                        type: 'html',
+                        style: {height: '100%'},
+                        value: '<embed src="/repcon/f_get/repository/data/test_5gl_server/pdfviewer.pdf" type="application/pdf" width="100%" height="100%"></embed>'                 
+                    }  
+                ]
+            }                             
+        ]
+    },
+    Obj_class = {
+        type: 'rprocess',
+        hasKw: staber_pdfviewer__0,           
+        hasDsca: Title,
+        hasIcon: 'filepdf',
+        isRoot: false,
+        isSession: true,
+        hasNavbar: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        gui_out: Obj_pdfviewer_and_detail
+    },
+    create_rprocess(_,Obj_class,_,OBJ_out).
+
+'staber_pdfviewer::folders'(_, _, _, _):-
+    Title = 'Tests para la visualización de documentos PDFs',
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_pdfviewer,
+        hasDsca: Title,
+        hasIcon: 'filepdf',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP], 
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart: [
+            staber_pdfviewer__0
+        ]
+	},
+    create_rprocess(_,Conf_folder,_,_).

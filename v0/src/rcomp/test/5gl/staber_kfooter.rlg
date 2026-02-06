@@ -1,0 +1,153 @@
+﻿/**staber_k
+@descr	staber_kfooter <br>
+		staber_kfooter
+@author XXX
+@date	20XX_XX_XX
+**/
+rc_class('staber_kfooter') :-
+	class +$ 'staber_kfooter' d ( es,'Patrón rproc para kfooter') sc function,
+    'staber_kfooter::usecase__001'(_, _, _, _),
+    'staber_kfooter::hasLayout_statusView'(_, _, _, _),
+    'staber_kfooter::folders'(_, _, _, _).
+
+'staber_kfooter::usecase__001'(_, _ObjIn, _, ObjOut) :-
+    newKw('channel__kfooter__', FooterChannel),
+    newKw('bus__kfooter__', FooterBusId), 
+    newKw('channel__kfooter__usecase__001', MainChannel),
+    newKw('busId__kfooter__usecase__001', MainBusId),
+    Footer = {
+        type : 'kfooter',
+        busId: FooterBusId,
+        hasChannel: FooterChannel
+    },
+    ObjMain = {
+        type: 'rprocess',
+        busId: MainBusId,
+        hasChannel: MainChannel,
+        hasKw: kfooter_test_001,
+        hasDsca: kfooter_test_001_uiML,
+        hasIcon: 'rocket-line',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false,
+        gui_out: {
+            type: 'assembly',
+            children: [Footer]
+        }
+    },
+    create_rprocess(_,ObjMain,_,ObjOut).
+
+'staber_kfooter::hasLayout_statusView'(_, _ObjIn, _, ObjOut) :-
+
+    newKw('channel__kfooter__', FooterChannel),
+    newKw('busId__kfooter__', FooterBusId),
+    newKw('channel__kfooter__hasLayout_statusView', MainChannel),
+    newKw('busId__footer__hasLayout_statusView', MainBusId),
+    newKw('channel__kfooter_kstatusView__', StatusChannel),
+    newKw('busId__kfooter_kstatusView__', StatusBusId),
+
+	Footer = {
+        type : 'kfooter',
+        busId: FooterBusId,
+        hasChannel: FooterChannel,
+        hasLayout: 'statusView',
+        in: {
+            hasStatusView: {
+                type : 'kstatusview',
+                hasChannel: StatusChannel,
+                busId: StatusBusId,
+                hasNotification: true,
+                hasUser: true,
+                hasFooterLogo: true,
+                in: {
+                    statusActions: [
+                        {
+                            type: 'r-label',
+                            position: 'left',
+                            icon: 'world-line',
+                            text: 'kStatusView.linkNavigation.tip',
+                            i18n: ['tip', 'text'],
+                            tip: 'kStatusView.linkNavigation.tip',
+                            events: [
+                                {
+                                    type: 'click',
+                                    method: 'log',
+                                    targetBusId: StatusBusId,
+                                    payload:{
+                                        url:'http://www.semantic-systems.com'
+                                    },
+                                    p_exec: {
+                                        type: 'sequence',
+                                        hasProcess: [
+                                            { type: 'method', name: 'openURL', busId: StatusBusId}
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            type: 'r-label',
+                            i18n: 'tip',
+                            tip: 'kStatusView.tagNavigation.tip',
+                            icon: 'send',
+                            position: 'left',
+                            events: [
+                                {
+                                    type: 'click',
+                                    method: 'nav',
+                                    targetBusId: '$.busId',
+                                    payload: {
+                                        hasTag: 'myProfile',
+                                        in: {
+                                            hasKw: '$.in.hasUserConfig.hasKw',
+                                            hasDsca: 'Mi Perfil[{$.in.hasUser}]'
+                                        },
+                                        navOptions: {
+                                            isSession: true
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    hasColorBackground: teal700
+                },
+                evtPublish: [{topic:'showPending',channel:'channel__notification'}],
+                evtSubscribe: [{topic:'sendMessagesCount',channel:'channel__notification'}]
+            }
+        }
+    },
+    ObjMain = {
+        type: 'rprocess',
+        busId: MainBusId,
+        hasChannel: MainChannel,
+        hasKw: kfooter_test_hasLayout_statusView,
+        hasDsca: kfooter_test_hasLayout_statusView_uiML,
+        hasIcon: 'bell',
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        isSession: true,
+        hasNavbar: false,
+        gui_out: {
+            type: 'assembly',
+            children: [Footer]
+        }
+    },
+    create_rprocess(_,ObjMain,_,ObjOut).
+
+'staber_kfooter::folders'(_, _, _, _):-
+	Conf_folder = {
+        type: 'krp:folder',
+        hasKw: folder__repositorioTests_kfooter,
+        hasDsca: 'kfooter: Componente de pie de página',
+        hasIcon: 'w3c',
+        isRoot: false,
+        security_edit: [permissionProfile__repositorioTests_KRP],
+        security_view: [permissionProfile__repositorioTests_KRP],
+        hasERCPart:[
+            kfooter_test_001,
+            kfooter_test_hasLayout_statusView
+        ]
+    },
+    create_rprocess(_,Conf_folder,_,_).
